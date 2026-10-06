@@ -1,0 +1,120 @@
+@import "tailwindcss";
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+@theme {
+  --font-sans: system-ui, -apple-system, "Segoe UI", Inter, Roboto, sans-serif;
+  --color-ink: #0b0d12;
+  --color-navy-950: #071633;
+  --color-navy-900: #0a1f44;
+  --color-navy-800: #14346b;
+  --color-navy-100: #dce6fa;
+  --color-gold-50: #fff8e1;
+  --color-gold-400: #ffc72c;
+  --color-gold-500: #f5b800;
+  --color-dorm-50: #fff8e1;
+  --color-dorm-100: #dce6fa;
+  --color-dorm-500: #0a1f44;
+  --color-dorm-600: #071633;
+  --color-dorm-900: #071633;
+}
+
+:root {
+  font: 100%/1.5 var(--font-sans);
+}
+
+html {
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+body {
+  margin: 0;
+  background: #f7f8fc;
+  color: #0a1f44;
+}
+
+.dark body {
+  background: #040f24;
+  color: #f1f5f9;
+}
+
+/* Apple-design typography: tight display, neutral body */
+.display {
+  font-size: clamp(2.25rem, 5vw, 3.75rem);
+  line-height: 1.05;
+  letter-spacing: -0.02em;
+  font-weight: 700;
+  font-optical-sizing: auto;
+}
+.h-section {
+  letter-spacing: -0.015em;
+  line-height: 1.2;
+}
+.body-text { line-height: 1.6; letter-spacing: 0; }
+
+/* Instant press feedback — respond on pointer-down */
+.pressable:active {
+  transform: scale(0.97);
+  transition: transform 100ms ease-out;
+}
+.pressable {
+  transition: transform 160ms ease-out, background-color 160ms ease-out, box-shadow 160ms ease-out;
+  /* NOTE: no will-change here — it forced a GPU layer per button and, combined
+     with backdrop blurs + a video-heavy tab, could crash flaky GPU drivers. */
+}
+
+/* Translucent material chrome — blur radii kept small on purpose: large
+   backdrop blurs repaint the GPU on every keystroke and have crashed
+   Brave/Chrome when a video tab saturates the GPU next door. */
+.material-bar {
+  background: rgba(255, 255, 255, 0.72);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-bottom: 1px solid rgba(10, 31, 68, 0.08);
+}
+.dark .material-bar {
+  background: rgba(4, 15, 36, 0.72);
+  border-bottom: 1px solid rgba(255, 199, 44, 0.15);
+}
+.material-card {
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+.dark .material-card {
+  background: rgba(11, 30, 58, 0.85);
+}
+
+/* Focus visibility for wayfinding */
+:focus-visible {
+  outline: 2px solid #0a1f44;
+  outline-offset: 2px;
+  box-shadow: 0 0 0 4px rgba(255, 199, 44, 0.5);
+}
+
+/* Reduced motion + transparency */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+  .sheet-motion { transform: none !important; }
+}
+@media (prefers-reduced-transparency: reduce) {
+  .material-bar, .material-card { background: white; backdrop-filter: none; -webkit-backdrop-filter: none; }
+}
+
+/* File drop glow */
+.drop-active {
+  border-color: #0a1f44 !important;
+  background: #fff8e1 !important;
+  box-shadow: 0 0 0 4px rgba(255, 199, 44, 0.45);
+}
+.dark .drop-active {
+  background: rgba(255, 199, 44, 0.15) !important;
+}
+
+/* Thin scrollbars for admin tables */
+.nice-scroll::-webkit-scrollbar { height: 8px; width: 8px; }
+.nice-scroll::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 8px; }
