@@ -1,5 +1,5 @@
 import { NavLink, Outlet, useNavigate } from "react-router-dom";
-import { LayoutDashboard, Files, LogOut, Sun, Moon } from "lucide-react";
+import { LayoutDashboard, Files, FileText, LogOut, Sun, Moon } from "lucide-react";
 import { useStore } from "../../lib/store";
 import { useAuth } from "../../lib/auth";
 
@@ -25,6 +25,7 @@ export default function AdminLayout() {
           <nav className="mt-2 grid gap-1">
             <NavLink to="/admin" end className={link}><LayoutDashboard size={16} /> Dashboard</NavLink>
             <NavLink to="/admin/apps" className={link}><Files size={16} /> Applications</NavLink>
+            <NavLink to="/admin/templates" className={link}><FileText size={16} /> Templates</NavLink>
           </nav>
           <div className="mt-4 grid gap-1 border-t border-white/10 pt-3">
             <button onClick={async () => { await signOut(); nav("/"); }} className="pressable flex items-center gap-2 rounded-xl px-3.5 py-2.5 text-sm font-semibold text-rose-300 hover:bg-white/10">
@@ -37,6 +38,7 @@ export default function AdminLayout() {
           <nav className="mb-4 flex gap-1 rounded-2xl bg-white/5 p-1 ring-1 ring-[#FFC72C]/20 md:hidden">
             <NavLink to="/admin" end className={({isActive}) => `flex-1 rounded-xl px-2 py-2 text-center text-[13px] font-bold ${isActive ? "bg-[#FFC72C] text-[#0A1F44]" : "text-slate-300"}`}>Dashboard</NavLink>
             <NavLink to="/admin/apps" className={({isActive}) => `flex-1 rounded-xl px-2 py-2 text-center text-[13px] font-bold ${isActive ? "bg-[#FFC72C] text-[#0A1F44]" : "text-slate-300"}`}>Apps</NavLink>
+            <NavLink to="/admin/templates" className={({isActive}) => `flex-1 rounded-xl px-2 py-2 text-center text-[13px] font-bold ${isActive ? "bg-[#FFC72C] text-[#0A1F44]" : "text-slate-300"}`}>Forms</NavLink>
           </nav>
           <Outlet />
         </div>

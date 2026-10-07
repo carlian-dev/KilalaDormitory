@@ -1,8 +1,35 @@
+export const BILLING = {
+  BASE_RATE: 775,
+  PER_APPLIANCE: 150,
+  CURRENCY: "₱",
+};
+
+export function computeTotal(devices = []) {
+  const list = Array.isArray(devices) ? devices : [];
+  const applianceCount = list.filter((d) => d.kind === "appliance").length;
+  return BILLING.BASE_RATE + applianceCount * BILLING.PER_APPLIANCE;
+}
+
+export function formatPeso(n) {
+  return `${BILLING.CURRENCY}${Number(n || 0).toLocaleString()}`;
+}
+
+// source: "template" = admin softcopy (download, print, sign, upload back)
+// source: "upload"   = student-provided document (upload directly)
 export const DOC_TYPES = [
-  { key: "school_id", label: "School ID / Valid ID", hint: "Front photo, PDF / JPG / PNG, max 5MB", required: true },
-  { key: "coe", label: "Certificate of Enrollment", hint: "Current semester COE or registration form", required: true },
-  { key: "birth_cert", label: "Birth Certificate", hint: "PSA / NSO copy", required: true },
+  { key: "residency_application", label: "Residency Application for Students", hint: "Download the form, print, sign, then upload the signed copy", source: "template", required: true },
+  { key: "personal_data", label: "Personal Data for Students", hint: "Download the form, print, sign, then upload the signed copy", source: "template", required: true },
+  { key: "residency_agreement", label: "Residency Agreement", hint: "Download the form, print, sign, then upload the signed copy", source: "template", required: true },
+  { key: "appliance_registration", label: "Registration of Appliance / Electronic Device", hint: "Download the form, print, sign, then upload the signed copy", source: "template", required: true },
+  { key: "residency_admission", label: "Residency Admission", hint: "Download the form, print, sign, then upload the signed copy", source: "template", required: true },
+  { key: "cor", label: "Certificate of Registration (COR)", hint: "Your COR for the current term, PDF / JPG / PNG, max 5MB", source: "upload", required: true },
+  { key: "student_id_copy", label: "Photocopy of Student ID", hint: "Clear front copy, PDF / JPG / PNG, max 5MB", source: "upload", required: true },
+  { key: "med_lab", label: "Medical Laboratory Result", hint: "Laboratory result copy, PDF / JPG / PNG, max 5MB", source: "upload", required: true },
+  { key: "med_cert", label: "Medical Certificate", hint: "Medical certificate copy, PDF / JPG / PNG, max 5MB", source: "upload", required: true },
 ];
+
+export const TEMPLATE_DOCS = DOC_TYPES.filter((d) => d.source === "template");
+export const UPLOAD_DOCS = DOC_TYPES.filter((d) => d.source === "upload");
 
 export const statusMeta = {
   pending: { label: "Pending", dot: "bg-[#F5B800]", pill: "bg-[#FFF8E1] text-[#0A1F44] ring-[#FFC72C] dark:bg-[#FFC72C]/15 dark:text-[#FFE9A8] dark:ring-[#FFC72C]/40" },

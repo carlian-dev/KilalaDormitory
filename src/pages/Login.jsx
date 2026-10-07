@@ -71,11 +71,11 @@ export default function Login() {
           <div className="mt-4 grid gap-3">
             {tab === "register" && (
               <label className="text-sm font-semibold">Full name
-                <input className={cls} value={name} onChange={(e) => setName(e.target.value)} placeholder="e.g. Carl Pepito" autoComplete="name" spellCheck={false} />
+                <input className={cls} value={name} onChange={(e) => setName(e.target.value)} placeholder="e.g. Juan dela Cruz" autoComplete="name" spellCheck={false} />
               </label>
             )}
             <label className="text-sm font-semibold">Email
-              <input className={cls} value={email} onChange={(e) => setEmail(e.target.value)} placeholder="you@univ.edu" autoComplete="email" spellCheck={false} />
+              <input className={cls} value={email} onChange={(e) => setEmail(e.target.value)} placeholder="JuanDelaCruz@buksu.edu.ph" autoComplete="email" spellCheck={false} />
             </label>
             <label className="text-sm font-semibold">Password
               <input className={cls} type="password" value={password} onChange={(e) => setPassword(e.target.value)}

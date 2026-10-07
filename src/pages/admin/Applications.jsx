@@ -59,7 +59,7 @@ export default function Applications() {
             </span>
             <span className="min-w-0 flex-1">
               <span className="block truncate text-sm font-bold">{a.name}</span>
-              <span className="block truncate text-xs text-slate-400">{a.course} · {a.year} · {a.docs.length}/3 docs</span>
+              <span className="block truncate text-xs text-slate-400">{a.course} · {a.year} · {a.docs.length}/9 docs</span>
             </span>
             <span className={`hidden sm:inline-block rounded-full px-2.5 py-1 text-[11px] font-bold ring-1 ${statusMeta[a.status].pill}`}>{statusMeta[a.status].label}</span>
             <ChevronRight size={16} className="text-slate-300" />

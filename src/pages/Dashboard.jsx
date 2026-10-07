@@ -3,7 +3,7 @@ import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { Search, FileText, LogOut, PlusCircle, ArrowLeft, ExternalLink } from "lucide-react";
 import { PageFade, StatusBadge } from "../components/ui";
 import { FileUploader } from "../components/FileUploader";
-import { DOC_TYPES } from "../lib/mockData";
+import { DOC_TYPES, TEMPLATE_DOCS, UPLOAD_DOCS, BILLING, formatPeso } from "../lib/mockData";
 import { useAuth } from "../lib/auth";
 import { fetchMyApplications, signedDocUrl, resubmitDocuments } from "../lib/applications";
 
@@ -75,6 +75,18 @@ export default function ApplicantDashboard() {
               <StatusBadge status={selected.status} />
             </div>
 
+            <div className="mt-4 rounded-2xl bg-[#0A1F44] p-3.5 text-white dark:bg-[#FFC72C] dark:text-[#0A1F44]">
+              <div className="flex justify-between text-sm font-bold">
+                <span>Monthly rate</span><span>{formatPeso(selected.monthlyTotal)}/mo</span>
+              </div>
+              <p className="mt-0.5 text-xs opacity-80">
+                {formatPeso(BILLING.BASE_RATE)} base
+                {(selected.devices || []).length > 0
+                  ? ` · Devices: ${selected.devices.map((d) => `${d.name} (${d.kind === "appliance" ? "+₱150" : "free"})`).join(", ")}`
+                  : " · No devices declared"}
+              </p>
+            </div>
+
             <div className="mt-5 flex items-center gap-1">
               {steps.map((t, i, arr) => (
                 <div key={t} className="flex flex-1 items-center gap-1 last:flex-none">
@@ -93,9 +105,25 @@ export default function ApplicantDashboard() {
               </div>
             )}
 
-            <p className="mt-5 text-sm font-bold">Uploaded requirements ({selected.docs.length}/3)</p>
+            <p className="mt-5 text-sm font-bold">Signed forms ({selected.docs.filter((d) => TEMPLATE_DOCS.some((t) => t.key === d.type)).length}/{TEMPLATE_DOCS.length})</p>
             <div className="mt-2 grid gap-2">
-              {selected.docs.map((d) => (
+              {selected.docs.filter((d) => TEMPLATE_DOCS.some((t) => t.key === d.type)).map((d) => (
+                <div key={d.type} className="flex items-center gap-3 rounded-2xl bg-slate-50 px-3 py-2.5 ring-1 ring-slate-100 dark:bg-white/5 dark:ring-white/10">
+                  <span className="grid h-9 w-9 place-items-center rounded-xl bg-white shadow-sm dark:bg-white/10"><FileText size={16} /></span>
+                  <div className="min-w-0 flex-1">
+                    <p className="text-[13px] font-bold">{docLabel(d.type)}</p>
+                    <p className="truncate text-xs text-slate-400">{d.fileName}</p>
+                  </div>
+                  <button onClick={() => openDoc(d)} className="pressable inline-flex items-center gap-1 rounded-full bg-[#0A1F44] px-3 py-1.5 text-xs font-bold text-[#FFC72C] dark:bg-[#FFC72C] dark:text-[#0A1F44]">
+                    <ExternalLink size={12} /> View
+                  </button>
+                </div>
+              ))}
+            </div>
+
+            <p className="mt-5 text-sm font-bold">Your documents ({selected.docs.filter((d) => UPLOAD_DOCS.some((t) => t.key === d.type)).length}/{UPLOAD_DOCS.length})</p>
+            <div className="mt-2 grid gap-2">
+              {selected.docs.filter((d) => UPLOAD_DOCS.some((t) => t.key === d.type)).map((d) => (
                 <div key={d.type} className="flex items-center gap-3 rounded-2xl bg-slate-50 px-3 py-2.5 ring-1 ring-slate-100 dark:bg-white/5 dark:ring-white/10">
                   <span className="grid h-9 w-9 place-items-center rounded-xl bg-white shadow-sm dark:bg-white/10"><FileText size={16} /></span>
                   <div className="min-w-0 flex-1">
@@ -185,7 +213,7 @@ export default function ApplicantDashboard() {
                     className="pressable flex w-full items-center gap-3 border-b border-slate-100 px-4 py-3.5 text-left last:border-0 hover:bg-slate-50 dark:border-white/10 dark:hover:bg-white/5">
                     <span className="min-w-0 flex-1">
                       <span className="block truncate text-sm font-bold">Application <span className="font-mono font-medium text-slate-400">· {String(a.id).slice(0, 8)}</span></span>
-                      <span className="block truncate text-xs text-slate-400">{a.course} · {a.year} · {new Date(a.submittedAt).toLocaleDateString()}</span>
+                      <span className="block truncate text-xs text-slate-400">{a.course} · {a.year} · {formatPeso(a.monthlyTotal)}/mo · {new Date(a.submittedAt).toLocaleDateString()}</span>
                     </span>
                     <StatusBadge status={a.status} />
                   </button>
@@ -200,13 +228,13 @@ export default function ApplicantDashboard() {
 }
 
 function ResubmitBox({ appId, onDone }) {
-  const [files, setFiles] = useState({ school_id: null, coe: null, birth_cert: null });
+  const [files, setFiles] = useState(() => Object.fromEntries(DOC_TYPES.map((d) => [d.key, null])));
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState("");
   const ready = DOC_TYPES.every((d) => files[d.key]);
 
   const submit = async () => {
-    if (!ready) { setErr("Please re-upload all 3 documents."); return; }
+    if (!ready) { setErr("Please re-upload all 9 documents."); return; }
     setErr("");
     setBusy(true);
     try {
@@ -223,7 +251,7 @@ function ResubmitBox({ appId, onDone }) {
     <div className="mt-5 rounded-2xl bg-[#FFF8E1] p-4 ring-1 ring-[#FFC72C] dark:bg-[#FFC72C]/10 dark:ring-[#FFC72C]/40">
       <p className="text-sm font-bold text-[#0A1F44] dark:text-[#FFE9A8]">Fix your documents and resubmit</p>
       <p className="mt-0.5 text-[13px] text-[#0A1F44]/70 dark:text-[#FFE9A8]/70">
-        Upload fresh copies of all 3 requirements. Your application goes back to Pending for re-review.
+        Upload fresh copies of all 9 documents. Your application goes back to Pending for re-review.
       </p>
       <div className="mt-3 grid gap-3 rounded-2xl bg-white p-3 dark:bg-[#0B1E3A]">
         {DOC_TYPES.map((d) => (

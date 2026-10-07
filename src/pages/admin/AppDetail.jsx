@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
 import { ArrowLeft, FileText, ExternalLink, Check, X } from "lucide-react";
-import { DOC_TYPES } from "../../lib/mockData";
+import { DOC_TYPES, TEMPLATE_DOCS, UPLOAD_DOCS, BILLING, formatPeso } from "../../lib/mockData";
 import { StatusBadge } from "../../components/ui";
 import { fetchAllApplications, updateApplication, signedDocUrl } from "../../lib/applications";
 
@@ -115,9 +115,37 @@ export default function AppDetail() {
             ))}
           </dl>
 
-          <p className="mt-5 text-sm font-bold">Requirements ({app.docs.length}/3)</p>
+          <div className="mt-4 rounded-2xl bg-[#0A1F44] p-3.5 text-white dark:bg-[#FFC72C] dark:text-[#0A1F44]">
+            <div className="flex justify-between text-sm font-bold">
+              <span>Monthly rate</span><span>{formatPeso(app.monthlyTotal)}/mo</span>
+            </div>
+            <p className="mt-0.5 text-xs opacity-80">
+              {formatPeso(BILLING.BASE_RATE)} base
+              {(app.devices || []).length > 0
+                ? ` · Devices: ${app.devices.map((d) => `${d.name} (${d.kind === "appliance" ? "+₱150" : "free"})`).join(", ")}`
+                : " · No devices declared"}
+            </p>
+          </div>
+
+          <p className="mt-5 text-sm font-bold">Signed forms ({app.docs.filter((d) => TEMPLATE_DOCS.some((t) => t.key === d.type)).length}/{TEMPLATE_DOCS.length})</p>
           <div className="mt-2 grid gap-2">
-            {app.docs.map((d) => (
+            {app.docs.filter((d) => TEMPLATE_DOCS.some((t) => t.key === d.type)).map((d) => (
+              <div key={d.type} className="flex items-center gap-3 rounded-2xl border border-slate-100 bg-white px-3 py-2.5 shadow-sm dark:border-white/10 dark:bg-white/5">
+                <span className="grid h-10 w-10 place-items-center rounded-xl bg-[#0A1F44] text-[#FFC72C] dark:bg-[#FFC72C] dark:text-[#0A1F44]"><FileText size={16} /></span>
+                <div className="min-w-0 flex-1">
+                  <p className="text-[13px] font-bold">{label(d.type)}</p>
+                  <p className="truncate font-mono text-xs text-slate-400">{d.fileName}</p>
+                </div>
+                <button onClick={() => openDoc(d)} className="pressable inline-flex items-center gap-1 rounded-full bg-slate-100 px-3 py-1.5 text-xs font-bold dark:bg-white/10">
+                  <ExternalLink size={13} /> Open
+                </button>
+              </div>
+            ))}
+          </div>
+
+          <p className="mt-5 text-sm font-bold">Student documents ({app.docs.filter((d) => UPLOAD_DOCS.some((t) => t.key === d.type)).length}/{UPLOAD_DOCS.length})</p>
+          <div className="mt-2 grid gap-2">
+            {app.docs.filter((d) => UPLOAD_DOCS.some((t) => t.key === d.type)).map((d) => (
               <div key={d.type} className="flex items-center gap-3 rounded-2xl border border-slate-100 bg-white px-3 py-2.5 shadow-sm dark:border-white/10 dark:bg-white/5">
                 <span className="grid h-10 w-10 place-items-center rounded-xl bg-[#0A1F44] text-[#FFC72C] dark:bg-[#FFC72C] dark:text-[#0A1F44]"><FileText size={16} /></span>
                 <div className="min-w-0 flex-1">

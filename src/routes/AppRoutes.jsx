@@ -10,6 +10,7 @@ import AdminLayout from "../pages/admin/AdminLayout";
 import Dashboard from "../pages/admin/Dashboard";
 import Applications from "../pages/admin/Applications";
 import AppDetail from "../pages/admin/AppDetail";
+import Templates from "../pages/admin/Templates";
 
 function SiteShell() {
   return (
@@ -75,6 +76,7 @@ export default function AppRoutes() {
               <Route index element={<Dashboard />} />
               <Route path="apps" element={<Applications />} />
               <Route path="apps/:id" element={<AppDetail />} />
+              <Route path="templates" element={<Templates />} />
             </Route>
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>

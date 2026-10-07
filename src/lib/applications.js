@@ -1,9 +1,12 @@
 import { supabase } from "./supabase";
+import { computeTotal } from "./mockData";
 
 const BUCKET = "dorm-requirements";
+const TEMPLATE_BUCKET = "dorm-templates";
 
 // DB (snake_case) -> UI (camelCase) mapper shared by student + admin views.
 export function toApp(row, docs = [], profileName = "") {
+  const devices = Array.isArray(row.devices) ? row.devices : [];
   return {
     id: row.id,
     owner_id: row.owner_id,
@@ -16,6 +19,8 @@ export function toApp(row, docs = [], profileName = "") {
     address: row.address || "",
     roomPref: row.room_pref,
     term: row.term,
+    devices,
+    monthlyTotal: computeTotal(devices),
     status: row.status,
     remarks: row.remarks || "",
     assignedRoom: row.assigned_room || "",
@@ -78,6 +83,7 @@ export async function createApplication({ userId, form, files }) {
       guardian: form.guardian.trim(),
       address: (form.address || "").trim(),
       term: form.term,
+      devices: Array.isArray(form.devices) ? form.devices : [],
     })
     .select("*")
     .single();
@@ -125,6 +131,40 @@ export async function signedDocUrl(path, expiresIn = 3600) {
     .createSignedUrl(path, expiresIn);
   if (error) throw error;
   return data.signedUrl;
+}
+
+// ---------- Admin-managed templates (downloadable softcopies) ----------
+
+export async function listTemplates() {
+  const { data, error } = await supabase
+    .from("doc_templates")
+    .select("*")
+    .order("key");
+  if (error) throw error;
+  return data || [];
+}
+
+export async function downloadTemplate(path) {
+  const { data, error } = await supabase.storage
+    .from(TEMPLATE_BUCKET)
+    .createSignedUrl(path, 3600);
+  if (error) throw error;
+  return data.signedUrl;
+}
+
+export async function uploadTemplate({ key, file, fileName }) {
+  const extMatch = /\.[a-z0-9]+$/i.exec(fileName || "");
+  const path = `${key}${extMatch ? extMatch[0].toLowerCase() : ""}`;
+  const { error: upErr } = await supabase.storage
+    .from(TEMPLATE_BUCKET)
+    .upload(path, file, { upsert: true, contentType: file.type || undefined });
+  if (upErr) throw upErr;
+  const { error: rowErr } = await supabase
+    .from("doc_templates")
+    .update({ file_path: path, file_name: fileName, updated_at: new Date().toISOString() })
+    .eq("key", key);
+  if (rowErr) throw rowErr;
+  return path;
 }
 
 // Resubmit: replace documents on a rejected application and send it back
