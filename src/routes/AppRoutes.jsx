@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route, Navigate, Outlet, useLocation, Link } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate, Outlet, useLocation } from "react-router-dom";
 import { TopBar } from "../components/chrome";
 import { StoreProvider } from "../lib/store";
 import { AuthProvider, useAuth } from "../lib/auth";
@@ -18,9 +18,8 @@ function SiteShell() {
       <TopBar />
       <Outlet />
       <footer className="mx-auto max-w-6xl px-4 sm:px-6 pb-8 pt-4 text-[12px] text-slate-400 dark:text-slate-500">
-        <div className="flex flex-wrap items-center justify-between gap-2 border-t border-slate-200 pt-4 dark:border-white/10">
-          <span>Kilala Dormitory · React + Vite + Tailwind (Bun) · Supabase</span>
-          <span>Auth · applications table · dorm-requirements bucket</span>
+        <div className="border-t border-slate-200 pt-4 text-center dark:border-white/10">
+          <span>© 2026 Kilala Dormitory · Bukidnon State University</span>
         </div>
       </footer>
     </div>
@@ -32,11 +31,12 @@ function Loading() {
 }
 
 function StudentGate() {
-  const { user, loading, configured } = useAuth();
+  const { user, profile, loading, configured } = useAuth();
   const loc = useLocation();
   if (!configured) return <p className="mx-auto max-w-xl px-4 py-16 text-center text-sm text-rose-500">Supabase is not configured. Add keys to .env.local (see .env.example).</p>;
   if (loading) return <Loading />;
   if (!user) return <Navigate to={`/login?next=${encodeURIComponent(loc.pathname + loc.search)}`} replace />;
+  if (profile?.role === "admin") return <Navigate to="/admin" replace />;
   return <Outlet />;
 }
 
@@ -45,15 +45,7 @@ function AdminGate() {
   if (!configured) return <p className="mx-auto max-w-xl px-4 py-16 text-center text-sm text-rose-500">Supabase is not configured. Add keys to .env.local (see .env.example).</p>;
   if (loading) return <Loading />;
   if (!user) return <Navigate to="/login?next=/admin" replace />;
-  if (profile?.role !== "admin") {
-    return (
-      <div className="mx-auto max-w-md px-4 py-16 text-center">
-        <p className="text-lg font-bold text-white">Not authorized</p>
-        <p className="mt-1 text-sm text-slate-400">This console requires an admin account.</p>
-        <Link to="/" className="mt-4 inline-block font-semibold text-[#FFC72C] hover:underline">Back home</Link>
-      </div>
-    );
-  }
+  if (profile?.role !== "admin") return <Navigate to="/dashboard" replace />;
   return <AdminLayout />;
 }
 

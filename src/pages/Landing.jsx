@@ -12,10 +12,6 @@ export default function Landing() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ type: "spring", bounce: 0, duration: 0.5 }}
         >
-          <span className="inline-flex items-center gap-2 rounded-full bg-white px-3 py-1.5 text-xs font-semibold text-slate-600 shadow-sm ring-1 ring-slate-200 dark:bg-white/10 dark:text-slate-200 dark:ring-white/10">
-            <span className="h-2 w-2 rounded-full bg-emerald-500" />
-            Admission open · AY 2026–27
-          </span>
           <h1 className="display mt-4 text-[#0A1F44] dark:text-white">Welcome to<br />Kilala Dormitory.</h1>
           <p className="body-text mx-auto mt-3 max-w-md text-[15px] text-slate-500 dark:text-slate-300">
             Sign in to apply for a dorm room and follow your application status.

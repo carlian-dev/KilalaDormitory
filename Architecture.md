@@ -53,7 +53,7 @@ C:\DormitorySystem
 │   └── pages/
 │       ├── Landing.jsx         Public welcome (no applicant data, no rates)
 │       ├── Login.jsx           Sign in / Create account tabs + `next` redirect
-│       ├── Apply.jsx           4-step wizard: Personal → Downloads → Upload → Payment
+│       ├── Apply.jsx           5-step wizard: Personal → Downloads → Upload → Review → Payment
 │       ├── Dashboard.jsx       Applicant home: my apps, detail, re-upload box
 │       └── admin/
 │           ├── AdminLayout.jsx Console shell (role-gated)

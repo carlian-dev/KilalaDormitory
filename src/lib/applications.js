@@ -69,9 +69,23 @@ const extOf = (name) => {
   return m ? m[0].toLowerCase() : "";
 };
 
-// Insert application + upload 3 files + insert document rows.
-// Rolls back the application row if uploads fail.
+// One student = one application. Enforced by unique index
+// applications_owner_unique (mvp4_one_application.sql); this pre-check
+// gives a friendly message before the DB raises 23505. The only way to
+// revise is the resubmit flow (admin marks rejected → back to pending).
 export async function createApplication({ userId, form, files }) {
+  const { data: existing, error: existErr } = await supabase
+    .from("applications")
+    .select("id,status")
+    .eq("owner_id", userId)
+    .limit(1);
+  if (existErr) throw existErr;
+  if (existing && existing.length) {
+    throw new Error(
+      "You already have an application. Track it in My dashboard — if corrections are needed, the housing office will mark it Needs resubmit and you'll revise the same application."
+    );
+  }
+
   const { data: app, error } = await supabase
     .from("applications")
     .insert({
@@ -87,7 +101,14 @@ export async function createApplication({ userId, form, files }) {
     })
     .select("*")
     .single();
-  if (error) throw error;
+  if (error) {
+    if (error.code === "23505" || /duplicate|unique/i.test(error.message || "")) {
+      throw new Error(
+        "You already have an application. Track it in My dashboard — if corrections are needed, the housing office will mark it Needs resubmit and you'll revise the same application."
+      );
+    }
+    throw error;
+  }
 
   try {
     for (const [docType, v] of Object.entries(files)) {

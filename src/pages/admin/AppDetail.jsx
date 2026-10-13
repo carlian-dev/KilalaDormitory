@@ -99,9 +99,9 @@ export default function AppDetail() {
         <div className="rounded-3xl bg-white p-5 sm:p-6 text-slate-900 shadow dark:bg-[#0B1E3A] dark:text-white dark:ring-1 dark:ring-white/10">
           <div className="flex flex-wrap items-start justify-between gap-2">
             <div>
-              <p className="font-mono text-xs font-bold text-slate-400 break-all">{app.id}</p>
               <h1 className="text-2xl font-bold tracking-tight">{app.name}</h1>
               <p className="text-[13px] text-slate-500 dark:text-slate-300">{app.studentId} · {app.course} · {app.year}</p>
+              <p className="text-xs text-slate-400">{app.term} · Submitted {new Date(app.submittedAt).toLocaleString()}</p>
             </div>
             <StatusBadge status={app.status} />
           </div>

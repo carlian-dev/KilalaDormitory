@@ -68,21 +68,22 @@ export function AuthProvider({ children }) {
           role: "student",
         });
         if (pErr) return { ok: false, error: pErr.message };
-        await fetchProfile(newUser.id);
       }
       // If email confirmation is ON, there is no session yet — user must confirm.
       if (!data.session) {
         return { ok: true, needsConfirm: true };
       }
-      return { ok: true };
+      const newProfile = newUser ? await fetchProfile(newUser.id) : null;
+      return { ok: true, profile: newProfile };
     },
     signIn: async ({ email, password }) => {
-      const { error } = await supabase.auth.signInWithPassword({
+      const { data, error } = await supabase.auth.signInWithPassword({
         email: email.trim().toLowerCase(),
         password,
       });
       if (error) return { ok: false, error: error.message };
-      return { ok: true };
+      const profile = data.user ? await fetchProfile(data.user.id) : null;
+      return { ok: true, profile };
     },
     signOut: async () => {
       await supabase.auth.signOut();

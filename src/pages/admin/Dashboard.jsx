@@ -30,7 +30,6 @@ export default function Dashboard() {
     <div>
       <p className="text-[11px] font-bold uppercase tracking-widest text-slate-400">Overview</p>
       <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-white">Kilala Housing Office</h1>
-      <p className="mt-1 text-sm text-slate-400">{applications.length} total applications · paperless queue</p>
 
       {fetchErr && <p className="mt-3 rounded-2xl bg-rose-500/10 p-3 text-[13px] font-semibold text-rose-300 ring-1 ring-rose-400/30">{fetchErr}</p>}
       {loading && <p className="mt-6 text-sm text-slate-400">Loading…</p>}
@@ -65,11 +64,6 @@ export default function Dashboard() {
                 </Link>
               ))}
             </div>
-          </div>
-
-          <div className="mt-4 rounded-3xl bg-white/5 p-5 ring-1 ring-white/10">
-            <p className="font-bold text-white">Reviewer tip</p>
-            <p className="mt-1 text-[13px] text-slate-300">Open an application → view the 3 uploads → Approve, or Reject with a clear remark. Remarks appear in the student's dashboard.</p>
           </div>
         </>
       )}

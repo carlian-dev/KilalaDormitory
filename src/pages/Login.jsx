@@ -7,7 +7,6 @@ export default function Login() {
   const { signIn, signUp, configured } = useAuth();
   const nav = useNavigate();
   const [params] = useSearchParams();
-  const next = params.get("next") || "/dashboard";
   const [tab, setTab] = useState("signin");
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -20,15 +19,19 @@ export default function Login() {
     setErr("");
     setBusy(true);
     try {
-      const dest = next.startsWith("/") ? next : "/dashboard";
+      // Explicit ?next= wins; otherwise redirect by role (admins -> /admin).
+      const rawNext = params.get("next");
+      const destFor = (role) =>
+        rawNext && rawNext.startsWith("/") ? rawNext : role === "admin" ? "/admin" : "/dashboard";
       if (tab === "signin") {
         const r = await signIn({ email, password });
         if (!r.ok) { setErr(r.error); return; }
-        nav(dest, { replace: true });
+        nav(destFor(r.profile?.role), { replace: true });
       } else {
         if (!name.trim()) { setErr("Please enter your full name."); return; }
         const r = await signUp({ name, email, password });
         if (!r.ok) { setErr(r.error); return; }
+        const dest = destFor(r.profile?.role);
         if (r.needsConfirm) {
           setErr("");
           nav(`/login?next=${encodeURIComponent(dest)}`, { replace: true });
@@ -49,9 +52,6 @@ export default function Login() {
         <div className="rounded-3xl bg-white p-6 shadow-sm ring-1 ring-slate-100 dark:bg-[#0B1E3A] dark:ring-white/10 dark:text-white">
           <p className="text-xs font-semibold uppercase tracking-widest text-slate-400">Kilala Dormitory · student portal</p>
           <h1 className="text-2xl font-bold tracking-tight">Sign in to apply</h1>
-          <p className="mt-1 text-[13px] text-slate-500 dark:text-slate-300">
-            Your applications belong to your account only. Other students can never see them.
-          </p>
 
           {!configured && (
             <p className="mt-3 rounded-2xl bg-rose-50 p-3 text-[13px] font-semibold text-rose-700 ring-1 ring-rose-200">

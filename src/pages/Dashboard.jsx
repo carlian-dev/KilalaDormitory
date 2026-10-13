@@ -40,7 +40,7 @@ export default function ApplicantDashboard() {
   const filtered = useMemo(() => {
     const needle = q.trim().toLowerCase();
     if (!needle) return mine;
-    return mine.filter((a) => [a.id, a.course, a.status].join(" ").toLowerCase().includes(needle));
+    return mine.filter((a) => [a.course, a.status].join(" ").toLowerCase().includes(needle));
   }, [mine, q]);
 
   const selectedId = params.get("id");
@@ -68,9 +68,9 @@ export default function ApplicantDashboard() {
           <div className="mt-4 rounded-3xl bg-white p-5 sm:p-7 shadow-sm ring-1 ring-slate-100 dark:bg-[#0B1E3A] dark:ring-white/10 dark:text-white">
             <div className="flex flex-wrap items-start justify-between gap-3">
               <div>
-                <p className="font-mono text-xs font-bold text-slate-500 dark:text-slate-300 break-all">{selected.id}</p>
                 <p className="text-xl font-bold tracking-tight">{profile?.full_name}</p>
                 <p className="text-[13px] text-slate-500 dark:text-slate-300">{selected.studentId} · {selected.course} · {selected.year}</p>
+                <p className="text-xs text-slate-400">{selected.term} · Submitted {new Date(selected.submittedAt).toLocaleDateString()}</p>
               </div>
               <StatusBadge status={selected.status} />
             </div>
@@ -158,12 +158,14 @@ export default function ApplicantDashboard() {
             <h1 className="h-section text-3xl font-bold text-[#0A1F44] dark:text-white">
               Hello, {profile?.full_name?.split(" ")[0] || "applicant"}
             </h1>
-            <p className="mt-1 text-sm text-slate-500 dark:text-slate-300">{user?.email} · {mine.length} application{mine.length === 1 ? "" : "s"}</p>
+            <p className="mt-1 text-sm text-slate-500 dark:text-slate-300">{user?.email}</p>
           </div>
           <div className="flex gap-2">
-            <Link to="/apply" className="pressable inline-flex items-center gap-1.5 rounded-full bg-[#FFC72C] px-5 py-2.5 text-sm font-bold text-[#0A1F44] hover:bg-[#F5B800]">
-              <PlusCircle size={15} /> New application
-            </Link>
+            {!loading && mine.length === 0 && (
+              <Link to="/apply" className="pressable inline-flex items-center gap-1.5 rounded-full bg-[#FFC72C] px-5 py-2.5 text-sm font-bold text-[#0A1F44] hover:bg-[#F5B800]">
+                <PlusCircle size={15} /> New application
+              </Link>
+            )}
             <button
               onClick={async () => { await signOut(); nav("/"); }}
               className="pressable inline-flex items-center gap-1.5 rounded-full bg-white px-4 py-2.5 text-sm font-semibold text-[#0A1F44] ring-1 ring-[#0A1F44]/15 dark:bg-white/10 dark:text-white dark:ring-white/15"
@@ -188,7 +190,7 @@ export default function ApplicantDashboard() {
 
             <label className="mt-4 flex items-center gap-2 rounded-full bg-white px-4 shadow-sm ring-1 ring-slate-200 dark:bg-white/5 dark:ring-white/15 dark:text-white">
               <Search size={15} className="text-slate-400" />
-              <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Search my applications by ID, course, status…"
+              <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Search by course or status…"
                 className="w-full bg-transparent py-3 text-sm outline-none placeholder:text-slate-400" />
             </label>
 
@@ -212,7 +214,7 @@ export default function ApplicantDashboard() {
                   <button key={a.id} onClick={() => setParams({ id: a.id })}
                     className="pressable flex w-full items-center gap-3 border-b border-slate-100 px-4 py-3.5 text-left last:border-0 hover:bg-slate-50 dark:border-white/10 dark:hover:bg-white/5">
                     <span className="min-w-0 flex-1">
-                      <span className="block truncate text-sm font-bold">Application <span className="font-mono font-medium text-slate-400">· {String(a.id).slice(0, 8)}</span></span>
+                      <span className="block truncate text-sm font-bold">My application</span>
                       <span className="block truncate text-xs text-slate-400">{a.course} · {a.year} · {formatPeso(a.monthlyTotal)}/mo · {new Date(a.submittedAt).toLocaleDateString()}</span>
                     </span>
                     <StatusBadge status={a.status} />

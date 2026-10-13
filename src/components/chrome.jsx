@@ -1,5 +1,5 @@
 import { Link, NavLink, useNavigate } from "react-router-dom";
-import { Building2, LogOut, LayoutDashboard, Sun, Moon } from "lucide-react";
+import { Building2, LogOut, Sun, Moon } from "lucide-react";
 import { useStore } from "../lib/store";
 import { useAuth } from "../lib/auth";
 
@@ -17,15 +17,12 @@ export function TopBar() {
           </span>
           <span className="leading-tight">
             <span className="block text-[15px] font-bold tracking-tight text-[#0A1F44] dark:text-white">Kilala Dormitory</span>
-            <span className="block text-[11px] font-medium text-slate-500 dark:text-slate-400">Paperless Dorm Admission</span>
+            <span className="block text-[11px] font-medium text-slate-500 dark:text-slate-400">Bukidnon State University</span>
           </span>
         </Link>
         <nav className="flex items-center gap-1 text-sm font-medium">
           <NavLink to="/apply" className={({isActive}) => `pressable rounded-full px-4 py-2 ${isActive ? "bg-[#0A1F44] text-white dark:bg-[#FFC72C] dark:text-[#0A1F44]" : "text-[#0A1F44]/70 hover:bg-[#FFC72C]/20 dark:text-white/70"}`}>Apply</NavLink>
           <NavLink to="/dashboard" className={({isActive}) => `pressable rounded-full px-4 py-2 ${isActive ? "bg-[#0A1F44] text-white dark:bg-[#FFC72C] dark:text-[#0A1F44]" : "text-[#0A1F44]/70 hover:bg-[#FFC72C]/20 dark:text-white/70"}`}>My dashboard</NavLink>
-          <NavLink to="/admin" className="pressable hidden sm:inline-flex items-center gap-1.5 rounded-full px-4 py-2 text-[#0A1F44]/70 hover:bg-[#FFC72C]/20 dark:text-white/70">
-            <LayoutDashboard size={15} /> Admin
-          </NavLink>
           <button
             onClick={toggleTheme}
             aria-label={dark ? "Switch to light mode" : "Switch to dark mode"}
