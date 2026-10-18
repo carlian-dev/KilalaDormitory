@@ -19,8 +19,12 @@ There are no Edge Functions, webhooks, or cron jobs in MVP 1 (see §5).
 | Billing math (₱775 + ₱150/appliance, computed never stored) | `src/lib/mockData.js` → `computeTotal` |
 | All DB/Storage calls (CRUD, signed URLs, templates, resubmit) | `src/lib/applications.js` |
 | Auth flows (signUp + profile insert, signIn, signOut, role load) | `src/lib/auth.jsx` |
+| Dormi AI quota tables + `dormi_take_quota()` / `dormi_refund_quota()` | `mvp5_ai_usage.sql` |
+| Dormi chat proxy (Gemini free tier — first Edge Function) | `supabase/functions/dormi-chat/index.ts` |
+| Dormi client calls (context builders + `askDormi()`) | `src/lib/dormi.js` |
+| Dormi widget UI (placeholder mascot) | `src/components/DormiChat.jsx`, `DormiAvatar.jsx` |
 
-Run order for a fresh project: **mvp1 → mvp2 → mvp3 → mvp4** (each is idempotent).
+Run order for a fresh project: **mvp1 → mvp2 → mvp3 → mvp4 → mvp5** (each is idempotent).
 
 ## 2. Dashboard-only config (NOT in code — follow this checklist)
 
@@ -28,9 +32,11 @@ Supabase Dashboard → Authentication → Providers → **Email**:
 - [ ] Email provider: **ON** (master switch — OFF kills all login)
 - [ ] Confirm email: **OFF** (instant login for MVP 1)
 
-Supabase Dashboard → Project Settings → API: copy Project URL + `anon`
-public key into `.env.local` (local) and the Vercel dashboard (deploy).
-Never commit keys; never use the `service_role` key client-side.
+Supabase Dashboard → Project Settings → API Keys: copy Project URL + the
+client key — the **publishable** key (`sb_publishable_…`) on new projects,
+or the legacy `anon` public key on older ones — into `.env.local` (local)
+and the Vercel dashboard (deploy). Never commit keys; never use the
+`service_role`/secret key client-side.
 
 First admin: register via the app, then
 ```sql
@@ -53,11 +59,28 @@ after a rebuild, users re-register and `profiles` rows re-link by id.
 3. Restore `backups/` data rows and bucket files if they exist.
 4. Users re-register; promote admins per §2.
 
-## 5. Edge Functions verdict (MVP 1): none needed
+## 5. Edge Functions: one, `dormi-chat` (Dormi AI, Gemini free tier)
 
-Nothing in MVP 1 requires server-side code (no emails, no external APIs, no
-scheduled jobs). First post-MVP candidates: decision-notification emails and
-orphaned-file cleanup. Rule going forward: any function starts as
+MVP 1 needed none. The first (and so far only) function is **`dormi-chat`**,
+added with the Dormi assistant (plan + privacy rules: `docs/AI-integration.md`):
+
+- Source: `supabase/functions/dormi-chat/index.ts` — in-repo from day one.
+- Job: verify the caller's JWT and DB role, enforce the free-tier daily quotas
+  (`mvp5_ai_usage.sql`), then proxy one `generateContent` call to Google Gemini.
+- Key handling: `GEMINI_API_KEY` exists **only** as a Supabase secret — never in
+  `.env.local`, never in the client bundle.
+- Secrets (CLI): `GEMINI_API_KEY` (required), `GEMINI_MODEL`,
+  `DORMI_USER_DAILY_LIMIT`, `DORMI_GLOBAL_DAILY_LIMIT`.
+- Local test: `supabase functions serve dormi-chat --env-file supabase/functions/.env.local`
+  (copy `supabase/functions/.env.example` first).
+- Deploy: `supabase functions deploy dormi-chat` — or paste the same file in
+  Dashboard → Edge Functions → editor. Either way this file is the source of
+  truth; redeploy after every change to it.
+- Graceful absence: without the function or secret, the widget shows a quiet
+  "isn't set up yet" notice and `bun run build` never needs these values.
+
+Still-open post-MVP candidates: decision-notification emails and orphaned-file
+cleanup. Rule going forward: any function starts as
 `supabase/functions/<name>/index.ts` **in this repo from day one** and is
 deployed with `supabase functions deploy` — code is never created only in
 the cloud.

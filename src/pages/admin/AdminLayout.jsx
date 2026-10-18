@@ -2,6 +2,7 @@ import { NavLink, Outlet, useNavigate } from "react-router-dom";
 import { LayoutDashboard, Files, FileText, LogOut, Sun, Moon } from "lucide-react";
 import { useStore } from "../../lib/store";
 import { useAuth } from "../../lib/auth";
+import DormiChat from "../../components/DormiChat";
 
 export default function AdminLayout() {
   const { theme, toggleTheme } = useStore();
@@ -43,6 +44,7 @@ export default function AdminLayout() {
           <Outlet />
         </div>
       </div>
+      <DormiChat />
     </div>
   );
 }

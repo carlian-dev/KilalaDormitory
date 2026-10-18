@@ -88,20 +88,25 @@ The frontend connects directly to Supabase via `@supabase/supabase-js`. You must
    Open `.env.local` in your editor:
    ```env
    VITE_SUPABASE_URL=https://your-project-ref.supabase.co
-   VITE_SUPABASE_ANON_KEY=your-anon-key-here
+   VITE_SUPABASE_ANON_KEY=your-publishable-or-anon-key-here
    ```
 
 > [!NOTE]
 > **Where to get these keys?**
-> - **Option 1 (Shared Dev Backend)**: Ask your team lead / project owner for the development Supabase URL and anon key.
+> - **Option 1 (Shared Dev Backend)**: Ask your team lead / project owner for the development Supabase URL and client key (publishable `sb_publishable_…`, or the legacy anon key).
 > - **Option 2 (Personal Supabase Project)**: Create a free project at [supabase.com](https://supabase.com). Run migrations in the SQL Editor in order:
 >   1. `supabase/mvp1_schema.sql`
 >   2. `supabase/mvp2_cleanup_resubmit.sql`
 >   3. `supabase/mvp3_billing_docs.sql`
 >   4. `supabase/mvp4_one_application.sql`
+>   5. `supabase/mvp5_ai_usage.sql`
 >   Then in Dashboard → Authentication → Providers → **Email**:
 >   - Email Provider: **ON**
 >   - Confirm email: **OFF**
+>
+> **Dormi AI (assistant)**: the chat widget talks to the shared `dormi-chat`
+> Edge Function — nothing to configure on your machine. Local function testing
+> needs the Supabase CLI + your own free Gemini key; see `docs/AI-integration.md`.
 
 ---
 

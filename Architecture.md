@@ -23,6 +23,7 @@ migrations.
 | Motion   | Motion (`motion/react`) | Critically-damped springs for page/step/sheet transitions |
 | Icons    | Lucide (`lucide-react`) | — |
 | Backend  | Supabase | Email/password Auth, Postgres, private Storage buckets |
+| AI       | Google Gemini free tier via Edge Function `dormi-chat` | Dormi assistant; plan + privacy rules in `docs/AI-integration.md` |
 | Deploys  | Vercel (planned) | SPA fallback rewrite + `VITE_…` env vars; CI/CD deferred post-MVP 1 |
 
 ## 3. Directory map
@@ -35,7 +36,10 @@ C:\DormitorySystem
 ├── supabase/
 │   ├── mvp1_schema.sql         Base schema + RLS + dorm-requirements bucket (run 1st)
 │   ├── mvp2_cleanup_resubmit.sql  room_pref nullable + resubmit UPDATE policies (run 2nd)
-│   └── mvp3_billing_docs.sql   devices column + 9 doc keys + templates table/bucket (run 3rd)
+│   ├── mvp3_billing_docs.sql   devices column + 9 doc keys + templates table/bucket (run 3rd)
+│   ├── mvp4_one_application.sql   1 student = 1 application (run 4th)
+│   ├── mvp5_ai_usage.sql       Dormi AI quota tables + RPCs (run 5th)
+│   └── functions/dormi-chat/   Edge Function: JWT + quotas + Gemini proxy
 ├── src/
 │   ├── main.jsx / App.jsx      Entry + router mount
 │   ├── index.css               Tailwind + theme tokens, materials, press feedback, a11y
@@ -44,12 +48,15 @@ C:\DormitorySystem
 │   │   ├── supabase.js         Supabase client (reads VITE_… env)
 │   │   ├── auth.jsx            AuthProvider: session, profile+role, signUp/signIn/signOut
 │   │   ├── applications.js     All DB/Storage calls (CRUD, signed URLs, templates, resubmit)
+│   │   ├── dormi.js            Dormi context builders + askDormi()
 │   │   ├── store.jsx           Theme state only (persisted `kilala-theme`)
 │   │   └── mockData.js         Static constants: DOC_TYPES, statusMeta, BILLING rates
 │   ├── components/
 │   │   ├── chrome.jsx          TopBar (nav, theme toggle, session chip)
 │   │   ├── ui.jsx              StatusBadge, PageFade, Stepper
-│   │   └── FileUploader.jsx    Validated drag-and-drop upload (5 MB, PDF/JPG/PNG)
+│   │   ├── FileUploader.jsx    Validated drag-and-drop upload (5 MB, PDF/JPG/PNG)
+│   │   ├── DormiChat.jsx       Dormi AI chat widget (signed-in users)
+│   │   └── DormiAvatar.jsx     Placeholder mascot — swap point for final art
 │   └── pages/
 │       ├── Landing.jsx         Public welcome (no applicant data, no rates)
 │       ├── Login.jsx           Sign in / Create account tabs + `next` redirect
@@ -90,11 +97,22 @@ role check.
 `doc_templates` row update → students fetch the list and open signed-URL
 downloads in Apply step 2, then upload signed copies back in step 3.
 
+### Dormi AI chat
+`DormiChat.jsx` (signed-in student pages + admin console) builds a minimal
+context from data the user already sees through RLS (`lib/dormi.js`) →
+`supabase.functions.invoke("dormi-chat")`. The function verifies JWT + DB role,
+enforces per-user + global free-tier quotas (`mvp5_ai_usage.sql`), then calls
+Gemini with the key held in Supabase secrets. Students get answers about their
+own application; admins about aggregate dormitory stats. No chat history and
+no document contents are ever sent.
+
 ## 5. Database & access control
 
 Tables: `profiles (id, full_name, role)` · `applications (…, devices jsonb,
 status, remarks, …)` · `application_documents (application_id, doc_type,
-file_path, file_name)` · `doc_templates (key, label, file_path, …)`.
+file_path, file_name)` · `doc_templates (key, label, file_path, …)` ·
+`dormi_quota` / `dormi_quota_global` (Dormi AI quotas — RLS locked,
+service-role only).
 Buckets: `dorm-requirements` (private, `{app_id}/{doctype}`),
 `dorm-templates` (private, `{key}{ext}`).
 
@@ -146,3 +164,19 @@ form input.
 * Known environment quirk: heavy `backdrop-filter` blurs + a video-saturated
   GPU have crashed Brave during typing; blurs were reduced and global
   `will-change` removed (`src/index.css`). Dev-test in a light window.
+
+## 9. AI assistant (Dormi)
+
+Plan, privacy rules, and rollout: `docs/AI-integration.md`.
+
+* **Shape:** `DormiChat.jsx` (visible to signed-in users only) builds a minimal
+  context from data the user already sees through RLS, then invokes the
+  `dormi-chat` Edge Function — the only place the Gemini key exists.
+* **Trust model:** role comes from `profiles` in the DB (never from the client);
+  context is client-supplied but scoped to the caller's own visibility, so Dormi
+  cannot leak across users; the function never reads application tables.
+* **Budget:** the Gemini free tier is small and shared per project — per-user
+  (default 20/day, `dormi_quota`) and global (default 200/day, `dormi_quota_global`)
+  caps, plus the hard rule: **never enable Google Cloud billing** on the AI project.
+* **Scope:** student status/docs/fees/next steps; admin aggregate business stats;
+  no document contents, no chat persistence, no public access.

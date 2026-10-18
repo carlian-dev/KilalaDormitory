@@ -1,5 +1,6 @@
 import { BrowserRouter, Routes, Route, Navigate, Outlet, useLocation } from "react-router-dom";
 import { TopBar } from "../components/chrome";
+import DormiChat from "../components/DormiChat";
 import { StoreProvider } from "../lib/store";
 import { AuthProvider, useAuth } from "../lib/auth";
 import Landing from "../pages/Landing";
@@ -13,6 +14,7 @@ import AppDetail from "../pages/admin/AppDetail";
 import Templates from "../pages/admin/Templates";
 
 function SiteShell() {
+  const { user } = useAuth();
   return (
     <div className="min-h-screen bg-[#F7F8FC] text-[#0A1F44] dark:bg-[#040F24] dark:text-slate-100">
       <TopBar />
@@ -22,6 +24,7 @@ function SiteShell() {
           <span>© 2026 Kilala Dormitory · Bukidnon State University</span>
         </div>
       </footer>
+      {user && <DormiChat />}
     </div>
   );
 }
