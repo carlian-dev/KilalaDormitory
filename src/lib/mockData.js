@@ -32,8 +32,8 @@ export const TEMPLATE_DOCS = DOC_TYPES.filter((d) => d.source === "template");
 export const UPLOAD_DOCS = DOC_TYPES.filter((d) => d.source === "upload");
 
 export const statusMeta = {
-  pending: { label: "Pending", dot: "bg-[#F5B800]", pill: "bg-[#FFF8E1] text-[#0A1F44] ring-[#FFC72C] dark:bg-[#FFC72C]/15 dark:text-[#FFE9A8] dark:ring-[#FFC72C]/40" },
-  under_review: { label: "Under Review", dot: "bg-[#0A1F44] dark:bg-[#FFC72C]", pill: "bg-[#DCE6FA] text-[#0A1F44] ring-[#0A1F44]/20 dark:bg-white/10 dark:text-white dark:ring-white/20" },
+  pending: { label: "Pending", dot: "bg-[#F0BB00]", pill: "bg-[#FFF8E1] text-[#0B2A6B] ring-[#FFD120] dark:bg-[#FFD120]/15 dark:text-[#FFE9A8] dark:ring-[#FFD120]/40" },
+  under_review: { label: "Under Review", dot: "bg-[#0B2A6B] dark:bg-[#FFD120]", pill: "bg-[#DCE6FA] text-[#0B2A6B] ring-[#0B2A6B]/20 dark:bg-white/10 dark:text-white dark:ring-white/20" },
   approved: { label: "Approved", dot: "bg-emerald-500", pill: "bg-emerald-50 text-emerald-700 ring-emerald-200 dark:bg-emerald-500/15 dark:text-emerald-300 dark:ring-emerald-400/30" },
   rejected: { label: "Needs Resubmit", dot: "bg-rose-500", pill: "bg-rose-50 text-rose-700 ring-rose-200 dark:bg-rose-500/15 dark:text-rose-300 dark:ring-rose-400/30" },
 };

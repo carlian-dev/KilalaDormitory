@@ -4,19 +4,21 @@
 
 @theme {
   --font-sans: system-ui, -apple-system, "Segoe UI", Inter, Roboto, sans-serif;
+  --font-display: "Nunito", var(--font-sans);
   --color-ink: #0b0d12;
-  --color-navy-950: #071633;
-  --color-navy-900: #0a1f44;
-  --color-navy-800: #14346b;
+  --color-buksu-red: #e2402f;
+  --color-navy-950: #081f52;
+  --color-navy-900: #0b2a6b;
+  --color-navy-800: #15427f;
   --color-navy-100: #dce6fa;
   --color-gold-50: #fff8e1;
-  --color-gold-400: #ffc72c;
-  --color-gold-500: #f5b800;
+  --color-gold-400: #ffd120;
+  --color-gold-500: #f0bb00;
   --color-dorm-50: #fff8e1;
   --color-dorm-100: #dce6fa;
-  --color-dorm-500: #0a1f44;
-  --color-dorm-600: #071633;
-  --color-dorm-900: #071633;
+  --color-dorm-500: #0b2a6b;
+  --color-dorm-600: #081f52;
+  --color-dorm-900: #081f52;
 }
 
 :root {
@@ -31,23 +33,25 @@ html {
 body {
   margin: 0;
   background: #f7f8fc;
-  color: #0a1f44;
+  color: #0b2a6b;
 }
 
 .dark body {
-  background: #040f24;
+  background: #041743;
   color: #f1f5f9;
 }
 
-/* Apple-design typography: tight display, neutral body */
+/* Apple-design typography: Nunito display (BukSU-friendly rounded), neutral body */
 .display {
+  font-family: var(--font-display);
   font-size: clamp(2.25rem, 5vw, 3.75rem);
   line-height: 1.05;
   letter-spacing: -0.02em;
-  font-weight: 700;
-  font-optical-sizing: auto;
+  font-weight: 800;
 }
 .h-section {
+  font-family: var(--font-display);
+  font-weight: 800;
   letter-spacing: -0.015em;
   line-height: 1.2;
 }
@@ -75,7 +79,7 @@ body {
 }
 .dark .material-bar {
   background: rgba(4, 15, 36, 0.72);
-  border-bottom: 1px solid rgba(255, 199, 44, 0.15);
+  border-bottom: 1px solid rgba(255, 209, 32, 0.15);
 }
 .material-card {
   background: rgba(255, 255, 255, 0.9);
@@ -88,9 +92,9 @@ body {
 
 /* Focus visibility for wayfinding */
 :focus-visible {
-  outline: 2px solid #0a1f44;
+  outline: 2px solid #0b2a6b;
   outline-offset: 2px;
-  box-shadow: 0 0 0 4px rgba(255, 199, 44, 0.5);
+  box-shadow: 0 0 0 4px rgba(255, 209, 32, 0.5);
 }
 
 /* Reduced motion + transparency */
@@ -107,9 +111,9 @@ body {
 
 /* File drop glow */
 .drop-active {
-  border-color: #0a1f44 !important;
+  border-color: #0b2a6b !important;
   background: #fff8e1 !important;
-  box-shadow: 0 0 0 4px rgba(255, 199, 44, 0.45);
+  box-shadow: 0 0 0 4px rgba(255, 209, 32, 0.45);
 }
 .dark .drop-active {
   background: rgba(255, 199, 44, 0.15) !important;
@@ -118,3 +122,39 @@ body {
 /* Thin scrollbars for admin tables */
 .nice-scroll::-webkit-scrollbar { height: 8px; width: 8px; }
 .nice-scroll::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 8px; }
+
+/* Dormi mascot motion — CSS only, so she can move at any render size.
+   Guarded explicitly: it also must not spin on endless ~0ms loops when the
+   global prefers-reduced-motion override below sets tiny durations. */
+@keyframes dormi-bob {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-4%); }
+}
+@keyframes dormi-blink {
+  0%, 90%, 100% { transform: scaleY(1); }
+  94% { transform: scaleY(0.08); }
+}
+@keyframes dormi-nod {
+  0%, 100% { transform: rotate(0deg); }
+  50% { transform: rotate(3deg); }
+}
+.dormi-bob { animation: dormi-bob 3.8s ease-in-out infinite; }
+.dormi-bounce { animation: dormi-bob 0.7s ease-in-out 3; }
+.dormi-nod { animation: dormi-nod 1.6s ease-in-out infinite; }
+.dormi-eyes {
+  animation: dormi-blink 4.6s infinite;
+  transform-box: fill-box;
+  transform-origin: center 62%;
+}
+/* Wings: resting tilt in CSS (replaces the old SVG attr) so one wing can wave */
+.dormi-wing { transform-box: fill-box; transform-origin: center top; }
+.dormi-wing-l { transform: rotate(16deg); }
+.dormi-wing-r { transform: rotate(-16deg); }
+@keyframes dormi-wave {
+  0%, 100% { transform: rotate(-16deg); }
+  50% { transform: rotate(-64deg); }
+}
+.dormi-wing-wave { animation: dormi-wave 0.5s ease-in-out 3; }
+@media (prefers-reduced-motion: reduce) {
+  .dormi-bob, .dormi-bounce, .dormi-nod, .dormi-eyes, .dormi-wing-wave { animation: none !important; }
+}

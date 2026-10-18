@@ -20,7 +20,7 @@ import Templates from "../pages/admin/Templates";
 function SiteShell() {
   const { user } = useAuth();
   return (
-    <div className="min-h-screen bg-[#F7F8FC] text-[#0A1F44] dark:bg-[#040F24] dark:text-slate-100">
+    <div className="min-h-screen bg-[#F7F8FC] text-[#0B2A6B] dark:bg-[#041743] dark:text-slate-100">
       <TopBar />
       <Outlet />
       <footer className="mx-auto max-w-6xl px-4 sm:px-6 pb-8 pt-4 text-[12px] text-slate-400 dark:text-slate-500">

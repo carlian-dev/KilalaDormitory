@@ -21,7 +21,7 @@
 - File inputs can't be refilled by code: `Apply.jsx` draft autosave (`kilala-draft:<userId>`) covers text/step/devices only; files + consent checkbox always reset.
 
 ## UI conventions
-- Palette: navy `#0A1F44` + gold `#FFC72C` + white; dark mode via `.dark` class + Tailwind `dark:` variants. No public numbers/rates on landing/login.
+- Palette (from the BukSU logo): royal blue `#0B2A6B` + gold `#FFD120` + white, red accent `#E2402F` used sparingly; dark mode via `.dark` class + Tailwind `dark:` variants. Display font: Nunito (headings only, `--font-display`). No public numbers/rates on landing/login.
 - Motion: Motion springs only; keep `backdrop-filter` blurs small and never restore global `will-change` (documented Brave GPU crashes — see `Architecture.md` §8).
 - Canonical docs: `Architecture.md` (system design), `supabase/BACKEND.md` (backend inventory + DR runbook), `docs/ci-cd-plan.md` (**deferred** — CI/Vercel not yet executed).
 

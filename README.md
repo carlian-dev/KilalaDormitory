@@ -3,7 +3,7 @@
 Kilala Dormitory is a web application for dormitory management and student application workflows at Bukidnon State University. Built with React 19, Vite, Tailwind CSS v4, Motion, and Supabase.
 
 ## Teammate & Developer Setup
-For full prerequisite installation instructions, environment keys, and troubleshooting, read the **[Teammate Installation & Setup Guide](docs/teammate-setup.md)**.
+For full prerequisite installation instructions, environment keys, and troubleshooting, read the **[Development Setup Guide](docs/setup.md)**.
 
 ### Quickstart Summary
 1. **Prerequisites**: [Git](https://git-scm.com/) and [Bun](https://bun.sh/) (`bun --version`).
@@ -11,7 +11,7 @@ For full prerequisite installation instructions, environment keys, and troublesh
    ```bash
    git clone https://github.com/carlian-dev/KilalaDormitory.git
    cd KilalaDormitory
-   git checkout integration
+   git switch --track origin/integration
    ```
 3. **Install dependencies** (strictly Bun):
    ```bash

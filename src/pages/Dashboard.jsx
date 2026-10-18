@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { Search, FileText, LogOut, PlusCircle, ArrowLeft, ExternalLink } from "lucide-react";
-import { PageFade, StatusBadge } from "../components/ui";
+import { ConfirmDialog, PageFade, StatusBadge } from "../components/ui";
 import { FileUploader } from "../components/FileUploader";
 import { DOC_TYPES, TEMPLATE_DOCS, UPLOAD_DOCS, BILLING, formatPeso } from "../lib/mockData";
 import { useAuth } from "../lib/auth";
@@ -24,6 +24,7 @@ export default function ApplicantDashboard() {
   const [mine, setMine] = useState([]);
   const [loading, setLoading] = useState(true);
   const [fetchErr, setFetchErr] = useState("");
+  const [confirmingSignOut, setConfirmingSignOut] = useState(false);
 
   const load = () => {
     if (!user) return Promise.resolve();
@@ -62,10 +63,10 @@ export default function ApplicantDashboard() {
     return (
       <PageFade>
         <div className="mx-auto max-w-3xl px-4 sm:px-6 py-8">
-          <button onClick={() => setParams({})} className="pressable inline-flex items-center gap-1.5 rounded-full bg-[#0A1F44]/5 px-4 py-2 text-[13px] font-bold text-[#0A1F44] dark:bg-white/10 dark:text-white">
+          <button onClick={() => setParams({})} className="pressable inline-flex items-center gap-1.5 rounded-full bg-[#0B2A6B]/5 px-4 py-2 text-[13px] font-bold text-[#0B2A6B] dark:bg-white/10 dark:text-white">
             <ArrowLeft size={14} /> My applications
           </button>
-          <div className="mt-4 rounded-3xl bg-white p-5 sm:p-7 shadow-sm ring-1 ring-slate-100 dark:bg-[#0B1E3A] dark:ring-white/10 dark:text-white">
+          <div className="mt-4 rounded-3xl bg-white p-5 sm:p-7 shadow-sm ring-1 ring-slate-100 dark:bg-[#0A2456] dark:ring-white/10 dark:text-white">
             <div className="flex flex-wrap items-start justify-between gap-3">
               <div>
                 <p className="text-xl font-bold tracking-tight">{profile?.full_name}</p>
@@ -75,7 +76,7 @@ export default function ApplicantDashboard() {
               <StatusBadge status={selected.status} />
             </div>
 
-            <div className="mt-4 rounded-2xl bg-[#0A1F44] p-3.5 text-white dark:bg-[#FFC72C] dark:text-[#0A1F44]">
+            <div className="mt-4 rounded-2xl bg-[#0B2A6B] p-3.5 text-white dark:bg-[#FFD120] dark:text-[#0B2A6B]">
               <div className="flex justify-between text-sm font-bold">
                 <span>Monthly rate</span><span>{formatPeso(selected.monthlyTotal)}/mo</span>
               </div>
@@ -91,7 +92,7 @@ export default function ApplicantDashboard() {
               {steps.map((t, i, arr) => (
                 <div key={t} className="flex flex-1 items-center gap-1 last:flex-none">
                   <div className="flex flex-col items-center gap-1">
-                    <span className={`grid h-7 w-7 place-items-center rounded-full text-xs font-bold ${i === arr.length - 1 ? (selected.status === "rejected" ? "bg-rose-500 text-white" : "bg-emerald-500 text-white") : "bg-[#0A1F44] text-[#FFC72C] dark:bg-[#FFC72C] dark:text-[#0A1F44]"}`}>{i + 1}</span>
+                    <span className={`grid h-7 w-7 place-items-center rounded-full text-xs font-bold ${i === arr.length - 1 ? (selected.status === "rejected" ? "bg-rose-500 text-white" : "bg-emerald-500 text-white") : "bg-[#0B2A6B] text-[#FFD120] dark:bg-[#FFD120] dark:text-[#0B2A6B]"}`}>{i + 1}</span>
                     <span className="whitespace-nowrap text-[11px] font-semibold text-slate-600 dark:text-slate-300">{t}</span>
                   </div>
                   {i < arr.length - 1 && <span className="mx-1 mb-5 h-px flex-1 bg-slate-200 dark:bg-white/15" />}
@@ -100,7 +101,7 @@ export default function ApplicantDashboard() {
             </div>
 
             {selected.remarks && (
-              <div className={`mt-4 rounded-2xl p-3.5 text-[13px] ring-1 ${selected.status === "rejected" ? "bg-rose-50 text-rose-800 ring-rose-200 dark:bg-rose-500/10 dark:text-rose-200 dark:ring-rose-400/30" : "bg-[#FFF8E1] text-[#0A1F44] ring-[#FFC72C] dark:bg-[#FFC72C]/10 dark:text-[#FFE9A8] dark:ring-[#FFC72C]/40"}`}>
+              <div className={`mt-4 rounded-2xl p-3.5 text-[13px] ring-1 ${selected.status === "rejected" ? "bg-rose-50 text-rose-800 ring-rose-200 dark:bg-rose-500/10 dark:text-rose-200 dark:ring-rose-400/30" : "bg-[#FFF8E1] text-[#0B2A6B] ring-[#FFD120] dark:bg-[#FFD120]/10 dark:text-[#FFE9A8] dark:ring-[#FFD120]/40"}`}>
                 <b>Admin note:</b> {selected.remarks}
               </div>
             )}
@@ -114,7 +115,7 @@ export default function ApplicantDashboard() {
                     <p className="text-[13px] font-bold">{docLabel(d.type)}</p>
                     <p className="truncate text-xs text-slate-400">{d.fileName}</p>
                   </div>
-                  <button onClick={() => openDoc(d)} className="pressable inline-flex items-center gap-1 rounded-full bg-[#0A1F44] px-3 py-1.5 text-xs font-bold text-[#FFC72C] dark:bg-[#FFC72C] dark:text-[#0A1F44]">
+                  <button onClick={() => openDoc(d)} className="pressable inline-flex items-center gap-1 rounded-full bg-[#0B2A6B] px-3 py-1.5 text-xs font-bold text-[#FFD120] dark:bg-[#FFD120] dark:text-[#0B2A6B]">
                     <ExternalLink size={12} /> View
                   </button>
                 </div>
@@ -130,7 +131,7 @@ export default function ApplicantDashboard() {
                     <p className="text-[13px] font-bold">{docLabel(d.type)}</p>
                     <p className="truncate text-xs text-slate-400">{d.fileName}</p>
                   </div>
-                  <button onClick={() => openDoc(d)} className="pressable inline-flex items-center gap-1 rounded-full bg-[#0A1F44] px-3 py-1.5 text-xs font-bold text-[#FFC72C] dark:bg-[#FFC72C] dark:text-[#0A1F44]">
+                  <button onClick={() => openDoc(d)} className="pressable inline-flex items-center gap-1 rounded-full bg-[#0B2A6B] px-3 py-1.5 text-xs font-bold text-[#FFD120] dark:bg-[#FFD120] dark:text-[#0B2A6B]">
                     <ExternalLink size={12} /> View
                   </button>
                 </div>
@@ -155,23 +156,31 @@ export default function ApplicantDashboard() {
         <div className="flex flex-wrap items-start justify-between gap-3">
           <div>
             <p className="text-xs font-semibold uppercase tracking-widest text-slate-400">Kilala Dormitory · my dashboard</p>
-            <h1 className="h-section text-3xl font-bold text-[#0A1F44] dark:text-white">
+            <h1 className="h-section text-3xl font-bold text-[#0B2A6B] dark:text-white">
               Hello, {profile?.full_name?.split(" ")[0] || "applicant"}
             </h1>
             <p className="mt-1 text-sm text-slate-500 dark:text-slate-300">{user?.email}</p>
           </div>
           <div className="flex gap-2">
             {!loading && mine.length === 0 && (
-              <Link to="/apply" className="pressable inline-flex items-center gap-1.5 rounded-full bg-[#FFC72C] px-5 py-2.5 text-sm font-bold text-[#0A1F44] hover:bg-[#F5B800]">
+              <Link to="/apply" className="pressable inline-flex items-center gap-1.5 rounded-full bg-[#FFD120] px-5 py-2.5 text-sm font-bold text-[#0B2A6B] hover:bg-[#F0BB00]">
                 <PlusCircle size={15} /> New application
               </Link>
             )}
             <button
-              onClick={async () => { await signOut(); nav("/"); }}
-              className="pressable inline-flex items-center gap-1.5 rounded-full bg-white px-4 py-2.5 text-sm font-semibold text-[#0A1F44] ring-1 ring-[#0A1F44]/15 dark:bg-white/10 dark:text-white dark:ring-white/15"
+              onClick={() => setConfirmingSignOut(true)}
+              className="pressable inline-flex items-center gap-1.5 rounded-full bg-white px-4 py-2.5 text-sm font-semibold text-[#0B2A6B] ring-1 ring-[#0B2A6B]/15 dark:bg-white/10 dark:text-white dark:ring-white/15"
             ><LogOut size={14} /> Sign out</button>
           </div>
         </div>
+        <ConfirmDialog
+          open={confirmingSignOut}
+          title="Sign out?"
+          message="You will need to sign in again to access your applications and dashboard."
+          confirmLabel="Sign out"
+          onCancel={() => setConfirmingSignOut(false)}
+          onConfirm={async () => { setConfirmingSignOut(false); if (await signOut()) nav("/"); }}
+        />
 
         {fetchErr && <p className="mt-4 rounded-2xl bg-rose-50 p-3 text-[13px] font-semibold text-rose-700 ring-1 ring-rose-200">{fetchErr}</p>}
 
@@ -181,8 +190,8 @@ export default function ApplicantDashboard() {
           <>
             <div className="mt-5 grid grid-cols-2 gap-2 sm:grid-cols-4">
               {[["Pending", count("pending")], ["Under review", count("under_review")], ["Approved", count("approved")], ["Needs resubmit", count("rejected")]].map(([k, v]) => (
-                <div key={k} className="rounded-2xl bg-white px-3 py-3.5 text-center shadow-sm ring-1 ring-slate-100 dark:bg-[#0B1E3A] dark:ring-white/10">
-                  <p className="text-2xl font-bold text-[#0A1F44] dark:text-[#FFC72C]">{v}</p>
+                <div key={k} className="rounded-2xl bg-white px-3 py-3.5 text-center shadow-sm ring-1 ring-slate-100 dark:bg-[#0A2456] dark:ring-white/10">
+                  <p className="text-2xl font-bold text-[#0B2A6B] dark:text-[#FFD120]">{v}</p>
                   <p className="text-[11px] font-semibold text-slate-500 dark:text-slate-300">{k}</p>
                 </div>
               ))}
@@ -195,7 +204,7 @@ export default function ApplicantDashboard() {
             </label>
 
             {filtered.length === 0 ? (
-              <div className="mt-4 rounded-3xl bg-white p-10 text-center shadow-sm ring-1 ring-slate-100 dark:bg-[#0B1E3A] dark:ring-white/10">
+              <div className="mt-4 rounded-3xl bg-white p-10 text-center shadow-sm ring-1 ring-slate-100 dark:bg-[#0A2456] dark:ring-white/10">
                 <p className="text-lg font-bold dark:text-white">{mine.length === 0 ? "No applications yet" : "No matches"}</p>
                 <p className="mx-auto mt-1 max-w-sm text-sm text-slate-500 dark:text-slate-300">
                   {mine.length === 0
@@ -203,13 +212,13 @@ export default function ApplicantDashboard() {
                     : "Try a different search term."}
                 </p>
                 {mine.length === 0 && (
-                  <Link to="/apply" className="pressable mt-4 inline-flex items-center gap-1.5 rounded-full bg-[#FFC72C] px-6 py-3 text-sm font-bold text-[#0A1F44] hover:bg-[#F5B800]">
+                  <Link to="/apply" className="pressable mt-4 inline-flex items-center gap-1.5 rounded-full bg-[#FFD120] px-6 py-3 text-sm font-bold text-[#0B2A6B] hover:bg-[#F0BB00]">
                     <PlusCircle size={15} /> Start application
                   </Link>
                 )}
               </div>
             ) : (
-              <div className="mt-4 overflow-hidden rounded-3xl bg-white shadow-sm ring-1 ring-slate-100 dark:bg-[#0B1E3A] dark:ring-white/10 dark:text-white">
+              <div className="mt-4 overflow-hidden rounded-3xl bg-white shadow-sm ring-1 ring-slate-100 dark:bg-[#0A2456] dark:ring-white/10 dark:text-white">
                 {filtered.map((a) => (
                   <button key={a.id} onClick={() => setParams({ id: a.id })}
                     className="pressable flex w-full items-center gap-3 border-b border-slate-100 px-4 py-3.5 text-left last:border-0 hover:bg-slate-50 dark:border-white/10 dark:hover:bg-white/5">
@@ -250,12 +259,12 @@ function ResubmitBox({ appId, onDone }) {
   };
 
   return (
-    <div className="mt-5 rounded-2xl bg-[#FFF8E1] p-4 ring-1 ring-[#FFC72C] dark:bg-[#FFC72C]/10 dark:ring-[#FFC72C]/40">
-      <p className="text-sm font-bold text-[#0A1F44] dark:text-[#FFE9A8]">Fix your documents and resubmit</p>
-      <p className="mt-0.5 text-[13px] text-[#0A1F44]/70 dark:text-[#FFE9A8]/70">
+    <div className="mt-5 rounded-2xl bg-[#FFF8E1] p-4 ring-1 ring-[#FFD120] dark:bg-[#FFD120]/10 dark:ring-[#FFD120]/40">
+      <p className="text-sm font-bold text-[#0B2A6B] dark:text-[#FFE9A8]">Fix your documents and resubmit</p>
+      <p className="mt-0.5 text-[13px] text-[#0B2A6B]/70 dark:text-[#FFE9A8]/70">
         Upload fresh copies of all 9 documents. Your application goes back to Pending for re-review.
       </p>
-      <div className="mt-3 grid gap-3 rounded-2xl bg-white p-3 dark:bg-[#0B1E3A]">
+      <div className="mt-3 grid gap-3 rounded-2xl bg-white p-3 dark:bg-[#0A2456]">
         {DOC_TYPES.map((d) => (
           <FileUploader key={d.key} label={d.label} hint={d.hint}
             value={files[d.key]} onChange={(v) => setFiles((f) => ({ ...f, [d.key]: v }))} />
@@ -263,7 +272,7 @@ function ResubmitBox({ appId, onDone }) {
       </div>
       {err && <p className="mt-2 text-[13px] font-semibold text-rose-500">{err}</p>}
       <button onClick={submit} disabled={busy || !ready}
-        className="pressable mt-3 w-full rounded-full bg-[#FFC72C] py-2.5 text-sm font-bold text-[#0A1F44] hover:bg-[#F5B800] disabled:opacity-50">
+        className="pressable mt-3 w-full rounded-full bg-[#FFD120] py-2.5 text-sm font-bold text-[#0B2A6B] hover:bg-[#F0BB00] disabled:opacity-50">
         {busy ? "Uploading…" : "Resubmit for review"}
       </button>
     </div>

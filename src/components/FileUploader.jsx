@@ -68,9 +68,9 @@ export function FileUploader({ label, hint, value, onChange, accept = ".pdf,.jpg
           onDragOver={(e) => { e.preventDefault(); setDrag(true); }}
           onDragLeave={() => setDrag(false)}
           onDrop={(e) => { e.preventDefault(); setDrag(false); pick(e.dataTransfer.files?.[0]); }}
-          className={`pressable flex w-full flex-col items-center justify-center gap-1 rounded-2xl border-2 border-dashed px-4 py-6 text-center ${drag ? "drop-active" : "border-[#0A1F44]/20 bg-white dark:border-white/15 dark:bg-white/5"}`}
+          className={`pressable flex w-full flex-col items-center justify-center gap-1 rounded-2xl border-2 border-dashed px-4 py-6 text-center ${drag ? "drop-active" : "border-[#0B2A6B]/20 bg-white dark:border-white/15 dark:bg-white/5"}`}
         >
-          <UploadCloud className="text-[#0A1F44] dark:text-[#FFC72C]" size={26} />
+          <UploadCloud className="text-[#0B2A6B] dark:text-[#FFD120]" size={26} />
           <span className="text-sm font-semibold text-slate-700 dark:text-slate-100">Tap to upload or drag & drop</span>
           <span className="text-xs text-slate-400">PDF / JPG / PNG · max 5MB</span>
         </button>
@@ -90,7 +90,7 @@ export function FileUploader({ label, hint, value, onChange, accept = ".pdf,.jpg
           <button
             type="button"
             onClick={openPreview}
-            className="pressable mt-2 inline-flex w-full items-center justify-center gap-1.5 rounded-full bg-[#0A1F44]/5 px-4 py-2 text-[13px] font-bold text-[#0A1F44] hover:bg-[#0A1F44]/10 dark:bg-white/10 dark:text-white dark:hover:bg-white/15"
+            className="pressable mt-2 inline-flex w-full items-center justify-center gap-1.5 rounded-full bg-[#0B2A6B]/5 px-4 py-2 text-[13px] font-bold text-[#0B2A6B] hover:bg-[#0B2A6B]/10 dark:bg-white/10 dark:text-white dark:hover:bg-white/15"
           >
             <Eye size={14} /> Verify — check this file looks right
           </button>
@@ -99,11 +99,11 @@ export function FileUploader({ label, hint, value, onChange, accept = ".pdf,.jpg
       {previewUrl && (
         <div className="fixed inset-0 z-50 grid place-items-center bg-black/60 p-4" role="dialog" aria-modal="true" aria-label={`Preview ${value?.fileName || "file"}`} onClick={closePreview}>
           <div
-            className="flex max-h-[85vh] w-full max-w-3xl flex-col overflow-hidden rounded-3xl bg-white shadow-xl dark:bg-[#0B1E3A] dark:ring-1 dark:ring-white/15"
+            className="flex max-h-[85vh] w-full max-w-3xl flex-col overflow-hidden rounded-3xl bg-white shadow-xl dark:bg-[#0A2456] dark:ring-1 dark:ring-white/15"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex items-center justify-between gap-2 border-b border-slate-100 px-4 py-3 dark:border-white/10">
-              <p className="min-w-0 truncate text-sm font-bold text-[#0A1F44] dark:text-white">{value?.fileName || "Preview"}</p>
+              <p className="min-w-0 truncate text-sm font-bold text-[#0B2A6B] dark:text-white">{value?.fileName || "Preview"}</p>
               <button type="button" onClick={closePreview} aria-label="Close preview" className="pressable grid h-8 w-8 shrink-0 place-items-center rounded-full bg-slate-100 dark:bg-white/10 dark:text-white"><X size={14} /></button>
             </div>
             <div className="min-h-0 flex-1 overflow-auto bg-slate-50 p-3 dark:bg-white/5">
@@ -116,8 +116,8 @@ export function FileUploader({ label, hint, value, onChange, accept = ".pdf,.jpg
             <div className="flex flex-wrap items-center justify-between gap-2 px-4 py-3">
               <p className="text-xs text-slate-500 dark:text-slate-300">{value?.fileName} · {formatSize(value?.size)}</p>
               <span className="flex gap-2">
-                <a href={previewUrl} target="_blank" rel="noopener noreferrer" className="pressable rounded-full bg-[#0A1F44]/5 px-4 py-2 text-xs font-bold text-[#0A1F44] dark:bg-white/10 dark:text-white">Open in new tab</a>
-                <button type="button" onClick={closePreview} className="pressable rounded-full bg-[#FFC72C] px-4 py-2 text-xs font-bold text-[#0A1F44] hover:bg-[#F5B800]">Done</button>
+                <a href={previewUrl} target="_blank" rel="noopener noreferrer" className="pressable rounded-full bg-[#0B2A6B]/5 px-4 py-2 text-xs font-bold text-[#0B2A6B] dark:bg-white/10 dark:text-white">Open in new tab</a>
+                <button type="button" onClick={closePreview} className="pressable rounded-full bg-[#FFD120] px-4 py-2 text-xs font-bold text-[#0B2A6B] hover:bg-[#F0BB00]">Done</button>
               </span>
             </div>
           </div>

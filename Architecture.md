@@ -19,7 +19,7 @@ migrations.
 |----------|-----------|-------|
 | UI       | React 19 + Vite 8 (SPA) | Bun toolchain (`bun install`, `bun run dev/build`) |
 | Routing  | React Router 7 | Public, student-gated, and admin-gated routes |
-| Styling  | Tailwind CSS v4 | Class-based dark mode (`.dark` on `<html>`), navy `#0A1F44` + gold `#FFC72C` + white |
+| Styling  | Tailwind CSS v4 | Class-based dark mode (`.dark` on `<html>`), BukSU royal blue `#0B2A6B` + gold `#FFD120` + white (red accent `#E2402F`, sparing), Nunito display |
 | Motion   | Motion (`motion/react`) | Critically-damped springs for page/step/sheet transitions |
 | Icons    | Lucide (`lucide-react`) | — |
 | Backend  | Supabase | Email/password Auth, Postgres, private Storage buckets |
