@@ -124,11 +124,17 @@ body {
 .nice-scroll::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 8px; }
 
 /* Dormi mascot motion — CSS only, so she can move at any render size.
-   Guarded explicitly: it also must not spin on endless ~0ms loops when the
-   global prefers-reduced-motion override below sets tiny durations. */
+   Rotation carries most of the motion on purpose: it's size-independent,
+   while percentage translateY is ~1px on the 24px chat avatars. */
 @keyframes dormi-bob {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-4%); }
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  35% { transform: translateY(-5%) rotate(-2.5deg); }
+  70% { transform: translateY(-1%) rotate(1.5deg); }
+}
+@keyframes dormi-hop {
+  0%, 100% { transform: translateY(0) scale(1, 1); }
+  30% { transform: translateY(-16%) scale(0.96, 1.06); }
+  55% { transform: translateY(-6%) scale(1.04, 0.96); }
 }
 @keyframes dormi-blink {
   0%, 90%, 100% { transform: scaleY(1); }
@@ -136,10 +142,10 @@ body {
 }
 @keyframes dormi-nod {
   0%, 100% { transform: rotate(0deg); }
-  50% { transform: rotate(3deg); }
+  50% { transform: rotate(4deg); }
 }
-.dormi-bob { animation: dormi-bob 3.8s ease-in-out infinite; }
-.dormi-bounce { animation: dormi-bob 0.7s ease-in-out 3; }
+.dormi-bob { animation: dormi-bob 3.4s ease-in-out infinite; }
+.dormi-bounce { animation: dormi-hop 0.7s ease-in-out 2; }
 .dormi-nod { animation: dormi-nod 1.6s ease-in-out infinite; }
 .dormi-eyes {
   animation: dormi-blink 4.6s infinite;
@@ -150,11 +156,13 @@ body {
 .dormi-wing { transform-box: fill-box; transform-origin: center top; }
 .dormi-wing-l { transform: rotate(16deg); }
 .dormi-wing-r { transform: rotate(-16deg); }
+/* Wave in bursts — two flaps, rest, repeat. A single finite burst looks
+   like the wing broke after 1.5s. */
 @keyframes dormi-wave {
-  0%, 100% { transform: rotate(-16deg); }
-  50% { transform: rotate(-64deg); }
+  0%, 10%, 55%, 100% { transform: rotate(-16deg); }
+  25%, 40% { transform: rotate(-64deg); }
 }
-.dormi-wing-wave { animation: dormi-wave 0.5s ease-in-out 3; }
+.dormi-wing-wave { animation: dormi-wave 2.8s ease-in-out infinite; }
 @media (prefers-reduced-motion: reduce) {
   .dormi-bob, .dormi-bounce, .dormi-nod, .dormi-eyes, .dormi-wing-wave { animation: none !important; }
 }
