@@ -328,7 +328,7 @@ export default function Apply() {
                 </div>
                 <label className="flex cursor-pointer items-start gap-2 rounded-2xl bg-slate-50 p-3 text-[13px] ring-1 ring-slate-200 dark:bg-white/5 dark:ring-white/15">
                   <input type="checkbox" checked={agree} onChange={(e) => setAgree(e.target.checked)} className="mt-1 accent-[#F5B800]" />
-                  I certify these uploads are true copies. I agree to paperless processing and to the monthly rate above.
+                  I certify these uploads are true copies. I agree to paperless processing and to the monthly rate above, and to the Terms of Service and Privacy Policy.
                 </label>
                 {err && <p className="text-[13px] font-semibold text-rose-500">{err}</p>}
               </div>

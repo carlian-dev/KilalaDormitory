@@ -3,6 +3,7 @@ import { LayoutDashboard, Files, FileText, LogOut, Sun, Moon } from "lucide-reac
 import { useStore } from "../../lib/store";
 import { useAuth } from "../../lib/auth";
 import DormiChat from "../../components/DormiChat";
+import ConsentBanner from "../../components/ConsentBanner";
 
 export default function AdminLayout() {
   const { theme, toggleTheme } = useStore();
@@ -45,6 +46,7 @@ export default function AdminLayout() {
         </div>
       </div>
       <DormiChat />
+      <ConsentBanner />
     </div>
   );
 }
