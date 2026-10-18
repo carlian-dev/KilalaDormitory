@@ -114,8 +114,7 @@ Google services — avoid sharing sensitive personal information."*
 - System instruction is assembled **server-side** from the profile role read from the DB —
   the client cannot spoof admin mode.
 - Prompt rules:
-  - Dormi persona (friendly, brief, bullets for steps), replies in the user's language
-    (English / Tagalog / Bisaya okay).
+  - Dormi persona (friendly, brief, bullets for steps), replies in English only.
   - Answer **only** from the provided context + fixed Kilala facts (doc checklist, ₱775 + ₱150
     formula, resubmit flow); never invent application data.
   - Refuse anything outside Kilala; refuse to discuss other students' data.
