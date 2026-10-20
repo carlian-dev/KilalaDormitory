@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
-import { Link, useNavigate, useSearchParams } from "react-router-dom";
-import { Search, FileText, LogOut, PlusCircle, ArrowLeft, ExternalLink } from "lucide-react";
-import { ConfirmDialog, PageFade, StatusBadge } from "../components/ui";
+import { Link, useSearchParams } from "react-router-dom";
+import { Search, FileText, PlusCircle, ArrowLeft, ExternalLink } from "lucide-react";
+import { PageFade, StatusBadge } from "../components/ui";
 import { FileUploader } from "../components/FileUploader";
 import { DOC_TYPES, TEMPLATE_DOCS, UPLOAD_DOCS, BILLING, formatPeso } from "../lib/mockData";
 import { useAuth } from "../lib/auth";
@@ -17,14 +17,12 @@ function timelineOf(status) {
 }
 
 export default function ApplicantDashboard() {
-  const { user, profile, signOut } = useAuth();
-  const nav = useNavigate();
+  const { user, profile } = useAuth();
   const [params, setParams] = useSearchParams();
   const [q, setQ] = useState("");
   const [mine, setMine] = useState([]);
   const [loading, setLoading] = useState(true);
   const [fetchErr, setFetchErr] = useState("");
-  const [confirmingSignOut, setConfirmingSignOut] = useState(false);
 
   const load = () => {
     if (!user) return Promise.resolve();
@@ -153,34 +151,12 @@ export default function ApplicantDashboard() {
   return (
     <PageFade>
       <div className="mx-auto max-w-4xl px-4 sm:px-6 py-8">
-        <div className="flex flex-wrap items-start justify-between gap-3">
-          <div>
-            <p className="text-xs font-semibold uppercase tracking-widest text-slate-400">Kilala Dormitory · my dashboard</p>
-            <h1 className="h-section text-3xl font-bold text-[#0B2A6B] dark:text-white">
-              Hello, {profile?.full_name?.split(" ")[0] || "applicant"}
-            </h1>
-            <p className="mt-1 text-sm text-slate-500 dark:text-slate-300">{user?.email}</p>
-          </div>
-          <div className="flex gap-2">
-            {!loading && mine.length === 0 && (
-              <Link to="/apply" className="pressable inline-flex items-center gap-1.5 rounded-full bg-[#FFD120] px-5 py-2.5 text-sm font-bold text-[#0B2A6B] hover:bg-[#F0BB00]">
-                <PlusCircle size={15} /> New application
-              </Link>
-            )}
-            <button
-              onClick={() => setConfirmingSignOut(true)}
-              className="pressable inline-flex items-center gap-1.5 rounded-full bg-white px-4 py-2.5 text-sm font-semibold text-[#0B2A6B] ring-1 ring-[#0B2A6B]/15 dark:bg-white/10 dark:text-white dark:ring-white/15"
-            ><LogOut size={14} /> Sign out</button>
-          </div>
+        <div>
+          <h1 className="h-section text-3xl font-bold text-[#0B2A6B] dark:text-white">
+            Hello, {profile?.full_name?.split(" ")[0] || "applicant"}
+          </h1>
+          <p className="mt-1 text-sm text-slate-500 dark:text-slate-300">{user?.email}</p>
         </div>
-        <ConfirmDialog
-          open={confirmingSignOut}
-          title="Sign out?"
-          message="You will need to sign in again to access your applications and dashboard."
-          confirmLabel="Sign out"
-          onCancel={() => setConfirmingSignOut(false)}
-          onConfirm={async () => { setConfirmingSignOut(false); if (await signOut()) nav("/"); }}
-        />
 
         {fetchErr && <p className="mt-4 rounded-2xl bg-rose-50 p-3 text-[13px] font-semibold text-rose-700 ring-1 ring-rose-200">{fetchErr}</p>}
 
@@ -189,10 +165,17 @@ export default function ApplicantDashboard() {
         ) : (
           <>
             <div className="mt-5 grid grid-cols-2 gap-2 sm:grid-cols-4">
-              {[["Pending", count("pending")], ["Under review", count("under_review")], ["Approved", count("approved")], ["Needs resubmit", count("rejected")]].map(([k, v]) => (
+              {[
+                ["Pending", count("pending"), "bg-amber-400 dark:bg-amber-300"],
+                ["Under review", count("under_review"), "bg-sky-500 dark:bg-sky-400"],
+                ["Approved", count("approved"), "bg-emerald-500 dark:bg-emerald-400"],
+                ["Needs resubmit", count("rejected"), "bg-rose-500 dark:bg-rose-400"],
+              ].map(([k, v, dot]) => (
                 <div key={k} className="rounded-2xl bg-white px-3 py-3.5 text-center shadow-sm ring-1 ring-slate-100 dark:bg-[#0A2456] dark:ring-white/10">
                   <p className="text-2xl font-bold text-[#0B2A6B] dark:text-[#FFD120]">{v}</p>
-                  <p className="text-[11px] font-semibold text-slate-500 dark:text-slate-300">{k}</p>
+                  <p className="flex items-center justify-center gap-1.5 text-[11px] font-semibold text-slate-500 dark:text-slate-300">
+                    <span className={`h-1.5 w-1.5 rounded-full ${dot}`} aria-hidden="true" />{k}
+                  </p>
                 </div>
               ))}
             </div>
@@ -219,12 +202,18 @@ export default function ApplicantDashboard() {
               </div>
             ) : (
               <div className="mt-4 overflow-hidden rounded-3xl bg-white shadow-sm ring-1 ring-slate-100 dark:bg-[#0A2456] dark:ring-white/10 dark:text-white">
+                <div className="flex items-center justify-between border-b border-slate-100 px-4 py-3 dark:border-white/10">
+                  <p className="text-sm font-bold">My applications</p>
+                  <p className="text-xs font-semibold text-slate-400">
+                    {filtered.length} of {mine.length} shown
+                  </p>
+                </div>
                 {filtered.map((a) => (
                   <button key={a.id} onClick={() => setParams({ id: a.id })}
                     className="pressable flex w-full items-center gap-3 border-b border-slate-100 px-4 py-3.5 text-left last:border-0 hover:bg-slate-50 dark:border-white/10 dark:hover:bg-white/5">
                     <span className="min-w-0 flex-1">
-                      <span className="block truncate text-sm font-bold">My application</span>
-                      <span className="block truncate text-xs text-slate-400">{a.course} · {a.year} · {formatPeso(a.monthlyTotal)}/mo · {new Date(a.submittedAt).toLocaleDateString()}</span>
+                      <span className="block truncate text-sm font-bold">{a.course} · {a.year}</span>
+                      <span className="block truncate text-xs text-slate-400">{formatPeso(a.monthlyTotal)}/mo · Submitted {new Date(a.submittedAt).toLocaleDateString()}</span>
                     </span>
                     <StatusBadge status={a.status} />
                   </button>

@@ -15,8 +15,6 @@ const STEPS = [
 
 export default function Landing() {
   const { user } = useAuth();
-  const applyHref = user ? "/apply" : "/login?next=/apply";
-  const dashboardHref = user ? "/dashboard" : "/login?next=/dashboard";
 
   return (
     <PageFade>
@@ -40,11 +38,8 @@ export default function Landing() {
               Bukidnon State University's paperless dormitory admission. Sign in to apply and follow your application status — nothing to print at the office window.
             </p>
             <div className="mt-6 flex justify-center flex-wrap gap-2 sm:justify-start">
-              <Link to={applyHref} className="pressable inline-flex items-center gap-2 rounded-full bg-[#FFD120] px-6 py-3 text-sm font-bold text-[#0B2A6B] shadow hover:bg-[#F0BB00]">
-                {user ? "Start application" : "Sign in & apply"} <ArrowRight size={16} />
-              </Link>
-              <Link to={dashboardHref} className="pressable inline-flex items-center gap-2 rounded-full bg-white px-6 py-3 text-sm font-semibold text-[#0B2A6B] shadow-sm ring-1 ring-[#0B2A6B]/15 hover:ring-[#0B2A6B]/30 dark:bg-white/10 dark:text-white dark:ring-white/15">
-                {user ? "My dashboard" : "Sign in to dashboard"}
+              <Link to={user ? "/dashboard" : "/login?next=/apply"} className="pressable inline-flex items-center gap-2 rounded-full bg-[#FFD120] px-6 py-3 text-sm font-bold text-[#0B2A6B] shadow hover:bg-[#F0BB00]">
+                {user ? "My dashboard" : "Sign in & apply"} <ArrowRight size={16} />
               </Link>
             </div>
           </motion.div>
