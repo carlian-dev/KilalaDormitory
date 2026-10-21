@@ -20,19 +20,19 @@ export default function DormiAvatar({ size = 32, className = "", mood = "idle" }
 
   return (
     <span
-      className={`grid shrink-0 place-items-center overflow-visible rounded-full bg-[#FFD120] text-[#0B2A6B] shadow-sm ${bodyAnim} ${className}`}
+      className={`grid shrink-0 place-items-center overflow-visible rounded-full bg-[#10B981] text-[#0B2A6B] shadow-sm ${bodyAnim} ${className}`}
       style={{ width: size, height: size }}
       aria-hidden="true"
     >
       <svg width={size} height={size} viewBox="0 0 48 48" className={headAnim}>
         {/* ear tufts */}
-        <path d="M13.2 9.6 Q12.6 3.4 18.2 6.4 Q15.7 8.3 13.2 9.6 Z" fill="#F0BB00" />
-        <path d="M34.8 9.6 Q35.4 3.4 29.8 6.4 Q32.3 8.3 34.8 9.6 Z" fill="#F0BB00" />
+        <path d="M13.2 9.6 Q12.6 3.4 18.2 6.4 Q15.7 8.3 13.2 9.6 Z" fill="#059669" />
+        <path d="M34.8 9.6 Q35.4 3.4 29.8 6.4 Q32.3 8.3 34.8 9.6 Z" fill="#059669" />
         {/* belly */}
-        <ellipse cx="24" cy="36.8" rx="8.8" ry="6.2" fill="#FFF8E1" opacity="0.9" />
+        <ellipse cx="24" cy="36.8" rx="8.8" ry="6.2" fill="#D1FAE5" opacity="0.9" />
         {/* wings — resting tilt lives in CSS (.dormi-wing-*) so the right one can wave */}
-        <ellipse cx="7.4" cy="30.6" rx="3.1" ry="6.6" fill="#F0BB00" className="dormi-wing dormi-wing-l" />
-        <ellipse cx="40.6" cy="30.6" rx="3.1" ry="6.6" fill="#F0BB00" className={`dormi-wing dormi-wing-r ${mood === "wave" ? "dormi-wing-wave" : ""}`} />
+        <ellipse cx="7.4" cy="30.6" rx="3.1" ry="6.6" fill="#059669" className="dormi-wing dormi-wing-l" />
+        <ellipse cx="40.6" cy="30.6" rx="3.1" ry="6.6" fill="#059669" className={`dormi-wing dormi-wing-r ${mood === "wave" ? "dormi-wing-wave" : ""}`} />
 
         {/* eyes: open with movable pupils, or closed arcs for happy/sleepy */}
         {!closed && (
