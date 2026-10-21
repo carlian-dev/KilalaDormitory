@@ -35,7 +35,9 @@ C:\DormitorySystem
 ├── supabase/
 │   ├── mvp1_schema.sql         Base schema + RLS + dorm-requirements bucket (run 1st)
 │   ├── mvp2_cleanup_resubmit.sql  room_pref nullable + resubmit UPDATE policies (run 2nd)
-│   └── mvp3_billing_docs.sql   devices column + 9 doc keys + templates table/bucket (run 3rd)
+│   ├── mvp3_billing_docs.sql   devices column + 10 doc keys + templates table/bucket (run 3rd)
+│   ├── mvp4_application_updates.sql application history + in-app notifications (run 4th)
+│   └── mvp5_account_access.sql restrict self-registration and profile updates (run 5th)
 ├── src/
 │   ├── main.jsx / App.jsx      Entry + router mount
 │   ├── index.css               Tailwind + theme tokens, materials, press feedback, a11y
@@ -51,16 +53,17 @@ C:\DormitorySystem
 │   │   ├── ui.jsx              StatusBadge, PageFade, Stepper
 │   │   └── FileUploader.jsx    Validated drag-and-drop upload (5 MB, PDF/JPG/PNG)
 │   └── pages/
-│       ├── Landing.jsx         Public welcome (no applicant data, no rates)
-│       ├── Login.jsx           Sign in / Create account tabs + `next` redirect
-│       ├── Apply.jsx           4-step wizard: Personal → Downloads → Upload → Payment
+│       ├── Landing.jsx         Public welcome + residence hall details and monthly rate
+│       ├── Login.jsx           Student/admin login selection + account forms
+│       ├── Profile.jsx         Edit profile name and account email
+│       ├── Apply.jsx           4-step wizard: Personal → Downloads → Upload → Review
 │       ├── Dashboard.jsx       Applicant home: my apps, detail, re-upload box
 │       └── admin/
 │           ├── AdminLayout.jsx Console shell (role-gated)
 │           ├── Dashboard.jsx   Counts + latest submissions
 │           ├── Applications.jsx Searchable, filterable queue
 │           ├── AppDetail.jsx   Review + Approve/Reject + remarks
-│           └── Templates.jsx   Upload/replace the 5 downloadable forms
+│           └── Templates.jsx   Upload/replace the 6 downloadable forms
 └── dist/                       Build output (git-ignored)
 ```
 
@@ -77,7 +80,9 @@ C:\DormitorySystem
 `Dashboard.jsx` → `fetchMyApplications(user.id)` → RLS returns **only**
 `owner_id = auth.uid()` rows → timeline, remarks, signed-URL doc views,
 re-upload box when rejected (`resubmitDocuments()` overwrites files in place
-and returns the row to `pending`).
+and returns the row to `pending`). The student dashboard also shows persisted
+application history and in-app notifications for submissions, status changes,
+staff remarks, and resubmissions.
 
 ### Admin review
 `Applications.jsx` / `AppDetail.jsx` → `fetchAllApplications()` (allowed by
@@ -90,17 +95,26 @@ role check.
 `doc_templates` row update → students fetch the list and open signed-URL
 downloads in Apply step 2, then upload signed copies back in step 3.
 
+### Payment
+Application submission does not collect payment online. After dorm staff review
+the submitted requirements, students receive a payment slip from dorm staff,
+pay in cash at the Accountancy Building, and submit the payment receipt to dorm
+staff.
+
 ## 5. Database & access control
 
 Tables: `profiles (id, full_name, role)` · `applications (…, devices jsonb,
 status, remarks, …)` · `application_documents (application_id, doc_type,
-file_path, file_name)` · `doc_templates (key, label, file_path, …)`.
+file_path, file_name)` · `doc_templates (key, label, file_path, …)` ·
+`application_history (application_id, event_type, status, remarks, …)` ·
+`notifications (user_id, title, message, is_read, …)`; notifications are
+standalone and do not link to an application.
 Buckets: `dorm-requirements` (private, `{app_id}/{doctype}`),
 `dorm-templates` (private, `{key}{ext}`).
 
 | Resource | Student | Admin |
 |----------|---------|-------|
-| `profiles` | read/update own row, insert own row | full read |
+| `profiles` | read own row, update own name, insert student row | full read |
 | `applications` | CRUD own rows; update only back to `pending` + blank remarks (resubmit) | full read/update |
 | `application_documents` | CRUD own rows | full read |
 | `doc_templates` | read | full write |
@@ -113,8 +127,8 @@ Helper: `public.is_admin()` (security-definer) reads the caller's
 
 | Route | Gate | Rule |
 |-------|------|------|
-| `/`, `/login` | public | — |
-| `/apply`, `/dashboard` | `StudentGate` | signed-in user, else `/login?next=…` |
+| `/`, `/login`, `/login/student`, `/login/admin` | public | Role-specific sign-in; authenticated profile role is checked |
+| `/apply`, `/dashboard`, `/profile` | `StudentGate` | signed-in user, else role-specific login |
 | `/admin/*` | `AdminGate` | signed-in user **and** `profile.role = 'admin'`, else "Not authorized" |
 
 Sessions come from Supabase Auth (persisted by the client library);
@@ -126,12 +140,14 @@ form input.
 
 * **Rates:** flat base `₱775/mo` per dorm + `₱150/mo` per declared **appliance**;
   gadgets are free but must be registered. Total = `775 + 150 × appliances`,
-  computed client-side (`computeTotal`) and never stored. Shown only inside
-  the application flow and dashboards — never on public pages.
-* **Documents (9 per application):** 5 admin templates (Residency Application,
+  computed client-side (`computeTotal`) and never stored. The base rate and
+  included utilities are shown on the public landing page; application totals
+  are shown during application and in the student/admin dashboards.
+* **Documents (10 per application):** 6 admin templates (Residency Application,
   Personal Data, Residency Agreement, Appliance Registration, Residency
-  Admission — download → print → sign → upload back) + 4 student uploads
-  (COR, Student ID copy, Medical Laboratory, Medical Certificate).
+  Admission, Birth Certificate — download → print → sign → upload back) +
+  4 student uploads (COR, Student ID copy, Medical Laboratory, Medical
+  Certificate).
 * Rejected applications are fixed by **re-upload** (same row back to Pending),
   not by filing a new application. Rooms were cut from MVP 1 (no room pages,
   no assignments).
@@ -141,7 +157,7 @@ form input.
 * Required env: `VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY` (`.env.local`,
   also set in the Vercel dashboard at deploy time).
 * Supabase dashboard prerequisites: Email provider ON, Confirm-email OFF,
-  migrations run in order mvp1 → mvp2 → mvp3; first admin promoted via
+  migrations run in order mvp1 → mvp2 → mvp3 → mvp4 → mvp5; first admin promoted via
   `update profiles set role='admin' …`.
 * Known environment quirk: heavy `backdrop-filter` blurs + a video-saturated
   GPU have crashed Brave during typing; blurs were reduced and global
