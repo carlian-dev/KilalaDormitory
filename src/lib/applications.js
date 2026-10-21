@@ -47,6 +47,34 @@ export async function fetchMyApplications(userId) {
   );
 }
 
+export async function fetchApplicationHistory(applicationId) {
+  const { data, error } = await supabase
+    .from("application_history")
+    .select("id, event_type, status, remarks, created_at")
+    .eq("application_id", applicationId)
+    .order("created_at", { ascending: true });
+  if (error) throw error;
+  return data || [];
+}
+
+export async function fetchNotifications(userId) {
+  const { data, error } = await supabase
+    .from("notifications")
+    .select("id, title, message, is_read, created_at")
+    .eq("user_id", userId)
+    .order("created_at", { ascending: false });
+  if (error) throw error;
+  return data || [];
+}
+
+export async function markNotificationRead(notificationId) {
+  const { error } = await supabase
+    .from("notifications")
+    .update({ is_read: true })
+    .eq("id", notificationId);
+  if (error) throw error;
+}
+
 export async function fetchAllApplications() {
   const { data: apps, error } = await supabase
     .from("applications")
