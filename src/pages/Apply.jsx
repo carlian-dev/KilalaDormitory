@@ -11,6 +11,10 @@ import { createApplication, listTemplates, downloadTemplate } from "../lib/appli
 const inputCls = "w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2.5 text-sm text-[#0A1F44] outline-none focus:border-[#0A1F44] focus:ring-4 focus:ring-[#FFC72C]/40 dark:border-white/15 dark:bg-white/5 dark:text-white dark:placeholder:text-slate-400";
 
 const emptyFiles = () => Object.fromEntries(DOC_TYPES.map((d) => [d.key, null]));
+const deviceKindFor = (name) =>
+  /\b(cell\s*phones?|smartphones?|iphones?|ipads?|phones?|tablets?|laptops?)\b/i.test(name)
+    ? "gadget"
+    : "appliance";
 
 export default function Apply() {
   const { user, profile } = useAuth();
@@ -42,7 +46,9 @@ export default function Apply() {
   }, []);
 
   const addDevice = () => setDevices((ds) => [...ds, { name: "", kind: "appliance" }]);
-  const setDevice = (i, patch) => setDevices((ds) => ds.map((d, j) => (j === i ? { ...d, ...patch } : d)));
+  const setDevice = (i, name) => setDevices((ds) => ds.map((d, j) => (
+    j === i ? { ...d, name, kind: deviceKindFor(name) } : d
+  )));
   const removeDevice = (i) => setDevices((ds) => ds.filter((_, j) => j !== i));
 
   const validStep0 = identityName && identityEmail && form.studentId.trim() && form.course.trim() && form.phone.trim() && form.guardian.trim();
@@ -60,7 +66,7 @@ export default function Apply() {
   };
 
   const submit = async () => {
-    if (!validSubmit) { setErr("Upload all 9 documents and accept the declaration."); return; }
+    if (!validSubmit) { setErr(`Upload all ${DOC_TYPES.length} documents and accept the declaration.`); return; }
     setErr("");
     setBusy(true);
     try {
@@ -85,9 +91,13 @@ export default function Apply() {
             <CheckCircle2 size={30} />
           </motion.div>
           <h1 className="display mt-4 !text-4xl text-[#0A1F44] dark:text-white">Application sent!</h1>
-          <p className="mt-2 text-sm text-slate-500 dark:text-slate-300">Paperless received — no need to visit the office. Save your application ID:</p>
+          <p className="mt-2 text-sm text-slate-500 dark:text-slate-300">Your application and uploaded requirements have been received. Save your application ID:</p>
           <p className="mx-auto mt-4 w-fit break-all rounded-2xl bg-[#0A1F44] px-6 py-3 font-mono text-sm font-bold tracking-wider text-[#FFC72C] dark:bg-[#FFC72C] dark:text-[#0A1F44]">{done.id}</p>
           <p className="mt-3 text-sm font-bold text-[#0A1F44] dark:text-white">Monthly rate: {formatPeso(done.total)}/mo</p>
+          <div className="mt-4 rounded-2xl bg-[#FFF8E1] p-4 text-left text-sm text-[#0A1F44] ring-1 ring-[#FFC72C] dark:bg-[#FFC72C]/10 dark:text-[#FFE9A8] dark:ring-[#FFC72C]/40">
+            <p className="font-bold">Pay in person after your requirements are reviewed</p>
+            <p className="mt-1">Get your payment slip from dorm staff, pay in cash at the Accountancy Building, then submit your payment receipt to dorm staff. No online payment is collected here.</p>
+          </div>
           <div className="mt-6 flex justify-center gap-2">
             <button onClick={() => nav(`/dashboard?id=${done.id}`)} className="pressable rounded-full bg-[#FFC72C] px-6 py-3 text-sm font-bold text-[#0A1F44] hover:bg-[#F5B800]">View in my dashboard</button>
             <button onClick={() => nav("/dashboard")} className="pressable rounded-full bg-white px-6 py-3 text-sm font-semibold text-[#0A1F44] ring-1 ring-[#0A1F44]/15 dark:bg-white/10 dark:text-white dark:ring-white/15">My dashboard</button>
@@ -105,7 +115,7 @@ export default function Apply() {
         <p className="mt-1 text-sm text-slate-500 dark:text-slate-300">4 steps · validated in-browser · stored securely</p>
 
         <div className="mt-5 rounded-3xl bg-white p-4 shadow-sm ring-1 ring-slate-100 dark:bg-[#0B1E3A] dark:ring-white/10">
-          <Stepper steps={["Personal", "Downloads", "Upload", "Payment"]} current={step} />
+          <Stepper steps={["Personal", "Downloads", "Upload", "Review"]} current={step} />
         </div>
 
         <AnimatePresence mode="wait">
@@ -138,7 +148,7 @@ export default function Apply() {
 
             {step === 3 && (
               <div className="grid gap-4">
-                <label className="text-sm font-semibold">Term this payment covers
+                <label className="text-sm font-semibold">Term applied for
                   <select className={inputCls} value={form.term} onChange={set("term")}>
                     <option className="text-slate-900">1st Sem AY 2026–27</option>
                     <option className="text-slate-900">2nd Sem AY 2026–27</option>
@@ -154,20 +164,21 @@ export default function Apply() {
 
                 <div>
                   <p className="flex items-center gap-1.5 text-sm font-semibold"><PlugZap size={15} /> Appliances & gadgets</p>
-                  <p className="mt-0.5 text-xs text-slate-500 dark:text-slate-400">Each appliance adds {formatPeso(BILLING.PER_APPLIANCE)}/mo. Gadgets are free but must still be registered.</p>
+                  <p className="mt-0.5 text-xs text-slate-500 dark:text-slate-400">Cellphones, tablets, and laptops are free. Other devices automatically add {formatPeso(BILLING.PER_APPLIANCE)}/mo each.</p>
                   <div className="mt-2 grid gap-2">
                     {devices.map((d, i) => (
                       <div key={i} className="flex items-center gap-2">
-                        <input value={d.name} onChange={(e) => setDevice(i, { name: e.target.value })}
+                        <input value={d.name} onChange={(e) => setDevice(i, e.target.value)}
                           placeholder="e.g. Rice cooker" className={`${inputCls} flex-1`} />
-                        <div className="flex shrink-0 gap-1 rounded-full bg-slate-100 p-1 dark:bg-white/10">
-                          {[["appliance", "+₱150"], ["gadget", "Free"]].map(([k, label]) => (
-                            <button key={k} type="button" onClick={() => setDevice(i, { kind: k })}
-                              className={`pressable rounded-full px-3 py-1.5 text-xs font-bold ${d.kind === k ? "bg-[#0A1F44] text-[#FFC72C] dark:bg-[#FFC72C] dark:text-[#0A1F44]" : "text-slate-500 dark:text-slate-300"}`}>
-                              {label}
-                            </button>
-                          ))}
-                        </div>
+                        {d.name.trim() && (
+                          <span className={`shrink-0 rounded-full px-3 py-1.5 text-xs font-bold ${
+                            d.kind === "gadget"
+                              ? "bg-emerald-100 text-emerald-700 dark:bg-emerald-500/15 dark:text-emerald-300"
+                              : "bg-[#FFF8E1] text-[#0A1F44] ring-1 ring-[#FFC72C] dark:bg-[#FFC72C]/15 dark:text-[#FFE9A8] dark:ring-[#FFC72C]/40"
+                          }`}>
+                            {d.kind === "gadget" ? "Free" : `+${formatPeso(BILLING.PER_APPLIANCE)}/mo`}
+                          </span>
+                        )}
                         <button type="button" onClick={() => removeDevice(i)} aria-label="Remove device"
                           className="pressable grid h-9 w-9 shrink-0 place-items-center rounded-full bg-slate-100 dark:bg-white/10">
                           <X size={15} />
@@ -188,9 +199,13 @@ export default function Apply() {
                     <span>Monthly total</span><span>{formatPeso(total)}/mo</span>
                   </div>
                 </div>
+                <div className="rounded-2xl bg-[#FFF8E1] p-3.5 text-[13px] text-[#0A1F44] ring-1 ring-[#FFC72C] dark:bg-[#FFC72C]/10 dark:text-[#FFE9A8] dark:ring-[#FFC72C]/40">
+                  <p className="font-bold">Payment is face-to-face, not online.</p>
+                  <p className="mt-0.5">After dorm staff review your submitted requirements, get a payment slip from them, pay in cash at the Accountancy Building, and submit your receipt to dorm staff.</p>
+                </div>
                 <label className="flex cursor-pointer items-start gap-2 rounded-2xl bg-slate-50 p-3 text-[13px] ring-1 ring-slate-200 dark:bg-white/5 dark:ring-white/15">
                   <input type="checkbox" checked={agree} onChange={(e) => setAgree(e.target.checked)} className="mt-1 accent-[#F5B800]" />
-                  I certify these uploads are true copies. I agree to paperless processing and to the monthly rate above.
+                  I certify these uploads are true copies, acknowledge the monthly rate above, and understand that payment is made in person after dorm staff issue a payment slip.
                 </label>
                 {err && <p className="text-[13px] font-semibold text-rose-500">{err}</p>}
               </div>
@@ -255,7 +270,7 @@ export default function Apply() {
                 >Continue <ArrowRight size={15} /></button>
               ) : (
                 <button onClick={submit} disabled={busy} className="pressable rounded-full bg-[#FFC72C] px-6 py-2.5 text-sm font-bold text-[#0A1F44] shadow hover:bg-[#F5B800] disabled:opacity-50">
-                  {busy ? "Uploading…" : `Submit · ${formatPeso(total)}/mo`}
+                  {busy ? "Submitting…" : "Submit application"}
                 </button>
               )}
             </div>
