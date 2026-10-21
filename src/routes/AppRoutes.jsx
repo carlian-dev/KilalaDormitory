@@ -6,6 +6,7 @@ import Landing from "../pages/Landing";
 import Apply from "../pages/Apply";
 import ApplicantDashboard from "../pages/Dashboard";
 import Login from "../pages/Login";
+import Profile from "../pages/Profile";
 import AdminLayout from "../pages/admin/AdminLayout";
 import Dashboard from "../pages/admin/Dashboard";
 import Applications from "../pages/admin/Applications";
@@ -32,11 +33,15 @@ function Loading() {
 }
 
 function StudentGate() {
-  const { user, loading, configured } = useAuth();
+  const { user, profile, loading, configured } = useAuth();
   const loc = useLocation();
   if (!configured) return <p className="mx-auto max-w-xl px-4 py-16 text-center text-sm text-rose-500">Supabase is not configured. Add keys to .env.local (see .env.example).</p>;
   if (loading) return <Loading />;
-  if (!user) return <Navigate to={`/login?next=${encodeURIComponent(loc.pathname + loc.search)}`} replace />;
+  if (!user) return <Navigate to={`/login/student?next=${encodeURIComponent(loc.pathname + loc.search)}`} replace />;
+  if (profile?.role === "admin") return <Navigate to="/admin" replace />;
+  if (profile?.role !== "student") {
+    return <p className="mx-auto max-w-xl px-4 py-16 text-center text-sm text-rose-500">Could not verify your student profile. Please sign in again or contact dorm staff.</p>;
+  }
   return <Outlet />;
 }
 
@@ -44,7 +49,7 @@ function AdminGate() {
   const { user, profile, loading, configured } = useAuth();
   if (!configured) return <p className="mx-auto max-w-xl px-4 py-16 text-center text-sm text-rose-500">Supabase is not configured. Add keys to .env.local (see .env.example).</p>;
   if (loading) return <Loading />;
-  if (!user) return <Navigate to="/login?next=/admin" replace />;
+  if (!user) return <Navigate to="/login/admin?next=/admin" replace />;
   if (profile?.role !== "admin") {
     return (
       <div className="mx-auto max-w-md px-4 py-16 text-center">
@@ -66,9 +71,12 @@ export default function AppRoutes() {
             <Route element={<SiteShell />}>
               <Route index element={<Landing />} />
               <Route path="login" element={<Login />} />
+              <Route path="login/student" element={<Login role="student" />} />
+              <Route path="login/admin" element={<Login role="admin" />} />
               <Route element={<StudentGate />}>
                 <Route path="apply" element={<Apply />} />
                 <Route path="dashboard" element={<ApplicantDashboard />} />
+                <Route path="profile" element={<Profile />} />
               </Route>
               <Route path="track" element={<Navigate to="/dashboard" replace />} />
             </Route>
