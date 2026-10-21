@@ -58,7 +58,7 @@ export default function Templates() {
       <p className="text-[11px] font-bold uppercase tracking-widest text-slate-400">Forms students download</p>
       <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-white">Templates</h1>
       <p className="mt-1 text-sm text-slate-400">
-        Upload the 5 softcopy forms. Students download, print, sign, and upload them back with their application.
+        Upload the 6 softcopy forms. Students download, print, sign, and upload them back with their application.
       </p>
 
       {fetchErr && <p className="mt-3 rounded-2xl bg-rose-500/10 p-3 text-[13px] font-semibold text-rose-300 ring-1 ring-rose-400/30">{fetchErr}</p>}
@@ -68,7 +68,7 @@ export default function Templates() {
         {loading && <p className="text-sm text-slate-400">Loading…</p>}
         {!loading && rows.length === 0 && !fetchErr && (
           <p className="rounded-3xl bg-white/5 p-6 text-center text-sm text-slate-300 ring-1 ring-white/10">
-            No templates yet — run <span className="font-mono">mvp3_billing_docs.sql</span> to seed the 5 rows.
+            No templates yet — run <span className="font-mono">mvp3_billing_docs.sql</span> to seed the 6 rows.
           </p>
         )}
         {rows.map((r) => (
