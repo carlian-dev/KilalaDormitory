@@ -76,11 +76,50 @@ export function AuthProvider({ children }) {
       }
       return { ok: true };
     },
-    signIn: async ({ email, password }) => {
-      const { error } = await supabase.auth.signInWithPassword({
+    signIn: async ({ email, password, expectedRole }) => {
+      const { data, error } = await supabase.auth.signInWithPassword({
         email: email.trim().toLowerCase(),
         password,
       });
+      if (error) return { ok: false, error: error.message };
+      if (expectedRole) {
+        const { data: accountProfile, error: profileError } = await supabase
+          .from("profiles")
+          .select("role")
+          .eq("id", data.user.id)
+          .single();
+        if (profileError) {
+          await supabase.auth.signOut();
+          return { ok: false, error: profileError.message };
+        }
+        if (accountProfile.role !== expectedRole) {
+          await supabase.auth.signOut();
+          return {
+            ok: false,
+            error: `This account is registered as ${accountProfile.role}. Choose the matching sign-in option.`,
+          };
+        }
+      }
+      return { ok: true };
+    },
+    updateProfileName: async (name) => {
+      if (!user) return { ok: false, error: "You must be signed in." };
+      const fullName = name.trim();
+      if (!fullName) return { ok: false, error: "Please enter your full name." };
+      const { data, error } = await supabase
+        .from("profiles")
+        .update({ full_name: fullName })
+        .eq("id", user.id)
+        .select("id, full_name, role")
+        .single();
+      if (error) return { ok: false, error: error.message };
+      setProfile(data);
+      return { ok: true };
+    },
+    updateAccountEmail: async (email) => {
+      const nextEmail = email.trim().toLowerCase();
+      if (!nextEmail) return { ok: false, error: "Please enter an email address." };
+      const { error } = await supabase.auth.updateUser({ email: nextEmail });
       if (error) return { ok: false, error: error.message };
       return { ok: true };
     },
