@@ -22,6 +22,7 @@ export const DOC_TYPES = [
   { key: "residency_agreement", label: "Residency Agreement", hint: "Download the form, print, sign, then upload the signed copy", source: "template", required: true },
   { key: "appliance_registration", label: "Registration of Appliance / Electronic Device", hint: "Download the form, print, sign, then upload the signed copy", source: "template", required: true },
   { key: "residency_admission", label: "Residency Admission", hint: "Download the form, print, sign, then upload the signed copy", source: "template", required: true },
+  { key: "birth_certificate", label: "Birth Certificate", hint: "Download the form, print, sign, then upload the signed copy", source: "template", required: true },
   { key: "cor", label: "Certificate of Registration (COR)", hint: "Your COR for the current term, PDF / JPG / PNG, max 5MB", source: "upload", required: true },
   { key: "student_id_copy", label: "Photocopy of Student ID", hint: "Clear front copy, PDF / JPG / PNG, max 5MB", source: "upload", required: true },
   { key: "med_lab", label: "Medical Laboratory Result", hint: "Laboratory result copy, PDF / JPG / PNG, max 5MB", source: "upload", required: true },
