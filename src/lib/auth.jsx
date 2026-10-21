@@ -1,9 +1,12 @@
 import { createContext, useContext, useEffect, useMemo, useState } from "react";
 import { supabase, isSupabaseConfigured } from "./supabase";
 
-// Real Supabase auth (MVP 1). Replaces the old passwordless localStorage
-// mock: sessions are bound to auth.users, ownership enforced by RLS.
+// Real Supabase auth. Students sign in with Google Workspace only; the
+// email/password path remains for the dorm office. The domain rule is
+// enforced in supabase/mvp6_google_auth.sql, not in this file — the
+// client is never the security boundary.
 const AuthCtx = createContext(null);
+const STUDENT_EMAIL_DOMAIN = "student.buksu.edu.ph";
 
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
@@ -54,27 +57,26 @@ export function AuthProvider({ children }) {
     isAdmin: profile?.role === "admin",
     loading: loading || profileLoading,
     configured: isSupabaseConfigured,
-    signUp: async ({ name, email, password }) => {
-      const { data, error } = await supabase.auth.signUp({
-        email: email.trim().toLowerCase(),
-        password,
+    // Google OAuth. `hd` filters Google's account chooser to the student
+    // Workspace domain; the auth.users trigger is what actually enforces it.
+    signInWithGoogle: async (next) => {
+      if (!isSupabaseConfigured) {
+        return { ok: false, error: "Supabase is not configured yet." };
+      }
+      const redirectTo = new URL("/login", window.location.origin);
+      if (next && next.startsWith("/")) redirectTo.searchParams.set("next", next);
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: "google",
+        options: {
+          redirectTo: redirectTo.toString(),
+          queryParams: {
+            hd: STUDENT_EMAIL_DOMAIN,
+            prompt: "select_account",
+          },
+        },
       });
       if (error) return { ok: false, error: error.message };
-      const newUser = data.user;
-      if (newUser) {
-        const { error: pErr } = await supabase.from("profiles").insert({
-          id: newUser.id,
-          full_name: name.trim(),
-          role: "student",
-        });
-        if (pErr) return { ok: false, error: pErr.message };
-      }
-      // If email confirmation is ON, there is no session yet — user must confirm.
-      if (!data.session) {
-        return { ok: true, needsConfirm: true };
-      }
-      const newProfile = newUser ? await fetchProfile(newUser.id) : null;
-      return { ok: true, profile: newProfile };
+      return { ok: true };
     },
     signIn: async ({ email, password }) => {
       const { data, error } = await supabase.auth.signInWithPassword({

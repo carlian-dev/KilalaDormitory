@@ -14,6 +14,54 @@ export function formatPeso(n) {
   return `${BILLING.CURRENCY}${Number(n || 0).toLocaleString()}`;
 }
 
+// Degree programs grouped by college — drives the College + Course dropdowns.
+// Full program names are stored in applications.course (no DB migration needed).
+export const COLLEGES = [
+  {
+    name: "College of Nursing",
+    courses: ["Bachelor of Science in Nursing"],
+  },
+  {
+    name: "College of Business",
+    courses: [
+      "Bachelor of Science in Accountancy",
+      "Bachelor of Science in Business Administration",
+      "Bachelor of Science in Hospitality Management",
+    ],
+  },
+  {
+    name: "College of Public Administration and Governance",
+    courses: ["Bachelor of Public Administration"],
+  },
+  {
+    name: "College of Technologies",
+    courses: [
+      "Bachelor of Science in Information Technology",
+      "Bachelor of Science in Automotive Technology",
+      "Bachelor of Science in Food Technology",
+      "Bachelor of Science in Entertainment and Multimedia Computing",
+      "Bachelor of Science in Electronics",
+    ],
+  },
+  {
+    name: "College of Arts and Sciences",
+    courses: [
+      "Bachelor of Science in Biology",
+      "Bachelor of Science in Mathematics",
+      "Bachelor of Science in Environmental Science",
+      "Bachelor of Arts in Economics",
+      "Bachelor of Arts in English",
+      "Bachelor of Arts in Philosophy",
+      "Bachelor of Arts in Sociology",
+      "Bachelor of Science in Development Communication",
+    ],
+  },
+];
+
+export function collegeOfCourse(course) {
+  return COLLEGES.find((c) => c.courses.includes(course))?.name || "";
+}
+
 // source: "template" = admin softcopy (download, print, sign, upload back)
 // source: "upload"   = student-provided document (upload directly)
 export const DOC_TYPES = [

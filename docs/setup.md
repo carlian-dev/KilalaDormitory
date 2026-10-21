@@ -100,9 +100,13 @@ The frontend connects directly to Supabase via `@supabase/supabase-js`. You must
 >   2. `supabase/mvp2_cleanup_resubmit.sql`
 >   3. `supabase/mvp3_billing_docs.sql`
 >   4. `supabase/mvp4_one_application.sql`
->   Then in Dashboard → Authentication → Providers → **Email**:
->   - Email Provider: **ON**
+>   5. `supabase/mvp5_ai_usage.sql`
+>   6. `supabase/mvp6_google_auth.sql`
+>   Then in Dashboard → Authentication → Providers:
+>   - **Google**: **ON** (Client ID + Secret; students sign in with `@student.buksu.edu.ph` only)
+>   - **Email**: **ON** (admin sign-in only)
 >   - Confirm email: **OFF**
+>   - URL Configuration → Redirect URLs: `http://localhost:5173/**`
 
 The migration files are idempotent and must be run in the order shown. The
 dashboard checklist and backend inventory are documented in

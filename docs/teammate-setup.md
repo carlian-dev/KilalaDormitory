@@ -100,9 +100,12 @@ The frontend connects directly to Supabase via `@supabase/supabase-js`. You must
 >   3. `supabase/mvp3_billing_docs.sql`
 >   4. `supabase/mvp4_one_application.sql`
 >   5. `supabase/mvp5_ai_usage.sql`
->   Then in Dashboard → Authentication → Providers → **Email**:
->   - Email Provider: **ON**
+>   6. `supabase/mvp6_google_auth.sql`
+>   Then in Dashboard → Authentication → Providers:
+>   - **Google**: **ON** (Client ID + Secret; students sign in with `@student.buksu.edu.ph` only)
+>   - **Email**: **ON** (admin sign-in only)
 >   - Confirm email: **OFF**
+>   - URL Configuration → Redirect URLs: `http://localhost:5173/**`
 >
 > **Dormi AI (assistant)**: the chat widget talks to the shared `dormi-chat`
 > Edge Function — nothing to configure on your machine. Local function testing

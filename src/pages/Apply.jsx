@@ -4,7 +4,7 @@ import { motion, AnimatePresence } from "motion/react";
 import { ArrowLeft, ArrowRight, CheckCircle2, Plus, X, Download, PlugZap, Pencil, ClipboardCheck } from "lucide-react";
 import { PageFade, Stepper } from "../components/ui";
 import { FileUploader } from "../components/FileUploader";
-import { DOC_TYPES, TEMPLATE_DOCS, UPLOAD_DOCS, BILLING, computeTotal, formatPeso } from "../lib/mockData";
+import { DOC_TYPES, TEMPLATE_DOCS, UPLOAD_DOCS, BILLING, COLLEGES, collegeOfCourse, computeTotal, formatPeso } from "../lib/mockData";
 import { useAuth } from "../lib/auth";
 import { createApplication, fetchMyApplications, listTemplates, downloadTemplate } from "../lib/applications";
 import { saveDraftFile, loadDraftFiles, removeDraftFile, clearDraftFiles } from "../lib/draftFiles";
@@ -26,9 +26,11 @@ function loadDraft(userId) {
     if (!raw) return null;
     const d = JSON.parse(raw);
     if (!d || typeof d !== "object") return null;
-    const form = { studentId: "", course: "", year: "1st Year", phone: "", guardian: "", guardianContact: "", address: "", term: "1st Sem AY 2026–27", ...(d.form || {}) };
+    const form = { studentId: "", college: "", course: "", year: "1st Year", phone: "", guardian: "", guardianContact: "", address: "", term: "1st Sem AY 2026–27", ...(d.form || {}) };
     // "Summer 2027" term was removed — remap stale drafts to the default.
     if (form.term === "Summer 2027") form.term = "1st Sem AY 2026–27";
+    // Drafts saved before College existed only have the typed course.
+    if (!form.college && form.course) form.college = collegeOfCourse(form.course);
     return {
       form,
       devices: Array.isArray(d.devices) ? d.devices.filter((x) => x && typeof x.name === "string") : [],
@@ -43,7 +45,7 @@ export default function Apply() {
   const [step, setStep] = useState(() => loadDraft(user?.id)?.step || 0);
   const [busy, setBusy] = useState(false);
   const [form, setForm] = useState(() => loadDraft(user?.id)?.form || {
-    studentId: "", course: "", year: "1st Year",
+    studentId: "", college: "", course: "", year: "1st Year",
     phone: "", guardian: "", guardianContact: "", address: "",
     term: "1st Sem AY 2026–27",
   });
@@ -67,6 +69,12 @@ export default function Apply() {
   const [checkingExisting, setCheckingExisting] = useState(true);
 
   const set = (k) => (e) => setForm((f) => ({ ...f, [k]: e.target.value }));
+  // Changing college invalidates the course picked under the old one.
+  const setCollege = (e) => {
+    const college = e.target.value;
+    setForm((f) => ({ ...f, college, course: f.college === college ? f.course : "" }));
+  };
+  const collegeCourses = COLLEGES.find((c) => c.name === form.college)?.courses || [];
   const namedDevices = devices.filter((d) => d.name.trim());
   const total = computeTotal(namedDevices);
   const applianceCount = namedDevices.filter((d) => d.kind === "appliance").length;
@@ -125,7 +133,7 @@ export default function Apply() {
   const startOver = () => {
     try { if (user?.id) localStorage.removeItem(draftKey(user.id)); } catch { /* ignore */ }
     if (user?.id) clearDraftFiles(user.id);
-    setForm({ studentId: "", course: "", year: "1st Year", phone: "", guardian: "", guardianContact: "", address: "", term: "1st Sem AY 2026–27" });
+    setForm({ studentId: "", college: "", course: "", year: "1st Year", phone: "", guardian: "", guardianContact: "", address: "", term: "1st Sem AY 2026–27" });
     setDevices([]);
     setFiles(emptyFiles());
     setFilesRestored(false);
@@ -140,7 +148,7 @@ export default function Apply() {
   const setDevice = (i, patch) => setDevices((ds) => ds.map((d, j) => (j === i ? { ...d, ...patch } : d)));
   const removeDevice = (i) => setDevices((ds) => ds.filter((_, j) => j !== i));
 
-  const validStep0 = identityName && identityEmail && form.studentId.trim() && form.course.trim() && form.phone.trim() && form.guardian.trim() && (form.guardianContact || "").trim();
+  const validStep0 = identityName && identityEmail && form.studentId.trim() && form.college && form.course.trim() && form.phone.trim() && form.guardian.trim() && (form.guardianContact || "").trim();
   const validUpload = DOC_TYPES.every((d) => files[d.key]);
   const validReview = Boolean(validStep0) && validUpload && confirmCorrect;
   const validSubmit = validUpload && agree;
@@ -263,7 +271,18 @@ export default function Apply() {
                 </div>
                 <label className="text-sm font-semibold">Student ID<input className={inputCls} value={form.studentId} onChange={set("studentId")} placeholder="2024-01209" /></label>
                 <label className="text-sm font-semibold">Contact number<input className={inputCls} value={form.phone} onChange={set("phone")} placeholder="09xx-xxx-xxxx" inputMode="tel" /></label>
-                <label className="text-sm font-semibold">Course<input className={inputCls} value={form.course} onChange={set("course")} placeholder="BS Nursing" /></label>
+                <label className="text-sm font-semibold sm:col-span-2">College
+                  <select className={inputCls} value={form.college} onChange={setCollege}>
+                    <option value="" disabled className="text-slate-900">Select your college</option>
+                    {COLLEGES.map((c) => <option key={c.name} value={c.name} className="text-slate-900">{c.name}</option>)}
+                  </select>
+                </label>
+                <label className="text-sm font-semibold">Course
+                  <select className={`${inputCls} disabled:opacity-50`} value={form.course} onChange={set("course")} disabled={!form.college}>
+                    <option value="" disabled className="text-slate-900">{form.college ? "Select your course" : "Choose a college first"}</option>
+                    {collegeCourses.map((c) => <option key={c} value={c} className="text-slate-900">{c}</option>)}
+                  </select>
+                </label>
                 <label className="text-sm font-semibold">Year level
                   <select className={inputCls} value={form.year} onChange={set("year")}>
                     {["1st Year","2nd Year","3rd Year","4th Year","5th Year"].map((y) => <option key={y} className="text-slate-900">{y}</option>)}
@@ -406,6 +425,7 @@ export default function Apply() {
                     <div><dt className="text-xs text-slate-500 dark:text-slate-400">Email</dt><dd className="font-semibold break-all">{identityEmail || "—"}</dd></div>
                     <div><dt className="text-xs text-slate-500 dark:text-slate-400">Student ID</dt><dd className="font-semibold">{form.studentId || "—"}</dd></div>
                     <div><dt className="text-xs text-slate-500 dark:text-slate-400">Contact number</dt><dd className="font-semibold">{form.phone || "—"}</dd></div>
+                    <div><dt className="text-xs text-slate-500 dark:text-slate-400">College</dt><dd className="font-semibold">{form.college || "—"}</dd></div>
                     <div><dt className="text-xs text-slate-500 dark:text-slate-400">Course</dt><dd className="font-semibold">{form.course || "—"}</dd></div>
                     <div><dt className="text-xs text-slate-500 dark:text-slate-400">Year level</dt><dd className="font-semibold">{form.year}</dd></div>
                     <div><dt className="text-xs text-slate-500 dark:text-slate-400">Parent / Guardian</dt><dd className="font-semibold">{form.guardian || "—"}</dd></div>

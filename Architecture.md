@@ -39,6 +39,7 @@ C:\DormitorySystem
 │   ├── mvp3_billing_docs.sql   devices column + 9 doc keys + templates table/bucket (run 3rd)
 │   ├── mvp4_one_application.sql   1 student = 1 application (run 4th)
 │   ├── mvp5_ai_usage.sql       Dormi AI quota tables + RPCs (run 5th)
+│   ├── mvp6_google_auth.sql    Google-only student auth + domain guard (run 6th)
 │   └── functions/dormi-chat/   Edge Function: JWT + quotas + Gemini proxy
 ├── src/
 │   ├── main.jsx / App.jsx      Entry + router mount
@@ -46,7 +47,7 @@ C:\DormitorySystem
 │   ├── routes/AppRoutes.jsx    Route table + StudentGate + AdminGate + footer
 │   ├── lib/
 │   │   ├── supabase.js         Supabase client (reads VITE_… env)
-│   │   ├── auth.jsx            AuthProvider: session, profile+role, signUp/signIn/signOut
+│   │   ├── auth.jsx            AuthProvider: session, profile+role, Google OAuth/signIn/signOut
 │   │   ├── applications.js     All DB/Storage calls (CRUD, signed URLs, templates, resubmit)
 │   │   ├── dormi.js            Dormi context builders + askDormi()
 │   │   ├── store.jsx           Theme state only (persisted `kilala-theme`)
@@ -59,7 +60,7 @@ C:\DormitorySystem
 │   │   └── DormiAvatar.jsx     Placeholder mascot — swap point for final art
 │   └── pages/
 │       ├── Landing.jsx         Public welcome (no applicant data, no rates)
-│       ├── Login.jsx           Sign in / Create account tabs + `next` redirect
+│       ├── Login.jsx           Continue with Google + admin email sign-in, `next` redirect
 │       ├── Apply.jsx           5-step wizard: Personal → Downloads → Upload → Review → Payment
 │       ├── Dashboard.jsx       Applicant home: my apps, detail, re-upload box
 │       └── admin/
@@ -158,9 +159,11 @@ form input.
 
 * Required env: `VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY` (`.env.local`,
   also set in the Vercel dashboard at deploy time).
-* Supabase dashboard prerequisites: Email provider ON, Confirm-email OFF,
-  migrations run in order mvp1 → mvp2 → mvp3; first admin promoted via
-  `update profiles set role='admin' …`.
+* Supabase dashboard prerequisites: Google provider ON for students
+  (`@student.buksu.edu.ph`), Email provider ON + Confirm-email OFF for the
+  admin console, redirect URLs allowlisted, migrations run in order
+  mvp1 → mvp6; admins allowlisted in `public.admin_emails` (see
+  `supabase/BACKEND.md` §2).
 * Known environment quirk: heavy `backdrop-filter` blurs + a video-saturated
   GPU have crashed Brave during typing; blurs were reduced and global
   `will-change` removed (`src/index.css`). Dev-test in a light window.

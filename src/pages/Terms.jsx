@@ -15,7 +15,7 @@ export default function Terms() {
           <section>
             <h2 className="text-lg font-bold text-[#0B2A6B] dark:text-white">1. Acceptance of these terms</h2>
             <p className="mt-2">
-              By creating an account or using the Kilala Dormitory web application, you agree to be bound by these Terms of
+              By signing in or using the Kilala Dormitory web application, you agree to be bound by these Terms of
               Service. If you do not agree, do not use the service.
             </p>
           </section>
@@ -31,7 +31,7 @@ export default function Terms() {
           <section>
             <h2 className="text-lg font-bold text-[#0B2A6B] dark:text-white">3. Your account</h2>
             <ul className="mt-2 list-disc space-y-1 pl-5">
-              <li>You are responsible for keeping your password secure and for all activity under your account.</li>
+              <li>You are responsible for keeping your sign-in credentials (your BukSU Google account or dorm-office password) secure and for all activity under your account.</li>
               <li>One person, one account. Do not share credentials or impersonate others.</li>
               <li>Notify the Housing Office promptly if you suspect unauthorized access.</li>
             </ul>
@@ -92,7 +92,7 @@ export default function Terms() {
             <h2 className="text-lg font-bold text-[#0B2A6B] dark:text-white">9. Third-party services</h2>
             <p className="mt-2">
               The service relies on third parties such as Supabase (hosting, database, authentication, storage) and Google
-              Gemini (Dormi assistant). Your use of those services is subject to their own terms and privacy policies.
+              (Workspace sign-in and Gemini for the Dormi assistant). Your use of those services is subject to their own terms and privacy policies.
             </p>
           </section>
 

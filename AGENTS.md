@@ -11,7 +11,7 @@
 
 ## Env & Supabase
 - `.env.local` (git-ignored) holds `VITE_SUPABASE_URL` + `VITE_SUPABASE_ANON_KEY`; `.env.example` is the template. Build succeeds without keys (client only warns) — a missing-key banner at runtime means env, not code.
-- Migrations in `supabase/` run **in order mvp1 → mvp2 → mvp3**, all idempotent. Dashboard-only Auth config (Email ON, Confirm-email OFF) is checklist-documented in `supabase/BACKEND.md`, not in code.
+- Migrations in `supabase/` run **in order mvp1 → mvp6**, all idempotent. Dashboard-only Auth config (Google + Email providers, redirect URLs) is checklist-documented in `supabase/BACKEND.md`, not in code.
 - Backend is **100% auto API** (PostgREST/GoTrue/Storage via `supabase-js`) — no custom endpoints exist. **RLS is the security boundary**: never filter other users' data client-side; stamp ownership from the session (`auth.jsx`), never from form input.
 
 ## Data-model gotchas

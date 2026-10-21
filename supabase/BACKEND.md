@@ -13,24 +13,48 @@ There are no Edge Functions, webhooks, or cron jobs in MVP 1 (see §5).
 | One student = one application (`applications_owner_unique`) | `mvp4_one_application.sql` |
 | `doc_type` 9-key CHECK | `mvp3_billing_docs.sql` |
 | `is_admin()` security-definer function | `mvp1_schema.sql` |
-| All RLS policies (owner-only + admin override) | `mvp1_schema.sql`, `mvp2_cleanup_resubmit.sql` |
+| All RLS policies (owner-only + admin override) | `mvp1_schema.sql`, `mvp2_cleanup_resubmit.sql`, `mvp6_google_auth.sql` |
 | Buckets `dorm-requirements`, `dorm-templates` (private) + Storage policies | `mvp1_schema.sql`, `mvp3_billing_docs.sql` |
 | `devices` jsonb column (appliance/gadget declarations) | `mvp3_billing_docs.sql` |
 | Billing math (₱775 + ₱150/appliance, computed never stored) | `src/lib/mockData.js` → `computeTotal` |
 | All DB/Storage calls (CRUD, signed URLs, templates, resubmit) | `src/lib/applications.js` |
-| Auth flows (signUp + profile insert, signIn, signOut, role load) | `src/lib/auth.jsx` |
+| Auth flows (Google OAuth, admin email signIn, signOut, role load) | `src/lib/auth.jsx` |
+| Institutional-email guard on `auth.users` + auto profile trigger + `admin_emails` allowlist | `mvp6_google_auth.sql` |
 | Dormi AI quota tables + `dormi_take_quota()` / `dormi_refund_quota()` | `mvp5_ai_usage.sql` |
 | Dormi chat proxy (Gemini free tier — first Edge Function) | `supabase/functions/dormi-chat/index.ts` |
 | Dormi client calls (context builders + `askDormi()`) | `src/lib/dormi.js` |
 | Dormi widget UI (placeholder mascot) | `src/components/DormiChat.jsx`, `DormiAvatar.jsx` |
 
-Run order for a fresh project: **mvp1 → mvp2 → mvp3 → mvp4 → mvp5** (each is idempotent).
+Run order for a fresh project: **mvp1 → mvp2 → mvp3 → mvp4 → mvp5 → mvp6** (each is idempotent).
+Deploy order for an existing project: **run mvp6 first, then ship the client** —
+the trigger replaces the old client-side profile insert, so new Google users
+have no `profiles` row until the migration is applied.
 
 ## 2. Dashboard-only config (NOT in code — follow this checklist)
 
+**Students: Google only.** `mvp6_google_auth.sql` rejects any new
+`auth.users` row that is not `@student.buksu.edu.ph`, so the provider and
+redirect settings must match that flow.
+
+Supabase Dashboard → Authentication → Providers → **Google**:
+- [ ] Google provider: **ON**
+- [ ] Client ID + Client Secret from Google Cloud Console → APIs & Services →
+      Credentials → OAuth client (Web application)
+- [ ] Authorized redirect URI in Google Cloud:
+      `https://<project-ref>.supabase.co/auth/v1/callback`
+- [ ] OAuth consent screen published for the BukSU Workspace (or Internal
+      if the student domain lives in the same Workspace)
+
+Supabase Dashboard → Authentication → URL Configuration:
+- [ ] Site URL: the deployed app URL (e.g. `https://kilala.vercel.app`)
+- [ ] Redirect URLs: `http://localhost:5173/**` and
+      `https://<deployed-domain>/**`
+      (Google returns to `/login?next=…`; unlisted URLs silently fall back
+      to the Site URL)
+
 Supabase Dashboard → Authentication → Providers → **Email**:
-- [ ] Email provider: **ON** (master switch — OFF kills all login)
-- [ ] Confirm email: **OFF** (instant login for MVP 1)
+- [ ] Email provider: **ON** (dorm-office accounts sign in here; students use Google)
+- [ ] Confirm email: **OFF**
 
 Supabase Dashboard → Project Settings → API Keys: copy Project URL + the
 client key — the **publishable** key (`sb_publishable_…`) on new projects,
@@ -38,11 +62,24 @@ or the legacy `anon` public key on older ones — into `.env.local` (local)
 and the Vercel dashboard (deploy). Never commit keys; never use the
 `service_role`/secret key client-side.
 
-First admin: register via the app, then
+**Admin accounts** (email/password) are allowlisted in the DB before the
+user exists — the allowlist bypasses the student-domain guard and makes the
+auto-created profile `role = 'admin'`:
+```sql
+insert into public.admin_emails (email, note)
+values ('dormadmin@buksu.edu.ph', 'dorm office')
+on conflict (email) do nothing;
+```
+Then Dashboard → Authentication → Users → **Add user** with that email and
+a password. To promote an existing account instead:
 ```sql
 update public.profiles set role = 'admin'
 where id = (select id from auth.users where email = 'you@example.com');
 ```
+
+> The client also passes Google's `hd=student.buksu.edu.ph` hint to filter
+> the account chooser. It is **UX only** — the trigger in
+> `mvp6_google_auth.sql` is the security boundary.
 
 ## 3. Live-only data (export separately, never to the public repo)
 
@@ -50,14 +87,16 @@ where id = (select id from auth.users where email = 'you@example.com');
 and both buckets' objects contain student PII (names, phones, guardians,
 IDs, medical docs). Dumps and file downloads belong in a **git-ignored local
 `backups/` folder only**. `auth.users` passwords cannot be exported at all —
-after a rebuild, users re-register and `profiles` rows re-link by id.
+after a rebuild, students sign in with Google again and `profiles` rows
+re-link by id (the trigger in `mvp6_google_auth.sql` recreates them).
 
 ## 4. Disaster recovery (fresh project, ~15 min)
 
-1. Create project → run mvp1 → mvp2 → mvp3 → mvp4 in SQL Editor.
-2. Apply the §2 checklist + re-enter Vercel env vars.
+1. Create project → run mvp1 → mvp2 → mvp3 → mvp4 → mvp5 → mvp6 in SQL Editor.
+2. Apply the §2 checklist (including Google OAuth + redirect URLs) and
+   re-enter Vercel env vars.
 3. Restore `backups/` data rows and bucket files if they exist.
-4. Users re-register; promote admins per §2.
+4. Students sign in with Google again; admins re-allowlist + Add user per §2.
 
 ## 5. Edge Functions: one, `dormi-chat` (Dormi AI, Gemini free tier)
 

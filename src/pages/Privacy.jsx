@@ -30,8 +30,8 @@ export default function Privacy() {
           <section>
             <h2 className="text-lg font-bold text-[#0B2A6B] dark:text-white">2. Data we collect</h2>
             <ul className="mt-2 list-disc space-y-1 pl-5">
-              <li><strong>Account data:</strong> full name, email address, and a password stored only as a salted hash by our authentication provider (Supabase Auth). Profile role (student or admin).</li>
-              <li><strong>Application data:</strong> student ID, course, year level, contact number, parent/guardian name and contact number, home address, selected term, and your list of devices/appliances.</li>
+              <li><strong>Account data:</strong> full name, email address, Google account identifier (student sign-in), and — for dorm-office accounts — a password stored only as a salted hash by our authentication provider (Supabase Auth). Profile role (student or admin).</li>
+              <li><strong>Application data:</strong> student ID, college, course, year level, contact number, parent/guardian name and contact number, home address, selected term, and your list of devices/appliances.</li>
               <li><strong>Documents:</strong> files you upload (signed forms and supporting documents such as certificates and medical results).</li>
               <li><strong>Computed data:</strong> your monthly rate, derived from the base rate plus registered appliances.</li>
               <li><strong>Technical data:</strong> IP address, browser and device information, timestamps, and authentication/security events processed by our hosting and database provider.</li>
@@ -56,7 +56,7 @@ export default function Privacy() {
           <section>
             <h2 className="text-lg font-bold text-[#0B2A6B] dark:text-white">4. Legal basis</h2>
             <p className="mt-2">
-              We process your data on the basis of your consent (creating an account and submitting an application),
+              We process your data on the basis of your consent (signing in with your BukSU Google account and submitting an application),
               our legitimate interests (security, service improvement, university administration), and legal obligations
               (university record-keeping and applicable law).
             </p>
@@ -66,6 +66,7 @@ export default function Privacy() {
             <h2 className="text-lg font-bold text-[#0B2A6B] dark:text-white">5. Sharing and third parties</h2>
             <ul className="mt-2 list-disc space-y-1 pl-5">
               <li><strong>Supabase</strong> (database, authentication, file storage, edge functions) acts as our data processor and hosts the data in its cloud infrastructure.</li>
+              <li><strong>Google</strong> provides student sign-in through Google Workspace; we receive your name and @student.buksu.edu.ph email address.</li>
               <li><strong>Housing Office staff / administrators</strong> with role-based access review applications and documents.</li>
               <li><strong>Dormi assistant</strong> sends only the limited context described in section 2 to Google Gemini to answer your questions. It never sends student IDs, phone numbers, guardian details, home addresses, or document contents.</li>
               <li><strong>Legal / regulatory</strong> disclosures when required by law or to protect rights and safety.</li>
