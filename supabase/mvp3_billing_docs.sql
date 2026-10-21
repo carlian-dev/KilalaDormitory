@@ -1,12 +1,12 @@
 -- ============================================================
 -- Kilala Dormitory — MVP 1 follow-up: flat billing + two-sided docs.
--- Run once in Supabase Dashboard > SQL Editor, AFTER mvp2.
+-- Run in Supabase Dashboard > SQL Editor, AFTER mvp2. Safe to re-run.
 --
 -- Billing:  applications.devices jsonb [{name, kind}] where kind is
 --   'appliance' (+P150 each) or 'gadget' (free). Base rate P775.
 --   Monthly total is computed client-side, never stored.
 --
--- Documents (9 keys): 5 admin templates (download, print, sign,
+-- Documents (10 keys): 6 admin templates (download, print, sign,
 --   upload back) + 4 student-provided uploads.
 -- ============================================================
 
@@ -14,7 +14,13 @@
 alter table public.applications
   add column if not exists devices jsonb not null default '[]';
 
--- ---------- doc_type: expand from old 3 keys to 9 ----------
+-- Ensure signed-in students can insert only applications they own.
+drop policy if exists "applications owner insert" on public.applications;
+create policy "applications owner insert" on public.applications
+  for insert to authenticated
+  with check (owner_id = auth.uid());
+
+-- ---------- doc_type: expand from old 3 keys to 10 ----------
 alter table public.application_documents
   drop constraint if exists application_documents_doc_type_check;
 alter table public.application_documents
@@ -25,6 +31,7 @@ alter table public.application_documents
     'residency_agreement',
     'appliance_registration',
     'residency_admission',
+    'birth_certificate',
     'cor',
     'student_id_copy',
     'med_lab',
@@ -45,15 +52,28 @@ create table if not exists public.doc_templates (
   file_name text,
   updated_at timestamptz not null default now()
 );
+alter table public.doc_templates
+  drop constraint if exists doc_templates_key_check;
+alter table public.doc_templates
+  add constraint doc_templates_key_check
+  check (key in (
+    'residency_application',
+    'personal_data',
+    'residency_agreement',
+    'appliance_registration',
+    'residency_admission',
+    'birth_certificate'
+  ));
 alter table public.doc_templates enable row level security;
 
--- Seed the 5 rows (no file yet = "Missing" in console).
+-- Seed the 6 rows (no file yet = "Missing" in console).
 insert into public.doc_templates (key, label) values
   ('residency_application', 'Residency Application for Students'),
   ('personal_data', 'Personal Data for Students'),
   ('residency_agreement', 'Residency Agreement'),
   ('appliance_registration', 'Registration of Appliance / Electronic Device'),
-  ('residency_admission', 'Residency Admission')
+  ('residency_admission', 'Residency Admission'),
+  ('birth_certificate', 'Birth Certificate')
 on conflict (key) do nothing;
 
 drop policy if exists "templates read" on public.doc_templates;
