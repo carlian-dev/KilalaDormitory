@@ -274,4 +274,28 @@ supabase functions serve dormi-chat --env-file supabase/functions/.env.local   #
 - Model fallback chain (Lite → Flash) when the primary is exhausted.
 - Admin usage dashboard (messages/day, remaining global quota).
 - Public FAQ mode on Landing (quota permitting).
-- Real mascot art replaces the placeholder.
+
+---
+
+## 12. Mascot
+
+The placeholder avatar was replaced by **Dormi the owl** (`src/components/DormiAvatar.jsx`),
+a pure-SVG character inspired by the Duolingo owl reference — navy/gold, Kilala's own tokens,
+no external assets. It is expressive, so it *reacts to real system state* via a `mood` prop
+(default `idle`; animations are CSS in `index.css`, disabled under `prefers-reduced-motion`):
+
+| Mood | Trigger (system fact) |
+|---|---|
+| `thinking` | A question is awaiting the `dormi-chat` reply |
+| `happy` | Context reload sees the student's application `approved` |
+| `worried` | The application is `rejected` (shown as "Needs Resubmit") |
+| `sleepy` | Quota/setup notices (`user_quota`, `global_quota`, `provider_busy`, `not_configured`) |
+| `sad` | Other errors (timeout, provider error, unreachable, offline) |
+| `wave` | The chat empty state / landing hero when calm (`idle` data) — waves once on mount |
+| `idle` | Default; blinks and bobs while waiting |
+
+The empty-state greeting is also personalized from the same RLS-visible context
+(status-specific for students; pending counts for admins), and the system prompt in
+`dormi-chat` frames Dormi as the dormitory's owl mascot without weakening the
+English-only / no-invented-data rules. Prompt changes take effect on the next
+`supabase functions deploy dormi-chat`.

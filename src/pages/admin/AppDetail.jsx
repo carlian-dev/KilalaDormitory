@@ -37,16 +37,16 @@ export default function AppDetail() {
       <div className="rounded-3xl bg-white p-8 text-center text-slate-900">
         <p className="font-bold">Could not load application</p>
         <p className="mt-1 text-sm text-slate-500">{fetchErr}</p>
-        <Link to="/admin/apps" className="mt-2 inline-block font-bold text-[#0A1F44] underline decoration-[#FFC72C] decoration-2 hover:underline">Back to queue</Link>
+        <Link to="/admin/apps" className="mt-2 inline-block font-bold text-[#0B2A6B] underline decoration-[#FFD120] decoration-2 hover:underline">Back to queue</Link>
       </div>
     );
   }
 
   if (!app) {
     return (
-      <div className="rounded-3xl bg-white p-8 text-center text-slate-900 dark:bg-[#0B1E3A] dark:text-white dark:ring-1 dark:ring-white/10">
+      <div className="rounded-3xl bg-white p-8 text-center text-slate-900 dark:bg-[#0A2456] dark:text-white dark:ring-1 dark:ring-white/10">
         <p className="font-bold">Application not found</p>
-        <Link to="/admin/apps" className="mt-2 inline-block font-bold text-[#0A1F44] underline decoration-[#FFC72C] decoration-2 hover:underline dark:text-[#FFC72C]">Back to queue</Link>
+        <Link to="/admin/apps" className="mt-2 inline-block font-bold text-[#0B2A6B] underline decoration-[#FFD120] decoration-2 hover:underline dark:text-[#FFD120]">Back to queue</Link>
       </div>
     );
   }
@@ -91,15 +91,15 @@ export default function AppDetail() {
 
   return (
     <div>
-      <button onClick={() => nav("/admin/apps")} className="pressable inline-flex items-center gap-1.5 rounded-full bg-white/10 px-4 py-2 text-[13px] font-bold text-slate-200">
+      <button onClick={() => nav("/admin/apps")} className="pressable inline-flex items-center gap-1.5 rounded-full bg-white px-4 py-2 text-[13px] font-bold text-[#0B2A6B] shadow-sm ring-1 ring-slate-200 dark:bg-white/10 dark:text-slate-200 dark:ring-0">
         <ArrowLeft size={14} /> Queue
       </button>
 
       <div className="mt-3 grid gap-3 lg:grid-cols-[1.2fr_0.8fr]">
-        <div className="rounded-3xl bg-white p-5 sm:p-6 text-slate-900 shadow dark:bg-[#0B1E3A] dark:text-white dark:ring-1 dark:ring-white/10">
+        <div className="rounded-3xl bg-white p-5 sm:p-6 text-slate-900 shadow dark:bg-[#0A2456] dark:text-white dark:ring-1 dark:ring-white/10">
           <div className="flex flex-wrap items-start justify-between gap-2">
             <div>
-              <h1 className="text-2xl font-bold tracking-tight">{app.name}</h1>
+              <h1 className="h-section text-2xl tracking-tight">{app.name}</h1>
               <p className="text-[13px] text-slate-500 dark:text-slate-300">{app.studentId} · {app.course} · {app.year}</p>
               <p className="text-xs text-slate-400">{app.term} · Submitted {new Date(app.submittedAt).toLocaleString()}</p>
             </div>
@@ -115,7 +115,7 @@ export default function AppDetail() {
             ))}
           </dl>
 
-          <div className="mt-4 rounded-2xl bg-[#0A1F44] p-3.5 text-white dark:bg-[#FFC72C] dark:text-[#0A1F44]">
+          <div className="mt-4 rounded-2xl bg-[#0B2A6B] p-3.5 text-white dark:bg-[#FFD120] dark:text-[#0B2A6B]">
             <div className="flex justify-between text-sm font-bold">
               <span>Monthly rate</span><span>{formatPeso(app.monthlyTotal)}/mo</span>
             </div>
@@ -127,11 +127,11 @@ export default function AppDetail() {
             </p>
           </div>
 
-          <p className="mt-5 text-sm font-bold">Signed forms ({app.docs.filter((d) => TEMPLATE_DOCS.some((t) => t.key === d.type)).length}/{TEMPLATE_DOCS.length})</p>
+          <p className="h-section mt-5 text-sm">Signed forms ({app.docs.filter((d) => TEMPLATE_DOCS.some((t) => t.key === d.type)).length}/{TEMPLATE_DOCS.length})</p>
           <div className="mt-2 grid gap-2">
             {app.docs.filter((d) => TEMPLATE_DOCS.some((t) => t.key === d.type)).map((d) => (
               <div key={d.type} className="flex items-center gap-3 rounded-2xl border border-slate-100 bg-white px-3 py-2.5 shadow-sm dark:border-white/10 dark:bg-white/5">
-                <span className="grid h-10 w-10 place-items-center rounded-xl bg-[#0A1F44] text-[#FFC72C] dark:bg-[#FFC72C] dark:text-[#0A1F44]"><FileText size={16} /></span>
+                <span className="grid h-10 w-10 place-items-center rounded-xl bg-[#0B2A6B] text-[#FFD120] dark:bg-[#FFD120] dark:text-[#0B2A6B]"><FileText size={16} /></span>
                 <div className="min-w-0 flex-1">
                   <p className="text-[13px] font-bold">{label(d.type)}</p>
                   <p className="truncate font-mono text-xs text-slate-400">{d.fileName}</p>
@@ -143,11 +143,11 @@ export default function AppDetail() {
             ))}
           </div>
 
-          <p className="mt-5 text-sm font-bold">Student documents ({app.docs.filter((d) => UPLOAD_DOCS.some((t) => t.key === d.type)).length}/{UPLOAD_DOCS.length})</p>
+          <p className="h-section mt-5 text-sm">Student documents ({app.docs.filter((d) => UPLOAD_DOCS.some((t) => t.key === d.type)).length}/{UPLOAD_DOCS.length})</p>
           <div className="mt-2 grid gap-2">
             {app.docs.filter((d) => UPLOAD_DOCS.some((t) => t.key === d.type)).map((d) => (
               <div key={d.type} className="flex items-center gap-3 rounded-2xl border border-slate-100 bg-white px-3 py-2.5 shadow-sm dark:border-white/10 dark:bg-white/5">
-                <span className="grid h-10 w-10 place-items-center rounded-xl bg-[#0A1F44] text-[#FFC72C] dark:bg-[#FFC72C] dark:text-[#0A1F44]"><FileText size={16} /></span>
+                <span className="grid h-10 w-10 place-items-center rounded-xl bg-[#0B2A6B] text-[#FFD120] dark:bg-[#FFD120] dark:text-[#0B2A6B]"><FileText size={16} /></span>
                 <div className="min-w-0 flex-1">
                   <p className="text-[13px] font-bold">{label(d.type)}</p>
                   <p className="truncate font-mono text-xs text-slate-400">{d.fileName}</p>
@@ -160,15 +160,15 @@ export default function AppDetail() {
           </div>
         </div>
 
-        <div className="h-fit rounded-3xl bg-white p-5 sm:p-6 text-slate-900 shadow dark:bg-[#0B1E3A] dark:text-white dark:ring-1 dark:ring-white/10">
-          <p className="font-bold">Decision</p>
+        <div className="h-fit rounded-3xl bg-white p-5 sm:p-6 text-slate-900 shadow dark:bg-[#0A2456] dark:text-white dark:ring-1 dark:ring-white/10">
+          <p className="h-section text-sm">Decision</p>
           <label className="mt-3 block text-[13px] font-bold">Admin remarks <span className="font-medium text-slate-400">(shown to student)</span>
             <textarea value={remarks} onChange={(e) => setRemarks(e.target.value)} rows={3} placeholder="e.g. Requirements complete and verified."
-              className="mt-1 w-full rounded-xl border border-slate-200 px-3 py-2.5 text-sm text-slate-900 outline-none focus:border-[#0A1F44] focus:ring-4 focus:ring-[#FFC72C]/40 dark:border-white/15 dark:bg-white/5 dark:text-white" />
+              className="mt-1 w-full rounded-xl border border-slate-200 px-3 py-2.5 text-sm text-slate-900 outline-none focus:border-[#0B2A6B] focus:ring-4 focus:ring-[#FFD120]/40 dark:border-white/15 dark:bg-white/5 dark:text-white" />
           </label>
           {saveErr && <p className="mt-2 text-[13px] font-semibold text-rose-500">{saveErr}</p>}
           <div className="mt-3 grid gap-2">
-            <button onClick={markReview} disabled={saving} className="pressable rounded-full bg-[#DCE6FA] py-2.5 text-sm font-bold text-[#0A1F44] ring-1 ring-[#0A1F44]/20 disabled:opacity-50">
+            <button onClick={markReview} disabled={saving} className="pressable rounded-full bg-[#DCE6FA] py-2.5 text-sm font-bold text-[#0B2A6B] ring-1 ring-[#0B2A6B]/20 disabled:opacity-50">
               Mark under review
             </button>
             <div className="grid grid-cols-2 gap-2">

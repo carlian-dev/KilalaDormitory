@@ -86,9 +86,14 @@ export function AuthProvider({ children }) {
       return { ok: true, profile };
     },
     signOut: async () => {
-      await supabase.auth.signOut();
+      const { error } = await supabase.auth.signOut();
+      if (error) {
+        console.error("[Kilala] sign out failed:", error.message);
+        return false;
+      }
       setUser(null);
       setProfile(null);
+      return true;
     },
   }), [user, profile, loading, profileLoading]);
 

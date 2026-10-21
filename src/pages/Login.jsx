@@ -13,7 +13,8 @@ export default function Login() {
   const [password, setPassword] = useState("");
   const [err, setErr] = useState("");
   const [busy, setBusy] = useState(false);
-  const cls = "w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2.5 text-sm text-[#0A1F44] outline-none focus:border-[#0A1F44] focus:ring-4 focus:ring-[#FFC72C]/40 dark:border-white/15 dark:bg-white/5 dark:text-white dark:placeholder:text-slate-400";
+  const cls = "w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2.5 text-sm text-[#0B2A6B] outline-none focus:border-[#0B2A6B] focus:ring-4 focus:ring-[#FFD120]/40 dark:border-white/15 dark:bg-white/5 dark:text-white dark:placeholder:text-slate-400";
+  const destination = params.get("next") === "/apply" ? "start an application" : params.get("next") === "/dashboard" ? "view your dashboard" : "continue";
 
   const go = async () => {
     setErr("");
@@ -49,9 +50,14 @@ export default function Login() {
   return (
     <PageFade>
       <div className="mx-auto max-w-md px-4 py-12">
-        <div className="rounded-3xl bg-white p-6 shadow-sm ring-1 ring-slate-100 dark:bg-[#0B1E3A] dark:ring-white/10 dark:text-white">
+        <div className="rounded-3xl bg-white p-6 shadow-sm ring-1 ring-slate-100 dark:bg-[#0A2456] dark:ring-white/10 dark:text-white">
           <p className="text-xs font-semibold uppercase tracking-widest text-slate-400">Kilala Dormitory · student portal</p>
-          <h1 className="text-2xl font-bold tracking-tight">Sign in to apply</h1>
+          <h1 className="text-2xl font-bold tracking-tight">Sign in to {destination}</h1>
+          <p className="mt-2 text-sm text-slate-500 dark:text-slate-300">
+            {destination === "view your dashboard"
+              ? "Your dashboard is private and shows only your applications and status."
+              : "Use your account to securely access the student portal."}
+          </p>
 
           {!configured && (
             <p className="mt-3 rounded-2xl bg-rose-50 p-3 text-[13px] font-semibold text-rose-700 ring-1 ring-rose-200">
@@ -62,7 +68,7 @@ export default function Login() {
           <div className="mt-4 grid grid-cols-2 gap-1 rounded-full bg-slate-100 p-1 dark:bg-white/10">
             {[["signin", "Sign in"], ["register", "Create account"]].map(([k, label]) => (
               <button key={k} onClick={() => { setTab(k); setErr(""); }}
-                className={`pressable rounded-full py-2 text-sm font-bold ${tab === k ? "bg-[#0A1F44] text-white dark:bg-[#FFC72C] dark:text-[#0A1F44]" : "text-slate-500 dark:text-slate-300"}`}>
+                className={`pressable rounded-full py-2 text-sm font-bold ${tab === k ? "bg-[#0B2A6B] text-white dark:bg-[#FFD120] dark:text-[#0B2A6B]" : "text-slate-500 dark:text-slate-300"}`}>
                 {label}
               </button>
             ))}
@@ -85,7 +91,7 @@ export default function Login() {
             {err && <p className="text-[13px] font-semibold text-rose-500">{err}</p>}
             <button
               onClick={go} disabled={busy || !configured}
-              className="pressable rounded-full bg-[#FFC72C] py-3 text-sm font-bold text-[#0A1F44] hover:bg-[#F5B800] disabled:opacity-40"
+              className="pressable rounded-full bg-[#FFD120] py-3 text-sm font-bold text-[#0B2A6B] hover:bg-[#F0BB00] disabled:opacity-40"
             >{busy ? "Please wait…" : tab === "signin" ? "Sign in" : "Create account & continue"}</button>
             <Link to="/" className="text-center text-[13px] font-semibold text-slate-400 hover:underline">Back home</Link>
           </div>

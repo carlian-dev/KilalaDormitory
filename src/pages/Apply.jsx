@@ -9,7 +9,7 @@ import { useAuth } from "../lib/auth";
 import { createApplication, fetchMyApplications, listTemplates, downloadTemplate } from "../lib/applications";
 import { saveDraftFile, loadDraftFiles, removeDraftFile, clearDraftFiles } from "../lib/draftFiles";
 
-const inputCls = "w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2.5 text-sm text-[#0A1F44] outline-none focus:border-[#0A1F44] focus:ring-4 focus:ring-[#FFC72C]/40 dark:border-white/15 dark:bg-white/5 dark:text-white dark:placeholder:text-slate-400";
+const inputCls = "w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2.5 text-sm text-[#0B2A6B] outline-none focus:border-[#0B2A6B] focus:ring-4 focus:ring-[#FFD120]/40 dark:border-white/15 dark:bg-white/5 dark:text-white dark:placeholder:text-slate-400";
 
 const emptyFiles = () => Object.fromEntries(DOC_TYPES.map((d) => [d.key, null]));
 
@@ -193,7 +193,7 @@ export default function Apply() {
     return (
       <PageFade>
         <div className="mx-auto max-w-xl px-4 py-14 text-center">
-          <h1 className="display !text-4xl text-[#0A1F44] dark:text-white">You already applied</h1>
+          <h1 className="display !text-4xl text-[#0B2A6B] dark:text-white">You already applied</h1>
           <p className="mt-2 text-sm text-slate-500 dark:text-slate-300">
             One student, one application. Track your status in My dashboard
             {existingApp.status === "rejected"
@@ -201,7 +201,7 @@ export default function Apply() {
               : " — if corrections are needed, the housing office will mark it Needs resubmit and you'll revise the same application."}
           </p>
           <div className="mt-6 flex justify-center gap-2">
-            <button onClick={() => nav("/dashboard")} className="pressable rounded-full bg-[#FFC72C] px-6 py-3 text-sm font-bold text-[#0A1F44] hover:bg-[#F5B800]">View my application</button>
+            <button onClick={() => nav("/dashboard")} className="pressable rounded-full bg-[#FFD120] px-6 py-3 text-sm font-bold text-[#0B2A6B] hover:bg-[#F0BB00]">View my application</button>
           </div>
         </div>
       </PageFade>
@@ -215,11 +215,11 @@ export default function Apply() {
           <motion.div initial={{ scale: 0.8, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} transition={{ type: "spring", bounce: 0.2, duration: 0.5 }} className="mx-auto grid h-16 w-16 place-items-center rounded-full bg-emerald-500 text-white shadow-lg">
             <CheckCircle2 size={30} />
           </motion.div>
-          <h1 className="display mt-4 !text-4xl text-[#0A1F44] dark:text-white">Application sent!</h1>
+          <h1 className="display mt-4 !text-4xl text-[#0B2A6B] dark:text-white">Application sent!</h1>
           <p className="mt-2 text-sm text-slate-500 dark:text-slate-300">Paperless received — no need to visit the office. Track your status in My dashboard.</p>
-          <p className="mt-3 text-sm font-bold text-[#0A1F44] dark:text-white">Monthly rate: {formatPeso(done.total)}/mo</p>
+          <p className="mt-3 text-sm font-bold text-[#0B2A6B] dark:text-white">Monthly rate: {formatPeso(done.total)}/mo</p>
           <div className="mt-6 flex justify-center gap-2">
-            <button onClick={() => nav("/dashboard")} className="pressable rounded-full bg-[#FFC72C] px-6 py-3 text-sm font-bold text-[#0A1F44] hover:bg-[#F5B800]">View my application</button>
+            <button onClick={() => nav("/dashboard")} className="pressable rounded-full bg-[#FFD120] px-6 py-3 text-sm font-bold text-[#0B2A6B] hover:bg-[#F0BB00]">View my application</button>
           </div>
         </div>
       </PageFade>
@@ -230,15 +230,15 @@ export default function Apply() {
     <PageFade>
       <div className="mx-auto max-w-3xl px-4 sm:px-6 py-8">
         <p className="text-xs font-semibold uppercase tracking-widest text-slate-400">Online admission</p>
-        <h1 className="h-section text-3xl font-bold text-[#0A1F44] dark:text-white">Kilala Dormitory application</h1>
+        <h1 className="h-section text-3xl font-bold text-[#0B2A6B] dark:text-white">Kilala Dormitory application</h1>
         <p className="mt-1 text-sm text-slate-500 dark:text-slate-300">5 steps · validated in-browser · stored securely</p>
 
-        <div className="mt-5 rounded-3xl bg-white p-4 shadow-sm ring-1 ring-slate-100 dark:bg-[#0B1E3A] dark:ring-white/10">
+        <div className="mt-5 rounded-3xl bg-white p-4 shadow-sm ring-1 ring-slate-100 dark:bg-[#0A2456] dark:ring-white/10">
           <Stepper steps={["Personal", "Downloads", "Upload", "Review", "Payment"]} current={step} />
         </div>
 
         {(restored || filesRestored) && !done && (
-          <div className="mt-4 flex flex-wrap items-center justify-between gap-2 rounded-2xl bg-[#FFF8E1] px-4 py-2.5 text-[13px] font-semibold text-[#0A1F44] ring-1 ring-[#FFC72C] dark:bg-[#FFC72C]/10 dark:text-[#FFE9A8] dark:ring-[#FFC72C]/40">
+          <div className="mt-4 flex flex-wrap items-center justify-between gap-2 rounded-2xl bg-[#FFF8E1] px-4 py-2.5 text-[13px] font-semibold text-[#0B2A6B] ring-1 ring-[#FFD120] dark:bg-[#FFD120]/10 dark:text-[#FFE9A8] dark:ring-[#FFD120]/40">
             <span>{filesRestored
               ? "Draft restored — your info and uploads are back. Use Verify under each file to check it."
               : "Draft restored — your typed info is back. Your uploads are saved on this device as you attach them."}</span>
@@ -253,11 +253,11 @@ export default function Apply() {
             animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0, x: -24 }}
             transition={{ type: "spring", bounce: 0, duration: 0.35 }}
-            className="mt-4 rounded-3xl bg-white p-5 sm:p-7 shadow-sm ring-1 ring-slate-100 dark:bg-[#0B1E3A] dark:ring-white/10 dark:text-white"
+            className="mt-4 rounded-3xl bg-white p-5 sm:p-7 shadow-sm ring-1 ring-slate-100 dark:bg-[#0A2456] dark:ring-white/10 dark:text-white"
           >
             {step === 0 && (
               <div className="grid gap-3 sm:grid-cols-2">
-                <div className="rounded-2xl bg-[#FFF8E1] px-3.5 py-2.5 ring-1 ring-[#FFC72C] dark:bg-[#FFC72C]/10 dark:ring-[#FFC72C]/40 sm:col-span-2">
+                <div className="rounded-2xl bg-[#FFF8E1] px-3.5 py-2.5 ring-1 ring-[#FFD120] dark:bg-[#FFD120]/10 dark:ring-[#FFD120]/40 sm:col-span-2">
                   <p className="text-[11px] font-bold uppercase tracking-wide text-slate-500 dark:text-slate-300">Applying as (your account)</p>
                   <p className="text-sm font-bold">{identityName} · {identityEmail}</p>
                 </div>
@@ -301,7 +301,7 @@ export default function Apply() {
                         <div className="flex shrink-0 gap-1 rounded-full bg-slate-100 p-1 dark:bg-white/10">
                           {[["appliance", "+₱150"], ["gadget", "Free"]].map(([k, label]) => (
                             <button key={k} type="button" onClick={() => setDevice(i, { kind: k })}
-                              className={`pressable rounded-full px-3 py-1.5 text-xs font-bold ${d.kind === k ? "bg-[#0A1F44] text-[#FFC72C] dark:bg-[#FFC72C] dark:text-[#0A1F44]" : "text-slate-500 dark:text-slate-300"}`}>
+                              className={`pressable rounded-full px-3 py-1.5 text-xs font-bold ${d.kind === k ? "bg-[#0B2A6B] text-[#FFD120] dark:bg-[#FFD120] dark:text-[#0B2A6B]" : "text-slate-500 dark:text-slate-300"}`}>
                               {label}
                             </button>
                           ))}
@@ -314,20 +314,20 @@ export default function Apply() {
                     ))}
                   </div>
                   <button type="button" onClick={addDevice}
-                    className="pressable mt-2 inline-flex items-center gap-1.5 rounded-full bg-[#0A1F44]/5 px-4 py-2 text-[13px] font-bold text-[#0A1F44] dark:bg-white/10 dark:text-white">
+                    className="pressable mt-2 inline-flex items-center gap-1.5 rounded-full bg-[#0B2A6B]/5 px-4 py-2 text-[13px] font-bold text-[#0B2A6B] dark:bg-white/10 dark:text-white">
                     <Plus size={14} /> Add device
                   </button>
                 </div>
 
-                <div className="rounded-2xl bg-[#0A1F44] p-4 text-white dark:bg-[#FFC72C] dark:text-[#0A1F44]">
+                <div className="rounded-2xl bg-[#0B2A6B] p-4 text-white dark:bg-[#FFD120] dark:text-[#0B2A6B]">
                   <div className="flex justify-between text-[13px]"><span>Base rate</span><span className="font-bold">{formatPeso(BILLING.BASE_RATE)}</span></div>
                   <div className="mt-1 flex justify-between text-[13px]"><span>Appliances × {applianceCount}</span><span className="font-bold">{formatPeso(applianceCount * BILLING.PER_APPLIANCE)}</span></div>
-                  <div className="mt-2 flex justify-between border-t border-white/20 pt-2 text-base font-bold dark:border-[#0A1F44]/20">
+                  <div className="mt-2 flex justify-between border-t border-white/20 pt-2 text-base font-bold dark:border-[#0B2A6B]/20">
                     <span>Monthly total</span><span>{formatPeso(total)}/mo</span>
                   </div>
                 </div>
                 <label className="flex cursor-pointer items-start gap-2 rounded-2xl bg-slate-50 p-3 text-[13px] ring-1 ring-slate-200 dark:bg-white/5 dark:ring-white/15">
-                  <input type="checkbox" checked={agree} onChange={(e) => setAgree(e.target.checked)} className="mt-1 accent-[#F5B800]" />
+                  <input type="checkbox" checked={agree} onChange={(e) => setAgree(e.target.checked)} className="mt-1 accent-[#F0BB00]" />
                   I certify these uploads are true copies. I agree to paperless processing and to the monthly rate above, and to the Terms of Service and Privacy Policy.
                 </label>
                 {err && <p className="text-[13px] font-semibold text-rose-500">{err}</p>}
@@ -347,7 +347,7 @@ export default function Apply() {
                         <p className="text-xs text-slate-400">{ready ? (t.file_name || "Softcopy available") : "Not available yet — check back soon"}</p>
                       </div>
                       <button type="button" onClick={() => openTemplate(t || {})} disabled={!ready}
-                        className="pressable inline-flex shrink-0 items-center gap-1 rounded-full bg-[#0A1F44] px-4 py-2 text-xs font-bold text-[#FFC72C] disabled:opacity-30 dark:bg-[#FFC72C] dark:text-[#0A1F44]">
+                        className="pressable inline-flex shrink-0 items-center gap-1 rounded-full bg-[#0B2A6B] px-4 py-2 text-xs font-bold text-[#FFD120] disabled:opacity-30 dark:bg-[#FFD120] dark:text-[#0B2A6B]">
                         <Download size={13} /> Download
                       </button>
                     </div>
@@ -384,7 +384,7 @@ export default function Apply() {
             {step === 3 && (
               <div className="grid gap-4">
                 <div className="flex items-start gap-3">
-                  <div className="grid h-10 w-10 shrink-0 place-items-center rounded-2xl bg-[#0A1F44] text-[#FFC72C] dark:bg-[#FFC72C] dark:text-[#0A1F44]">
+                  <div className="grid h-10 w-10 shrink-0 place-items-center rounded-2xl bg-[#0B2A6B] text-[#FFD120] dark:bg-[#FFD120] dark:text-[#0B2A6B]">
                     <ClipboardCheck size={18} />
                   </div>
                   <div>
@@ -397,7 +397,7 @@ export default function Apply() {
                   <div className="flex items-center justify-between px-4 pt-3">
                     <p className="text-[11px] font-bold uppercase tracking-wide text-slate-500 dark:text-slate-300">Personal</p>
                     <button type="button" onClick={() => { setConfirmCorrect(false); setErr(""); setStep(0); }}
-                      className="pressable inline-flex items-center gap-1 rounded-full bg-white px-3 py-1 text-xs font-bold text-[#0A1F44] shadow-sm ring-1 ring-slate-200 dark:bg-white/10 dark:text-white dark:ring-white/15">
+                      className="pressable inline-flex items-center gap-1 rounded-full bg-white px-3 py-1 text-xs font-bold text-[#0B2A6B] shadow-sm ring-1 ring-slate-200 dark:bg-white/10 dark:text-white dark:ring-white/15">
                       <Pencil size={12} /> Edit
                     </button>
                   </div>
@@ -420,7 +420,7 @@ export default function Apply() {
                       Documents · {DOC_TYPES.filter((d) => files[d.key]).length}/{DOC_TYPES.length}
                     </p>
                     <button type="button" onClick={() => { setConfirmCorrect(false); setErr(""); setStep(2); }}
-                      className="pressable inline-flex items-center gap-1 rounded-full bg-white px-3 py-1 text-xs font-bold text-[#0A1F44] shadow-sm ring-1 ring-slate-200 dark:bg-white/10 dark:text-white dark:ring-white/15">
+                      className="pressable inline-flex items-center gap-1 rounded-full bg-white px-3 py-1 text-xs font-bold text-[#0B2A6B] shadow-sm ring-1 ring-slate-200 dark:bg-white/10 dark:text-white dark:ring-white/15">
                       <Pencil size={12} /> Edit
                     </button>
                   </div>
@@ -439,7 +439,7 @@ export default function Apply() {
                   </ul>
                 </div>
 
-                <div className="rounded-2xl bg-[#FFF8E1] px-4 py-3 text-[13px] ring-1 ring-[#FFC72C] dark:bg-[#FFC72C]/10 dark:ring-[#FFC72C]/40">
+                <div className="rounded-2xl bg-[#FFF8E1] px-4 py-3 text-[13px] ring-1 ring-[#FFD120] dark:bg-[#FFD120]/10 dark:ring-[#FFD120]/40">
                   <p className="font-bold">What happens next</p>
                   <p className="mt-0.5 text-xs text-slate-600 dark:text-slate-300">
                     Term ({form.term}) and appliance declaration happen on the Payment step. Base rate is {formatPeso(BILLING.BASE_RATE)}/mo plus {formatPeso(BILLING.PER_APPLIANCE)}/mo per appliance.
@@ -448,7 +448,7 @@ export default function Apply() {
                 </div>
 
                 <label className="flex cursor-pointer items-start gap-2 rounded-2xl bg-slate-50 p-3 text-[13px] ring-1 ring-slate-200 dark:bg-white/5 dark:ring-white/15">
-                  <input type="checkbox" checked={confirmCorrect} onChange={(e) => setConfirmCorrect(e.target.checked)} className="mt-1 accent-[#F5B800]" />
+                  <input type="checkbox" checked={confirmCorrect} onChange={(e) => setConfirmCorrect(e.target.checked)} className="mt-1 accent-[#F0BB00]" />
                   I confirm all the details above are correct and I want to proceed to payment.
                 </label>
                 {err && <p className="text-[13px] font-semibold text-rose-500">{err}</p>}
@@ -464,10 +464,10 @@ export default function Apply() {
                 <button
                   onClick={() => { setErr(""); setStep((s) => s + 1); }}
                   disabled={(step === 0 && !validStep0) || (step === 2 && !validUpload) || (step === 3 && !validReview)}
-                  className="pressable inline-flex items-center gap-1.5 rounded-full bg-[#0A1F44] px-6 py-2.5 text-sm font-semibold text-white disabled:opacity-40 dark:bg-[#FFC72C] dark:text-[#0A1F44]"
+                  className="pressable inline-flex items-center gap-1.5 rounded-full bg-[#0B2A6B] px-6 py-2.5 text-sm font-semibold text-white disabled:opacity-40 dark:bg-[#FFD120] dark:text-[#0B2A6B]"
                 >Continue <ArrowRight size={15} /></button>
               ) : (
-                <button onClick={submit} disabled={busy} className="pressable rounded-full bg-[#FFC72C] px-6 py-2.5 text-sm font-bold text-[#0A1F44] shadow hover:bg-[#F5B800] disabled:opacity-50">
+                <button onClick={submit} disabled={busy} className="pressable rounded-full bg-[#FFD120] px-6 py-2.5 text-sm font-bold text-[#0B2A6B] shadow hover:bg-[#F0BB00] disabled:opacity-50">
                   {busy ? "Uploading…" : `Submit · ${formatPeso(total)}/mo`}
                 </button>
               )}
