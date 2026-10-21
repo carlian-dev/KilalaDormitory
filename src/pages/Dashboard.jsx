@@ -1,11 +1,18 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
-import { Search, FileText, LogOut, PlusCircle, ArrowLeft, ExternalLink } from "lucide-react";
+import { Search, FileText, LogOut, PlusCircle, ArrowLeft, ExternalLink, Bell, Check } from "lucide-react";
 import { PageFade, StatusBadge } from "../components/ui";
 import { FileUploader } from "../components/FileUploader";
 import { DOC_TYPES, TEMPLATE_DOCS, UPLOAD_DOCS, BILLING, formatPeso } from "../lib/mockData";
 import { useAuth } from "../lib/auth";
-import { fetchMyApplications, signedDocUrl, resubmitDocuments } from "../lib/applications";
+import {
+  fetchMyApplications,
+  fetchApplicationHistory,
+  fetchNotifications,
+  markNotificationRead,
+  signedDocUrl,
+  resubmitDocuments,
+} from "../lib/applications";
 
 const docLabel = (t) => DOC_TYPES.find((d) => d.key === t)?.label || t;
 
@@ -24,6 +31,10 @@ export default function ApplicantDashboard() {
   const [mine, setMine] = useState([]);
   const [loading, setLoading] = useState(true);
   const [fetchErr, setFetchErr] = useState("");
+  const [notifications, setNotifications] = useState([]);
+  const [notificationErr, setNotificationErr] = useState("");
+  const [notificationBusy, setNotificationBusy] = useState("");
+  const [historyResult, setHistoryResult] = useState({ applicationId: "", events: [], error: "" });
 
   const load = () => {
     if (!user) return Promise.resolve();
@@ -36,6 +47,12 @@ export default function ApplicantDashboard() {
   };
 
   useEffect(() => { load(); }, [user]); // eslint-disable-line react-hooks/exhaustive-deps
+  useEffect(() => {
+    if (!user) return;
+    fetchNotifications(user.id)
+      .then(setNotifications)
+      .catch((e) => setNotificationErr(e.message));
+  }, [user]);
 
   const filtered = useMemo(() => {
     const needle = q.trim().toLowerCase();
@@ -45,8 +62,40 @@ export default function ApplicantDashboard() {
 
   const selectedId = params.get("id");
   const selected = selectedId ? mine.find((a) => a.id === selectedId) || null : null;
+  const historyLoading = Boolean(selectedId && historyResult.applicationId !== selectedId);
+  const history = historyResult.applicationId === selectedId ? historyResult.events : [];
+  const historyErr = historyResult.applicationId === selectedId ? historyResult.error : "";
+  const showNotifications = params.get("view") === "notifications";
+
+  useEffect(() => {
+    if (!selectedId) return;
+    fetchApplicationHistory(selectedId)
+      .then((events) => setHistoryResult({ applicationId: selectedId, events, error: "" }))
+      .catch((e) => setHistoryResult({ applicationId: selectedId, events: [], error: e.message }));
+  }, [selectedId]);
+
+  useEffect(() => {
+    if (showNotifications) {
+      document.getElementById("notifications")?.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+  }, [showNotifications]);
 
   const count = (s) => mine.filter((a) => a.status === s).length;
+  const openNotification = async (notification) => {
+    if (notification.is_read) return;
+    setNotificationBusy(notification.id);
+    setNotificationErr("");
+    try {
+      await markNotificationRead(notification.id);
+      setNotifications((items) => items.map((item) =>
+        item.id === notification.id ? { ...item, is_read: true } : item
+      ));
+    } catch (e) {
+      setNotificationErr(e.message);
+    } finally {
+      setNotificationBusy("");
+    }
+  };
 
   const openDoc = async (doc) => {
     try {
@@ -104,6 +153,34 @@ export default function ApplicantDashboard() {
                 <b>Admin note:</b> {selected.remarks}
               </div>
             )}
+
+            <section className="mt-5">
+              <h2 className="text-sm font-bold">Application history</h2>
+              {historyErr && <p className="mt-2 text-[13px] font-semibold text-rose-500">{historyErr}</p>}
+              {historyLoading ? (
+                <p className="mt-2 text-sm text-slate-400">Loading history…</p>
+              ) : (
+                <ol className="mt-2 grid gap-2">
+                  {history.map((event) => (
+                    <li key={event.id} className="rounded-2xl bg-slate-50 p-3 ring-1 ring-slate-100 dark:bg-white/5 dark:ring-white/10">
+                      <div className="flex flex-wrap items-center justify-between gap-2">
+                        <p className="text-[13px] font-bold">
+                          {event.event_type === "submitted" ? "Application submitted"
+                            : event.event_type === "resubmitted" ? "Documents resubmitted"
+                              : event.event_type === "remarks_updated" ? "Staff note added"
+                                : `Status changed to ${event.status.replaceAll("_", " ")}`}
+                        </p>
+                        <time className="text-xs text-slate-400">{new Date(event.created_at).toLocaleString()}</time>
+                      </div>
+                      {event.remarks && <p className="mt-1 text-[13px] text-slate-500 dark:text-slate-300">{event.remarks}</p>}
+                    </li>
+                  ))}
+                  {!historyLoading && history.length === 0 && !historyErr && (
+                    <li className="text-sm text-slate-400">No history yet.</li>
+                  )}
+                </ol>
+              )}
+            </section>
 
             <p className="mt-5 text-sm font-bold">Signed forms ({selected.docs.filter((d) => TEMPLATE_DOCS.some((t) => t.key === d.type)).length}/{TEMPLATE_DOCS.length})</p>
             <div className="mt-2 grid gap-2">
@@ -172,6 +249,48 @@ export default function ApplicantDashboard() {
         </div>
 
         {fetchErr && <p className="mt-4 rounded-2xl bg-rose-50 p-3 text-[13px] font-semibold text-rose-700 ring-1 ring-rose-200">{fetchErr}</p>}
+        {notificationErr && <p className="mt-4 rounded-2xl bg-rose-50 p-3 text-[13px] font-semibold text-rose-700 ring-1 ring-rose-200">{notificationErr}</p>}
+
+        <section id="notifications" className="mt-5 scroll-mt-24 rounded-3xl bg-white p-4 shadow-sm ring-1 ring-slate-100 dark:bg-[#0B1E3A] dark:ring-white/10 dark:text-white">
+          <div className="flex items-center justify-between gap-2">
+            <h2 className="flex items-center gap-2 text-sm font-bold">
+              <Bell size={16} /> Notifications
+            </h2>
+            {notifications.some((item) => !item.is_read) && (
+              <span className="rounded-full bg-[#FFC72C] px-2.5 py-1 text-[11px] font-bold text-[#0A1F44]">
+                {notifications.filter((item) => !item.is_read).length} unread
+              </span>
+            )}
+          </div>
+          {notifications.length === 0 ? (
+            <p className="mt-2 text-sm text-slate-400">No notifications yet. We’ll let you know when your application is updated.</p>
+          ) : (
+            <ul className="mt-3 grid gap-2">
+              {notifications.map((notification) => (
+                <li key={notification.id}>
+                  <button
+                    onClick={() => openNotification(notification)}
+                    disabled={notificationBusy === notification.id}
+                    className={`pressable flex w-full items-start gap-3 rounded-2xl p-3 text-left ring-1 disabled:opacity-50 ${
+                      notification.is_read
+                        ? "bg-slate-50 ring-slate-100 dark:bg-white/5 dark:ring-white/10"
+                        : "bg-[#FFF8E1] ring-[#FFC72C] dark:bg-[#FFC72C]/10 dark:ring-[#FFC72C]/40"
+                    }`}
+                  >
+                    <span className="mt-0.5 text-[#0A1F44] dark:text-[#FFC72C]">
+                      {notification.is_read ? <Check size={16} /> : <Bell size={16} />}
+                    </span>
+                    <span className="min-w-0 flex-1">
+                      <span className="block text-[13px] font-bold">{notification.title}</span>
+                      <span className="mt-0.5 block text-[13px] text-slate-600 dark:text-slate-300">{notification.message}</span>
+                      <time className="mt-1 block text-xs text-slate-400">{new Date(notification.created_at).toLocaleString()}</time>
+                    </span>
+                  </button>
+                </li>
+              ))}
+            </ul>
+          )}
+        </section>
 
         {loading ? (
           <p className="mt-8 text-center text-sm text-slate-400">Loading your applications…</p>
@@ -234,7 +353,7 @@ function ResubmitBox({ appId, onDone }) {
   const ready = DOC_TYPES.every((d) => files[d.key]);
 
   const submit = async () => {
-    if (!ready) { setErr("Please re-upload all 9 documents."); return; }
+    if (!ready) { setErr(`Please re-upload all ${DOC_TYPES.length} documents.`); return; }
     setErr("");
     setBusy(true);
     try {
@@ -251,7 +370,7 @@ function ResubmitBox({ appId, onDone }) {
     <div className="mt-5 rounded-2xl bg-[#FFF8E1] p-4 ring-1 ring-[#FFC72C] dark:bg-[#FFC72C]/10 dark:ring-[#FFC72C]/40">
       <p className="text-sm font-bold text-[#0A1F44] dark:text-[#FFE9A8]">Fix your documents and resubmit</p>
       <p className="mt-0.5 text-[13px] text-[#0A1F44]/70 dark:text-[#FFE9A8]/70">
-        Upload fresh copies of all 9 documents. Your application goes back to Pending for re-review.
+        Upload fresh copies of all {DOC_TYPES.length} documents. Your application goes back to Pending for re-review.
       </p>
       <div className="mt-3 grid gap-3 rounded-2xl bg-white p-3 dark:bg-[#0B1E3A]">
         {DOC_TYPES.map((d) => (
