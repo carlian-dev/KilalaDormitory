@@ -1,5 +1,6 @@
 import { createContext, useContext, useEffect, useMemo, useState } from "react";
 import { supabase, isSupabaseConfigured } from "./supabase";
+import { formatFirstAndLastName, getUserAvatarUrl } from "./profile";
 
 // Real Supabase auth. Students sign in with Google Workspace only; the
 // email/password path remains for the dorm office. The domain rule is
@@ -20,7 +21,7 @@ export function AuthProvider({ children }) {
     try {
       const { data, error } = await supabase
         .from("profiles")
-        .select("id, full_name, role")
+        .select("id, full_name, role, created_at")
         .eq("id", userId)
         .single();
       if (error) throw error;
@@ -50,54 +51,67 @@ export function AuthProvider({ children }) {
     return () => sub.subscription.unsubscribe();
   }, []);
 
-  const value = useMemo(() => ({
-    user,
-    profile,
-    student: profile ? { name: profile.full_name, email: user?.email || "" } : null,
-    isAdmin: profile?.role === "admin",
-    loading: loading || profileLoading,
-    configured: isSupabaseConfigured,
-    // Google OAuth. `hd` filters Google's account chooser to the student
-    // Workspace domain; the auth.users trigger is what actually enforces it.
-    signInWithGoogle: async (next) => {
-      if (!isSupabaseConfigured) {
-        return { ok: false, error: "Supabase is not configured yet." };
-      }
-      const redirectTo = new URL("/login", window.location.origin);
-      if (next && next.startsWith("/")) redirectTo.searchParams.set("next", next);
-      const { error } = await supabase.auth.signInWithOAuth({
-        provider: "google",
-        options: {
-          redirectTo: redirectTo.toString(),
-          queryParams: {
-            hd: STUDENT_EMAIL_DOMAIN,
-            prompt: "select_account",
+  const value = useMemo(() => {
+    const avatar = getUserAvatarUrl(user);
+    const display = profile ? formatFirstAndLastName(profile.full_name) : "";
+
+    return {
+      user,
+      profile,
+      displayName: display,
+      avatarUrl: avatar,
+      student: profile ? {
+        name: display,
+        fullName: profile.full_name,
+        email: user?.email || "",
+        avatarUrl: avatar,
+      } : null,
+      isAdmin: profile?.role === "admin",
+      loading: loading || profileLoading,
+      configured: isSupabaseConfigured,
+      refreshProfile: () => (user ? fetchProfile(user.id) : Promise.resolve(null)),
+      // Google OAuth. `hd` filters Google's account chooser to the student
+      // Workspace domain; the auth.users trigger is what actually enforces it.
+      signInWithGoogle: async (next) => {
+        if (!isSupabaseConfigured) {
+          return { ok: false, error: "Supabase is not configured yet." };
+        }
+        const redirectTo = new URL("/login", window.location.origin);
+        if (next && next.startsWith("/")) redirectTo.searchParams.set("next", next);
+        const { error } = await supabase.auth.signInWithOAuth({
+          provider: "google",
+          options: {
+            redirectTo: redirectTo.toString(),
+            queryParams: {
+              hd: STUDENT_EMAIL_DOMAIN,
+              prompt: "select_account",
+            },
           },
-        },
-      });
-      if (error) return { ok: false, error: error.message };
-      return { ok: true };
-    },
-    signIn: async ({ email, password }) => {
-      const { data, error } = await supabase.auth.signInWithPassword({
-        email: email.trim().toLowerCase(),
-        password,
-      });
-      if (error) return { ok: false, error: error.message };
-      const profile = data.user ? await fetchProfile(data.user.id) : null;
-      return { ok: true, profile };
-    },
-    signOut: async () => {
-      const { error } = await supabase.auth.signOut();
-      if (error) {
-        console.error("[Kilala] sign out failed:", error.message);
-        return false;
-      }
-      setUser(null);
-      setProfile(null);
-      return true;
-    },
-  }), [user, profile, loading, profileLoading]);
+        });
+        if (error) return { ok: false, error: error.message };
+        return { ok: true };
+      },
+      signIn: async ({ email, password }) => {
+        const { data, error } = await supabase.auth.signInWithPassword({
+          email: email.trim().toLowerCase(),
+          password,
+        });
+        if (error) return { ok: false, error: error.message };
+        const profile = data.user ? await fetchProfile(data.user.id) : null;
+        return { ok: true, profile };
+      },
+      signOut: async () => {
+        const { error } = await supabase.auth.signOut();
+        if (error) {
+          console.error("[Kilala] sign out failed:", error.message);
+          return false;
+        }
+        setUser(null);
+        setProfile(null);
+        return true;
+      },
+    };
+  }, [user, profile, loading, profileLoading]);
 
   return <AuthCtx.Provider value={value}>{children}</AuthCtx.Provider>;
 }

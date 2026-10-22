@@ -1,9 +1,10 @@
 import { useEffect, useRef, useState } from "react";
 import { Link, NavLink, useNavigate } from "react-router-dom";
-import { Building2, ChevronDown, LayoutDashboard, LogOut, Sun, Moon } from "lucide-react";
+import { Building2, ChevronDown, LayoutDashboard, LogOut, Sun, Moon, User } from "lucide-react";
 import { useStore } from "../lib/store";
 import { useAuth } from "../lib/auth";
 import { ConfirmDialog } from "./ui";
+import ProfileModal from "./ProfileModal";
 
 export function TopBar() {
   const { theme, toggleTheme } = useStore();
@@ -11,6 +12,7 @@ export function TopBar() {
   const nav = useNavigate();
   const [menuOpen, setMenuOpen] = useState(false);
   const [confirmingSignOut, setConfirmingSignOut] = useState(false);
+  const [profileOpen, setProfileOpen] = useState(false);
   const userMenuRef = useRef(null);
   const dark = theme === "dark";
   const dashboardHref = student ? "/dashboard" : "/login?next=/dashboard";
@@ -21,6 +23,10 @@ export function TopBar() {
     document.addEventListener("mousedown", close);
     return () => document.removeEventListener("mousedown", close);
   }, [menuOpen]);
+
+  const initials = student?.name
+    ? student.name.split(" ").filter(Boolean).map((p) => p[0]).slice(0, 2).join("").toUpperCase()
+    : "U";
 
   return (
     <>
@@ -43,19 +49,55 @@ export function TopBar() {
                 onClick={() => setMenuOpen((v) => !v)}
                 aria-haspopup="menu"
                 aria-expanded={menuOpen}
-                className="pressable flex items-center gap-2 rounded-full bg-slate-100 py-1 pl-3 pr-1.5 dark:bg-white/10"
+                className="pressable flex items-center gap-2 rounded-full bg-slate-100 py-1 pl-1.5 pr-2.5 dark:bg-white/10"
               >
+                {student.avatarUrl ? (
+                  <img
+                    src={student.avatarUrl}
+                    alt=""
+                    className="h-7 w-7 rounded-full object-cover ring-1 ring-black/5 dark:ring-white/15"
+                    referrerPolicy="no-referrer"
+                  />
+                ) : (
+                  <span className="grid h-7 w-7 place-items-center rounded-full bg-[#0B2A6B] text-[11px] font-bold text-[#FFD120] dark:bg-[#FFD120] dark:text-[#0B2A6B]">
+                    {initials}
+                  </span>
+                )}
                 <span className="max-w-[90px] truncate text-[13px] font-semibold sm:max-w-[140px] dark:text-white">{student.name}</span>
-                <span className="grid h-7 w-7 place-items-center rounded-full bg-white shadow-sm dark:bg-white/10 dark:text-white">
-                  <ChevronDown size={13} className={`transition-transform ${menuOpen ? "rotate-180" : ""}`} />
-                </span>
+                <ChevronDown size={13} className={`text-slate-400 transition-transform ${menuOpen ? "rotate-180" : ""}`} />
               </button>
               {menuOpen && (
                 <div role="menu" className="absolute right-0 z-50 mt-2 w-56 overflow-hidden rounded-2xl bg-white p-1.5 text-[#0B2A6B] shadow-xl ring-1 ring-slate-200 dark:bg-[#0A2456] dark:text-white dark:ring-white/15">
+                  <div className="flex items-center gap-2.5 border-b border-slate-100 px-3 py-2.5 dark:border-white/10">
+                    {student.avatarUrl ? (
+                      <img
+                        src={student.avatarUrl}
+                        alt=""
+                        className="h-8 w-8 shrink-0 rounded-full object-cover ring-1 ring-slate-200 dark:ring-white/15"
+                        referrerPolicy="no-referrer"
+                      />
+                    ) : (
+                      <span className="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-[#0B2A6B] text-[11px] font-bold text-[#FFD120] dark:bg-[#FFD120] dark:text-[#0B2A6B]">
+                        {initials}
+                      </span>
+                    )}
+                    <div className="min-w-0 flex-1">
+                      <p className="truncate text-xs font-bold text-[#0B2A6B] dark:text-white">{student.name}</p>
+                      <p className="truncate text-[11px] text-slate-400">{student.email}</p>
+                    </div>
+                  </div>
                   <Link to={dashboardHref} onClick={() => setMenuOpen(false)} className="pressable flex items-center gap-2 rounded-xl px-3 py-2 text-[13px] font-semibold hover:bg-slate-100 sm:hidden dark:hover:bg-white/10">
                     <LayoutDashboard size={14} /> My dashboard
                   </Link>
-                  <p className="px-3 pb-1 pt-2 text-[10px] font-bold uppercase tracking-widest text-slate-400">Settings</p>
+                  <button
+                    role="menuitem"
+                    onClick={() => { setMenuOpen(false); setProfileOpen(true); }}
+                    className="pressable flex w-full items-center gap-2 rounded-xl px-3 py-2 text-[13px] font-semibold hover:bg-slate-100 dark:hover:bg-white/10"
+                  >
+                    <User size={14} /> Profile
+                  </button>
+                  <div className="my-1.5 h-px bg-slate-200 dark:bg-white/10" />
+                  <p className="px-3 pb-1 pt-1 text-[10px] font-bold uppercase tracking-widest text-slate-400">Settings</p>
                   <button role="menuitem" onClick={toggleTheme} className="pressable flex w-full items-center gap-2 rounded-xl px-3 py-2 text-[13px] font-semibold hover:bg-slate-100 dark:hover:bg-white/10">
                     {dark ? <Sun size={14} /> : <Moon size={14} />} {dark ? "Light mode" : "Dark mode"}
                   </button>
@@ -72,6 +114,10 @@ export function TopBar() {
         </nav>
       </div>
     </header>
+    <ProfileModal
+      open={profileOpen}
+      onClose={() => setProfileOpen(false)}
+    />
     <ConfirmDialog
         open={confirmingSignOut}
         title="Log out?"
