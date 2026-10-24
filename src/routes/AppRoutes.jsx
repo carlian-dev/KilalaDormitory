@@ -11,6 +11,7 @@ import Login from "../pages/Login";
 import Privacy from "../pages/Privacy";
 import Terms from "../pages/Terms";
 import StoragePolicy from "../pages/StoragePolicy";
+import NotFound from "../pages/NotFound";
 import AdminLayout from "../pages/admin/AdminLayout";
 import Dashboard from "../pages/admin/Dashboard";
 import Applications from "../pages/admin/Applications";
@@ -79,6 +80,7 @@ export default function AppRoutes() {
                 <Route path="dashboard" element={<ApplicantDashboard />} />
               </Route>
               <Route path="track" element={<Navigate to="/dashboard" replace />} />
+              <Route path="*" element={<NotFound />} />
             </Route>
             <Route path="/admin" element={<AdminGate />}>
               <Route index element={<Dashboard />} />
@@ -86,7 +88,6 @@ export default function AppRoutes() {
               <Route path="apps/:id" element={<AppDetail />} />
               <Route path="templates" element={<Templates />} />
             </Route>
-            <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
         </BrowserRouter>
       </AuthProvider>
