@@ -23,9 +23,9 @@
 ## UI conventions
 - Palette (from the BukSU logo): royal blue `#0B2A6B` + gold `#FFD120` + white, red accent `#E2402F` used sparingly; dark mode via `.dark` class + Tailwind `dark:` variants. Display font: Nunito (headings only, `--font-display`). No public numbers/rates on landing/login.
 - Motion: Motion springs only; keep `backdrop-filter` blurs small and never restore global `will-change` (documented Brave GPU crashes — see `Architecture.md` §8).
-- Canonical docs: `Architecture.md` (system design), `supabase/BACKEND.md` (backend inventory + DR runbook), `docs/ci-cd-plan.md` (**deferred** — CI/Vercel not yet executed).
+- Canonical docs: `Architecture.md` (system design), `supabase/BACKEND.md` (backend inventory + DR runbook), `docs/ci-cd-plan.md` (CI/CD via GitHub Actions + Cloudflare Pages).
 
 ## Windows ops
 - A running `bun run dev` locks `C:\DormitorySystem` against renames — stop bun/vite PIDs first.
 - CRLF warnings from git on write are harmless.
-- Deploy (not yet done): Vercel needs SPA fallback rewrite + the two `VITE_…` vars re-entered in its dashboard; `.env.local` never leaves this machine.
+- Deploy: Cloudflare Pages serves the SPA with `_redirects` fallback; the two `VITE_…` vars are set in the Cloudflare dashboard; `.env.local` never leaves this machine.

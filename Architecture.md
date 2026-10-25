@@ -24,7 +24,7 @@ migrations.
 | Icons    | Lucide (`lucide-react`) | — |
 | Backend  | Supabase | Email/password Auth, Postgres, private Storage buckets |
 | AI       | Google Gemini free tier via Edge Function `dormi-chat` | Dormi assistant; plan + privacy rules in `docs/AI-integration.md` |
-| Deploys  | Vercel (planned) | SPA fallback rewrite + `VITE_…` env vars; CI/CD deferred post-MVP 1 |
+| Deploys  | Cloudflare Pages | SPA `_redirects` fallback + `VITE_…` env vars in dashboard; CI via GitHub Actions |
 
 ## 3. Directory map
 
@@ -163,7 +163,7 @@ form input.
 ## 8. Environments & operations
 
 * Required env: `VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY` (`.env.local`,
-  also set in the Vercel dashboard at deploy time).
+  also set in the Cloudflare Pages dashboard for both Production and Preview).
 * Supabase dashboard prerequisites: Google provider ON for students
   (`@student.buksu.edu.ph`), Email provider ON + Confirm-email OFF for the
   admin console, redirect URLs allowlisted, migrations run in order

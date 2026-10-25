@@ -46,7 +46,7 @@ Supabase Dashboard → Authentication → Providers → **Google**:
       if the student domain lives in the same Workspace)
 
 Supabase Dashboard → Authentication → URL Configuration:
-- [ ] Site URL: the deployed app URL (e.g. `https://kilala.vercel.app`)
+- [ ] Site URL: the deployed app URL (e.g. `https://kilaladormitory.pages.dev`)
 - [ ] Redirect URLs: `http://localhost:5173/**` and
       `https://<deployed-domain>/**`
       (Google returns to `/login?next=…`; unlisted URLs silently fall back
@@ -59,7 +59,7 @@ Supabase Dashboard → Authentication → Providers → **Email**:
 Supabase Dashboard → Project Settings → API Keys: copy Project URL + the
 client key — the **publishable** key (`sb_publishable_…`) on new projects,
 or the legacy `anon` public key on older ones — into `.env.local` (local)
-and the Vercel dashboard (deploy). Never commit keys; never use the
+and the Cloudflare Pages dashboard (deploy). Never commit keys; never use the
 `service_role`/secret key client-side.
 
 **Admin accounts** (email/password) are allowlisted in the DB before the
@@ -94,7 +94,7 @@ re-link by id (the trigger in `mvp6_google_auth.sql` recreates them).
 
 1. Create project → run mvp1 → mvp2 → mvp3 → mvp4 → mvp5 → mvp6 → mvp7 in SQL Editor.
 2. Apply the §2 checklist (including Google OAuth + redirect URLs) and
-   re-enter Vercel env vars.
+   re-enter Cloudflare Pages env vars.
 3. Restore `backups/` data rows and bucket files if they exist.
 4. Students sign in with Google again; admins re-allowlist + Add user per §2.
 
