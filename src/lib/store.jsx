@@ -26,3 +26,5 @@ export function StoreProvider({ children }) {
 }
 
 export const useStore = () => useContext(StoreCtx);
+
+//for trigger
