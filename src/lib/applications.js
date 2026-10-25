@@ -1,12 +1,12 @@
 import { supabase } from "./supabase";
-import { computeTotal } from "./mockData";
+import { computeTotal, normalizeDevices } from "./mockData";
 
 const BUCKET = "dorm-requirements";
 const TEMPLATE_BUCKET = "dorm-templates";
 
 // DB (snake_case) -> UI (camelCase) mapper shared by student + admin views.
 export function toApp(row, docs = [], profileName = "") {
-  const devices = Array.isArray(row.devices) ? row.devices : [];
+  const devices = normalizeDevices(row.devices);
   return {
     id: row.id,
     owner_id: row.owner_id,
@@ -97,7 +97,7 @@ export async function createApplication({ userId, form, files }) {
       guardian: form.guardian.trim(),
       address: (form.address || "").trim(),
       term: form.term,
-      devices: Array.isArray(form.devices) ? form.devices : [],
+      devices: normalizeDevices(form.devices),
     })
     .select("*")
     .single();
@@ -134,13 +134,14 @@ export async function createApplication({ userId, form, files }) {
   return app.id;
 }
 
-export async function updateApplication(id, { status, remarks, assignedRoom }) {
+export async function updateApplication(id, { status, remarks, assignedRoom, devices }) {
   const { error } = await supabase
     .from("applications")
     .update({
       ...(status !== undefined ? { status } : {}),
       ...(remarks !== undefined ? { remarks } : {}),
       ...(assignedRoom !== undefined ? { assigned_room: assignedRoom } : {}),
+      ...(devices !== undefined ? { devices: normalizeDevices(devices) } : {}),
     })
     .eq("id", id);
   if (error) throw error;
@@ -162,7 +163,11 @@ export async function listTemplates() {
     .select("*")
     .order("key");
   if (error) throw error;
-  return data || [];
+  // Birth Certificate is student-provided, never an admin template. Filter by
+  // key and label so older rows (e.g. "birth_certificate") also stay hidden.
+  return (data || []).filter(
+    (r) => !/birth/i.test(r.key || "") && !/birth certificate/i.test(r.label || "")
+  );
 }
 
 export async function downloadTemplate(path) {

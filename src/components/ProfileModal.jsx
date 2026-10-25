@@ -252,7 +252,7 @@ function ProfileDialog({ onClose }) {
                       <span className="font-semibold text-[#0B2A6B] dark:text-white">{app.course} · {app.year}</span>
                     </div>
                     <div>
-                      <span className="text-slate-400">Monthly Rate:</span>{" "}
+                      <span className="text-slate-400">Expected Monthly Total:</span>{" "}
                       <span className="font-semibold text-[#0B2A6B] dark:text-white">{formatPeso(app.monthlyTotal)}/mo</span>
                     </div>
                   </div>

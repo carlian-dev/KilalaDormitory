@@ -71,7 +71,7 @@ export default function Applications() {
             </span>
             <span className="min-w-0 flex-1">
               <span className="block truncate text-sm font-bold">{a.name}</span>
-              <span className="block truncate text-xs text-slate-400">{a.course} · {a.year} · {a.docs.length}/9 docs · {new Date(a.submittedAt).toLocaleDateString()}</span>
+              <span className="block truncate text-xs text-slate-400">{a.course} · {a.year} · {a.docs.length}/10 docs · {new Date(a.submittedAt).toLocaleDateString()}</span>
             </span>
             <span className={`rounded-full px-2.5 py-1 text-[11px] font-bold ring-1 ${statusMeta[a.status].pill}`}>{statusMeta[a.status].label}</span>
             <ChevronRight size={16} className="shrink-0 text-slate-300" />

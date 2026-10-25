@@ -17,7 +17,7 @@
 ## Data-model gotchas
 - `application_documents.doc_type` is CHECK-locked to 9 keys (`mockData.js` `DOC_TYPES`); `doc_templates` holds the 5 downloadable forms.
 - Storage paths: `dorm-requirements/{app_id}/{doctype}`, `dorm-templates/{key}{ext}` (upsert on).
-- `applications.devices` jsonb drives billing: total = `775 + 150 × appliances`, computed in `computeTotal`, **never stored**. `room_pref`/`assigned_room` columns are legacy (rooms cut) — mapper still passes them through; leave alone.
+- `applications.devices` jsonb drives billing: total = `775 + 150 × paid appliances`, computed in `computeTotal`, **never stored**. Presets: laptop/cellphone/tablet = `gadget` (free); iron/rice cooker = `appliance` (+150); free-text “other” items use kind `other`, are not charged until assessed; admin can classify them as `gadget` (free) or `appliance` (+150) in `AppDetail`, updating the expected monthly total. Payment is **face-to-face** at the Housing Office; the app only shows the expected monthly total. `room_pref`/`assigned_room` columns are legacy (rooms cut) — mapper still passes them through; leave alone.
 - File inputs can't be refilled by code: `Apply.jsx` draft autosave (`kilala-draft:<userId>`) covers text/step/devices only; files + consent checkbox always reset.
 
 ## UI conventions

@@ -61,7 +61,7 @@ C:\DormitorySystem
 │   └── pages/
 │       ├── Landing.jsx         Public welcome (no applicant data, no rates)
 │       ├── Login.jsx           Continue with Google + admin email sign-in, `next` redirect
-│       ├── Apply.jsx           5-step wizard: Personal → Downloads → Upload → Review → Payment
+│       ├── Apply.jsx           5-step wizard: Personal → Downloads → Upload → Review → Summary
 │       ├── Dashboard.jsx       Applicant home: my apps, detail, re-upload box
 │       └── admin/
 │           ├── AdminLayout.jsx Console shell (role-gated)
@@ -144,13 +144,18 @@ form input.
 ## 7. Billing & document model (MVP 1 corrections)
 
 * **Rates:** flat base `₱775/mo` per dorm + `₱150/mo` per declared **appliance**;
-  gadgets are free but must be registered. Total = `775 + 150 × appliances`,
+  gadgets are free but must be registered. Apply offers fixed presets — laptop,
+  cellphone, tablet (free) and iron, rice cooker (paid) — plus free-text
+  **other** items stored as kind `other`; those are not charged until the
+  Housing Office reviews them and classifies them in `AppDetail` (Free or +₱150/mo Paid). Total = `775 + 150 × paid appliances`,
   computed client-side (`computeTotal`) and never stored. Shown only inside
-  the application flow and dashboards — never on public pages.
-* **Documents (9 per application):** 5 admin templates (Residency Application,
+  the application flow and dashboards — never on public pages. Payment is
+  collected **face-to-face** at the Housing Office; the app only displays the
+  expected monthly total and never processes online payments.
+* **Documents (10 per application):** 5 admin templates (Residency Application,
   Personal Data, Residency Agreement, Appliance Registration, Residency
-  Admission — download → print → sign → upload back) + 4 student uploads
-  (COR, Student ID copy, Medical Laboratory, Medical Certificate).
+  Admission — download → print → sign → upload back) + 5 student uploads
+  (COR, Student ID copy, Medical Laboratory, Medical Certificate, Birth Certificate).
 * Rejected applications are fixed by **re-upload** (same row back to Pending),
   not by filing a new application. Rooms were cut from MVP 1 (no room pages,
   no assignments).
@@ -162,7 +167,7 @@ form input.
 * Supabase dashboard prerequisites: Google provider ON for students
   (`@student.buksu.edu.ph`), Email provider ON + Confirm-email OFF for the
   admin console, redirect URLs allowlisted, migrations run in order
-  mvp1 → mvp6; admins allowlisted in `public.admin_emails` (see
+  mvp1 → mvp7; admins allowlisted in `public.admin_emails` (see
   `supabase/BACKEND.md` §2).
 * Known environment quirk: heavy `backdrop-filter` blurs + a video-saturated
   GPU have crashed Brave during typing; blurs were reduced and global

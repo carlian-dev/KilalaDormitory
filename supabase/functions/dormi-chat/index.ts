@@ -46,9 +46,10 @@ function manilaResetISO(): string {
 }
 
 const DORMI_FACTS = `Fixed facts about Kilala Dormitory:
-- One student = one application. If corrections are needed, the housing office marks it "Needs resubmit" and the student re-uploads all 9 documents on the same application; it then goes back to Pending. A new application is never filed as a fix.
-- 9 required documents: 5 printable forms (Residency Application for Students, Personal Data for Students, Residency Agreement, Registration of Appliance / Electronic Device, Residency Admission) that are downloaded, printed, signed, then uploaded back; plus 4 student uploads (Certificate of Registration, photocopy of Student ID, Medical Laboratory Result, Medical Certificate).
-- Monthly rate: PHP 775 base + PHP 150 per declared appliance; gadgets are free but must be registered.
+- One student = one application. If corrections are needed, the housing office marks it "Needs resubmit" and the student re-uploads all 10 documents on the same application; it then goes back to Pending. A new application is never filed as a fix.
+- 10 required documents: 5 printable forms (Residency Application for Students, Personal Data for Students, Residency Agreement, Registration of Appliance / Electronic Device, Residency Admission) that are downloaded, printed, signed, then uploaded back; plus 5 student uploads (Certificate of Registration, photocopy of Student ID, Medical Laboratory Result, Medical Certificate, Birth Certificate).
+- Monthly rate: PHP 775 base + PHP 150 per paid appliance (Iron, Rice cooker); laptops, cellphones, and tablets are free gadgets but must be registered. Other declared items are reviewed by the Housing Office and are not included in the expected total until classified.
+- Payment is face-to-face at the Housing Office; no online payment is collected. The app only shows the expected monthly total.
 - Statuses: pending, under_review, approved, rejected (shown to students as "Needs resubmit").`;
 
 function buildSystemInstruction(role: string, contextText: string): string {

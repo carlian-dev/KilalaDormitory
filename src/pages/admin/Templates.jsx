@@ -15,7 +15,9 @@ export default function Templates() {
     setLoading(true);
     setFetchErr("");
     listTemplates()
-      .then(setRows)
+      .then((data) => setRows(
+        (data || []).filter((r) => !/birth/i.test(r.key || "") && !/birth certificate/i.test(r.label || ""))
+      ))
       .catch((e) => setFetchErr(e.message))
       .finally(() => setLoading(false));
   };

@@ -11,12 +11,12 @@ There are no Edge Functions, webhooks, or cron jobs in MVP 1 (see §5).
 | Tables `profiles`, `applications`, `application_documents`, `doc_templates` | `mvp1_schema.sql`, `mvp3_billing_docs.sql` |
 | `room_pref` nullable + resubmit UPDATE policies | `mvp2_cleanup_resubmit.sql` |
 | One student = one application (`applications_owner_unique`) | `mvp4_one_application.sql` |
-| `doc_type` 9-key CHECK | `mvp3_billing_docs.sql` |
+| `doc_type` 10-key CHECK | `mvp3_billing_docs.sql` |
 | `is_admin()` security-definer function | `mvp1_schema.sql` |
 | All RLS policies (owner-only + admin override) | `mvp1_schema.sql`, `mvp2_cleanup_resubmit.sql`, `mvp6_google_auth.sql` |
 | Buckets `dorm-requirements`, `dorm-templates` (private) + Storage policies | `mvp1_schema.sql`, `mvp3_billing_docs.sql` |
-| `devices` jsonb column (appliance/gadget declarations) | `mvp3_billing_docs.sql` |
-| Billing math (₱775 + ₱150/appliance, computed never stored) | `src/lib/mockData.js` → `computeTotal` |
+| `devices` jsonb column (preset gadgets/appliances + custom “other” items, classifiable by admin) | `mvp3_billing_docs.sql` |
+| Billing math (₱775 + ₱150/paid appliance, display-only — payment is face-to-face, computed never stored) | `src/lib/mockData.js` → `computeTotal` |
 | All DB/Storage calls (CRUD, signed URLs, templates, resubmit) | `src/lib/applications.js` |
 | Auth flows (Google OAuth, admin email signIn, signOut, role load) | `src/lib/auth.jsx` |
 | Institutional-email guard on `auth.users` + auto profile trigger + `admin_emails` allowlist | `mvp6_google_auth.sql` |
@@ -25,7 +25,7 @@ There are no Edge Functions, webhooks, or cron jobs in MVP 1 (see §5).
 | Dormi client calls (context builders + `askDormi()`) | `src/lib/dormi.js` |
 | Dormi widget UI (placeholder mascot) | `src/components/DormiChat.jsx`, `DormiAvatar.jsx` |
 
-Run order for a fresh project: **mvp1 → mvp2 → mvp3 → mvp4 → mvp5 → mvp6** (each is idempotent).
+Run order for a fresh project: **mvp1 → mvp2 → mvp3 → mvp4 → mvp5 → mvp6 → mvp7** (each is idempotent).
 Deploy order for an existing project: **run mvp6 first, then ship the client** —
 the trigger replaces the old client-side profile insert, so new Google users
 have no `profiles` row until the migration is applied.
@@ -92,7 +92,7 @@ re-link by id (the trigger in `mvp6_google_auth.sql` recreates them).
 
 ## 4. Disaster recovery (fresh project, ~15 min)
 
-1. Create project → run mvp1 → mvp2 → mvp3 → mvp4 → mvp5 → mvp6 in SQL Editor.
+1. Create project → run mvp1 → mvp2 → mvp3 → mvp4 → mvp5 → mvp6 → mvp7 in SQL Editor.
 2. Apply the §2 checklist (including Google OAuth + redirect URLs) and
    re-enter Vercel env vars.
 3. Restore `backups/` data rows and bucket files if they exist.

@@ -4,14 +4,52 @@ export const BILLING = {
   CURRENCY: "₱",
 };
 
+// Preset device declarations shown as checkboxes in Apply. Free gadgets are
+// kind "gadget"; paid appliances are kind "appliance". Anything typed under
+// "Other" is stored as kind "other" and assessed by the Housing Office.
+export const DEVICE_PRESETS = [
+  { key: "laptop", label: "Laptop", kind: "gadget" },
+  { key: "cellphone", label: "Cellphone", kind: "gadget" },
+  { key: "tablet", label: "Tablet", kind: "gadget" },
+  { key: "iron", label: "Iron", kind: "appliance" },
+  { key: "rice_cooker", label: "Rice cooker", kind: "appliance" },
+];
+
 export function computeTotal(devices = []) {
   const list = Array.isArray(devices) ? devices : [];
+  // Only "appliance" adds a charge. "gadget" is free; "other" awaits admin review.
   const applianceCount = list.filter((d) => d.kind === "appliance").length;
   return BILLING.BASE_RATE + applianceCount * BILLING.PER_APPLIANCE;
 }
 
 export function formatPeso(n) {
   return `${BILLING.CURRENCY}${Number(n || 0).toLocaleString()}`;
+}
+
+export function deviceKindLabel(kind) {
+  if (kind === "appliance") return `+${formatPeso(BILLING.PER_APPLIANCE)}/mo`;
+  if (kind === "gadget") return "Free";
+  return "For review";
+}
+
+// Normalize saved/draft devices: known names become their preset (and their
+// fixed free/paid classification); custom items retain their admin classification
+// ('appliance' | 'gadget' | 'other') or default to 'other' awaiting review.
+export function normalizeDevices(list) {
+  if (!Array.isArray(list)) return [];
+  return list
+    .filter((d) => d && typeof d.name === "string")
+    .map((d) => {
+      const preset = DEVICE_PRESETS.find(
+        (p) => p.key === d.key || p.label.toLowerCase() === d.name.trim().toLowerCase()
+      );
+      return preset
+        ? { key: preset.key, name: preset.label, kind: preset.kind }
+        : {
+            name: d.name.trim(),
+            kind: d.kind === "appliance" || d.kind === "gadget" || d.kind === "other" ? d.kind : "other",
+          };
+    });
 }
 
 // Degree programs grouped by college — drives the College + Course dropdowns.
@@ -74,6 +112,7 @@ export const DOC_TYPES = [
   { key: "student_id_copy", label: "Photocopy of Student ID", hint: "Clear front copy, PDF / JPG / PNG, max 5MB", source: "upload", required: true },
   { key: "med_lab", label: "Medical Laboratory Result", hint: "Laboratory result copy, PDF / JPG / PNG, max 5MB", source: "upload", required: true },
   { key: "med_cert", label: "Medical Certificate", hint: "Medical certificate copy, PDF / JPG / PNG, max 5MB", source: "upload", required: true },
+  { key: "birth_certificate", label: "Birth Certificate", hint: "Birth certificate copy, PDF / JPG / PNG, max 5MB", source: "upload", required: true },
 ];
 
 export const TEMPLATE_DOCS = DOC_TYPES.filter((d) => d.source === "template");

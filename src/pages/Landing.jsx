@@ -8,8 +8,8 @@ import { useAuth } from "../lib/auth";
 // The three steps mirror the real Apply → upload → track flow. No public
 // rates or numbers (see AGENTS.md UI conventions).
 const STEPS = [
-  { title: "Apply online", body: "Sign in with your BukSU Google account, fill the application, and declare any appliances you'll bring." },
-  { title: "Upload requirements", body: "Download the 5 dorm forms, sign them, and upload all 9 documents in one go." },
+  { title: "Apply online", body: "Sign in with your BukSU Google account, fill the application, and declare any gadgets or appliances you'll bring." },
+  { title: "Upload requirements", body: "Download the 5 dorm forms, sign them, and upload all 10 documents in one go." },
   { title: "Track your status", body: "Follow your application — including resubmit requests — right up to a decision." },
 ];
 

@@ -63,9 +63,10 @@ export default function Terms() {
           <section>
             <h2 className="text-lg font-bold text-[#0B2A6B] dark:text-white">6. Rates and billing</h2>
             <p className="mt-2">
-              The monthly rate shown in the app is computed from a base rate plus a charge per registered appliance. Rates
-              are set by the Housing Office and may change with notice. The app provides an estimate for planning; actual
-              charges and payment terms are governed by university housing policy.
+              The expected monthly total shown in the app is computed from a base rate plus a charge per registered
+              appliance. Rates are set by the Housing Office and may change with notice. The app provides an estimate for
+              planning only and does not process online payments. Payment is made face-to-face at the Housing Office;
+              actual charges and payment terms are governed by university housing policy.
             </p>
           </section>
 

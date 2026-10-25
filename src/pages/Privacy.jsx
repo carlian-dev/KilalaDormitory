@@ -33,7 +33,7 @@ export default function Privacy() {
               <li><strong>Account data:</strong> full name, email address, Google account identifier (student sign-in), and — for dorm-office accounts — a password stored only as a salted hash by our authentication provider (Supabase Auth). Profile role (student or admin).</li>
               <li><strong>Application data:</strong> student ID, college, course, year level, contact number, parent/guardian name and contact number, home address, selected term, and your list of devices/appliances.</li>
               <li><strong>Documents:</strong> files you upload (signed forms and supporting documents such as certificates and medical results).</li>
-              <li><strong>Computed data:</strong> your monthly rate, derived from the base rate plus registered appliances.</li>
+              <li><strong>Computed data:</strong> your expected monthly total, derived from the base rate plus registered appliances.</li>
               <li><strong>Technical data:</strong> IP address, browser and device information, timestamps, and authentication/security events processed by our hosting and database provider.</li>
               <li><strong>Assistant data:</strong> when you use the Dormi assistant, a limited context (application status, course, year, device names, missing documents) and your chat messages.</li>
             </ul>
@@ -44,7 +44,7 @@ export default function Privacy() {
             <ul className="mt-2 list-disc space-y-1 pl-5">
               <li>Process, review, and decide on dormitory applications</li>
               <li>Communicate application status and remarks to you</li>
-              <li>Compute and display your monthly rate</li>
+              <li>Compute and display your expected monthly total</li>
               <li>Verify uploaded documents</li>
               <li>Administer accounts and protect the service (security, fraud prevention)</li>
               <li>Improve the application experience</li>

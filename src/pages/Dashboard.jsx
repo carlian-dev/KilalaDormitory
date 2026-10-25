@@ -3,7 +3,7 @@ import { Link, useSearchParams } from "react-router-dom";
 import { Search, FileText, PlusCircle, ArrowLeft, ExternalLink } from "lucide-react";
 import { PageFade, StatusBadge } from "../components/ui";
 import { FileUploader } from "../components/FileUploader";
-import { DOC_TYPES, TEMPLATE_DOCS, UPLOAD_DOCS, BILLING, formatPeso } from "../lib/mockData";
+import { DOC_TYPES, TEMPLATE_DOCS, UPLOAD_DOCS, BILLING, formatPeso, deviceKindLabel } from "../lib/mockData";
 import { useAuth } from "../lib/auth";
 import { fetchMyApplications, signedDocUrl, resubmitDocuments } from "../lib/applications";
 
@@ -76,14 +76,18 @@ export default function ApplicantDashboard() {
 
             <div className="mt-4 rounded-2xl bg-[#0B2A6B] p-3.5 text-white dark:bg-[#FFD120] dark:text-[#0B2A6B]">
               <div className="flex justify-between text-sm font-bold">
-                <span>Monthly rate</span><span>{formatPeso(selected.monthlyTotal)}/mo</span>
+                <span>Expected monthly total</span><span>{formatPeso(selected.monthlyTotal)}/mo</span>
               </div>
               <p className="mt-0.5 text-xs opacity-80">
                 {formatPeso(BILLING.BASE_RATE)} base
                 {(selected.devices || []).length > 0
-                  ? ` · Devices: ${selected.devices.map((d) => `${d.name} (${d.kind === "appliance" ? "+₱150" : "free"})`).join(", ")}`
+                  ? ` · Devices: ${selected.devices.map((d) => `${d.name} (${deviceKindLabel(d.kind)})`).join(", ")}`
                   : " · No devices declared"}
               </p>
+              {selected.devices?.some((d) => d.kind === "other") && (
+                <p className="mt-1 text-xs opacity-80">Items marked “For review” are assessed by the Housing Office and are not included in the expected total.</p>
+              )}
+              <p className="mt-1 text-xs opacity-80">Payment is made face-to-face at the Housing Office — no online payment is collected.</p>
             </div>
 
             <div className="mt-5 flex items-center gap-1">
@@ -234,7 +238,7 @@ function ResubmitBox({ appId, onDone }) {
   const ready = DOC_TYPES.every((d) => files[d.key]);
 
   const submit = async () => {
-    if (!ready) { setErr("Please re-upload all 9 documents."); return; }
+    if (!ready) { setErr("Please re-upload all 10 documents."); return; }
     setErr("");
     setBusy(true);
     try {
@@ -251,7 +255,7 @@ function ResubmitBox({ appId, onDone }) {
     <div className="mt-5 rounded-2xl bg-[#FFF8E1] p-4 ring-1 ring-[#FFD120] dark:bg-[#FFD120]/10 dark:ring-[#FFD120]/40">
       <p className="text-sm font-bold text-[#0B2A6B] dark:text-[#FFE9A8]">Fix your documents and resubmit</p>
       <p className="mt-0.5 text-[13px] text-[#0B2A6B]/70 dark:text-[#FFE9A8]/70">
-        Upload fresh copies of all 9 documents. Your application goes back to Pending for re-review.
+        Upload fresh copies of all 10 documents. Your application goes back to Pending for re-review.
       </p>
       <div className="mt-3 grid gap-3 rounded-2xl bg-white p-3 dark:bg-[#0A2456]">
         {DOC_TYPES.map((d) => (
