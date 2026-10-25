@@ -2,12 +2,13 @@
 -- Kilala Dormitory — MVP 1 follow-up: flat billing + two-sided docs.
 -- Run once in Supabase Dashboard > SQL Editor, AFTER mvp2.
 --
--- Billing:  applications.devices jsonb [{name, kind}] where kind is
---   'appliance' (+P150 each) or 'gadget' (free). Base rate P775.
---   Monthly total is computed client-side, never stored.
+-- Billing:  applications.devices jsonb [{key?, name, kind}] where kind is
+--   'appliance' (+P150 each), 'gadget' (free), or 'other' (pending admin
+--   review, not charged). Base rate P775. Monthly total is computed
+--   client-side, never stored.
 --
--- Documents (9 keys): 5 admin templates (download, print, sign,
---   upload back) + 4 student-provided uploads.
+-- Documents (10 keys): 5 admin templates (download, print, sign,
+--   upload back) + 5 student-provided uploads.
 -- ============================================================
 
 -- ---------- devices ----------
@@ -28,7 +29,8 @@ alter table public.application_documents
     'cor',
     'student_id_copy',
     'med_lab',
-    'med_cert'
+    'med_cert',
+    'birth_certificate'
   ));
 
 -- ---------- doc_templates (admin-managed softcopies) ----------

@@ -1,12 +1,12 @@
 import { supabase } from "./supabase";
-import { computeTotal } from "./mockData";
+import { computeTotal, normalizeDevices } from "./mockData";
 
 const BUCKET = "dorm-requirements";
 const TEMPLATE_BUCKET = "dorm-templates";
 
 // DB (snake_case) -> UI (camelCase) mapper shared by student + admin views.
 export function toApp(row, docs = [], profileName = "") {
-  const devices = Array.isArray(row.devices) ? row.devices : [];
+  const devices = normalizeDevices(row.devices);
   return {
     id: row.id,
     owner_id: row.owner_id,
@@ -69,9 +69,23 @@ const extOf = (name) => {
   return m ? m[0].toLowerCase() : "";
 };
 
-// Insert application + upload 3 files + insert document rows.
-// Rolls back the application row if uploads fail.
+// One student = one application. Enforced by unique index
+// applications_owner_unique (mvp4_one_application.sql); this pre-check
+// gives a friendly message before the DB raises 23505. The only way to
+// revise is the resubmit flow (admin marks rejected → back to pending).
 export async function createApplication({ userId, form, files }) {
+  const { data: existing, error: existErr } = await supabase
+    .from("applications")
+    .select("id,status")
+    .eq("owner_id", userId)
+    .limit(1);
+  if (existErr) throw existErr;
+  if (existing && existing.length) {
+    throw new Error(
+      "You already have an application. Track it in My dashboard — if corrections are needed, the housing office will mark it Needs resubmit and you'll revise the same application."
+    );
+  }
+
   const { data: app, error } = await supabase
     .from("applications")
     .insert({
@@ -83,11 +97,18 @@ export async function createApplication({ userId, form, files }) {
       guardian: form.guardian.trim(),
       address: (form.address || "").trim(),
       term: form.term,
-      devices: Array.isArray(form.devices) ? form.devices : [],
+      devices: normalizeDevices(form.devices),
     })
     .select("*")
     .single();
-  if (error) throw error;
+  if (error) {
+    if (error.code === "23505" || /duplicate|unique/i.test(error.message || "")) {
+      throw new Error(
+        "You already have an application. Track it in My dashboard — if corrections are needed, the housing office will mark it Needs resubmit and you'll revise the same application."
+      );
+    }
+    throw error;
+  }
 
   try {
     for (const [docType, v] of Object.entries(files)) {
@@ -113,13 +134,14 @@ export async function createApplication({ userId, form, files }) {
   return app.id;
 }
 
-export async function updateApplication(id, { status, remarks, assignedRoom }) {
+export async function updateApplication(id, { status, remarks, assignedRoom, devices }) {
   const { error } = await supabase
     .from("applications")
     .update({
       ...(status !== undefined ? { status } : {}),
       ...(remarks !== undefined ? { remarks } : {}),
       ...(assignedRoom !== undefined ? { assigned_room: assignedRoom } : {}),
+      ...(devices !== undefined ? { devices: normalizeDevices(devices) } : {}),
     })
     .eq("id", id);
   if (error) throw error;
@@ -141,7 +163,11 @@ export async function listTemplates() {
     .select("*")
     .order("key");
   if (error) throw error;
-  return data || [];
+  // Birth Certificate is student-provided, never an admin template. Filter by
+  // key and label so older rows (e.g. "birth_certificate") also stay hidden.
+  return (data || []).filter(
+    (r) => !/birth/i.test(r.key || "") && !/birth certificate/i.test(r.label || "")
+  );
 }
 
 export async function downloadTemplate(path) {
