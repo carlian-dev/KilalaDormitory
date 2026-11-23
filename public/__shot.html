@@ -1,0 +1,7 @@
+<!doctype html>
+<meta charset="utf-8" />
+<script>
+  localStorage.setItem("kilala-consent", "accepted");
+  localStorage.setItem("kilala-theme", new URLSearchParams(location.search).get("theme") || "light");
+  location.replace("/");
+</script>

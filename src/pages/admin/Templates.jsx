@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { FileText, UploadCloud, ExternalLink } from "lucide-react";
+import { ExternalLink, FileText, UploadCloud } from "lucide-react";
 import { listTemplates, uploadTemplate, downloadTemplate } from "../../lib/applications";
 
 export default function Templates() {
@@ -57,46 +57,51 @@ export default function Templates() {
 
   return (
     <div>
-      <p className="text-[11px] font-bold uppercase tracking-widest text-slate-400">Forms students download</p>
-      <h1 className="h-section text-2xl text-[#0B2A6B] sm:text-3xl dark:text-white">Templates</h1>
-      <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
-        Upload the 5 softcopy forms. Students download, print, sign, and upload them back with their application.
+      <p className="eyebrow">Forms students download</p>
+      <h1 className="h-section mt-2 text-2xl text-[var(--ink)] sm:text-3xl">Templates</h1>
+      <p className="mt-1.5 max-w-xl text-[12px] leading-relaxed text-[var(--muted)]">
+        Upload the five softcopy forms. Students download, print, sign, and upload them back with their application.
       </p>
 
-      {fetchErr && <p className="mt-3 rounded-2xl bg-rose-50 p-3 text-[13px] font-semibold text-rose-700 ring-1 ring-rose-200 dark:bg-rose-500/10 dark:text-rose-300 dark:ring-rose-400/30">{fetchErr}</p>}
-      {err && <p className="mt-3 rounded-2xl bg-rose-50 p-3 text-[13px] font-semibold text-rose-700 ring-1 ring-rose-200 dark:bg-rose-500/10 dark:text-rose-300 dark:ring-rose-400/30">{err}</p>}
+      {fetchErr && <p className="mt-4 rounded-2xl bg-rose-50 p-3 text-[12px] font-semibold text-rose-700 ring-1 ring-rose-200 dark:bg-rose-500/10 dark:text-rose-300 dark:ring-rose-400/30">{fetchErr}</p>}
+      {err && <p className="mt-4 rounded-2xl bg-rose-50 p-3 text-[12px] font-semibold text-rose-700 ring-1 ring-rose-200 dark:bg-rose-500/10 dark:text-rose-300 dark:ring-rose-400/30">{err}</p>}
 
-      <div className="mt-4 grid gap-2.5">
-        {loading && <p className="text-sm text-slate-500 dark:text-slate-400">Loading…</p>}
+      <div className="mt-5 grid gap-3">
+        {loading && <p className="text-[13px] text-[var(--muted-soft)]">Loading…</p>}
         {!loading && rows.length === 0 && !fetchErr && (
-          <p className="rounded-3xl bg-white p-6 text-center text-sm text-slate-500 shadow-sm ring-1 ring-slate-200 dark:bg-white/5 dark:text-slate-300 dark:ring-white/10">
-            No templates yet — run <span className="font-mono">mvp3_billing_docs.sql</span> to seed the 5 rows.
+          <p className="card p-8 text-center text-[13px] text-[var(--muted)]">
+            No templates yet — run <span className="font-mono text-[12px]">mvp3_billing_docs.sql</span> to seed the five rows.
           </p>
         )}
         {rows.map((r) => (
-          <div key={r.key} className="flex items-center gap-3 rounded-3xl bg-white p-4 text-slate-900 shadow dark:bg-[#0A2456] dark:text-white dark:ring-1 dark:ring-white/10">
-            <span className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-[#0B2A6B] text-[#FFD120] dark:bg-[#FFD120] dark:text-[#0B2A6B]">
-              <FileText size={16} />
-            </span>
-            <div className="min-w-0 flex-1">
-              <p className="text-sm font-bold">{r.label}</p>
-              <p className="truncate font-mono text-xs text-slate-400">
-                {r.file_name || "No file uploaded yet"}
-                {r.updated_at && r.file_name ? ` · ${new Date(r.updated_at).toLocaleDateString()}` : ""}
-              </p>
+          <div key={r.key} className="card flex flex-col gap-3 p-4 sm:flex-row sm:items-center">
+            <div className="flex min-w-0 flex-1 items-center gap-3">
+              <span className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-[#0B2A6B] text-[#FFD120] dark:bg-[#FFD120] dark:text-[#0B2A6B]">
+                <FileText size={16} />
+              </span>
+              <div className="min-w-0 flex-1">
+                <p className="text-[13px] font-bold text-[var(--ink)]">{r.label}</p>
+                <p className="mt-0.5 truncate text-[11px] font-mono text-[var(--muted-soft)]">
+                  {r.file_name || "No file uploaded yet"}
+                  {r.updated_at && r.file_name ? ` · ${new Date(r.updated_at).toLocaleDateString()}` : ""}
+                </p>
+              </div>
             </div>
-            <span className={`shrink-0 rounded-full px-2.5 py-1 text-[11px] font-bold ${r.file_path ? "bg-emerald-100 text-emerald-700 dark:bg-emerald-500/15 dark:text-emerald-300" : "bg-[#FFF8E1] text-[#0B2A6B] ring-1 ring-[#FFD120]"}`}>
-              {r.file_path ? "Uploaded" : "Missing"}
-            </span>
-            <div className="flex shrink-0 gap-1.5">
+
+            <div className="flex shrink-0 items-center gap-2 pl-[52px] sm:pl-0">
+              <span className={`chip ${r.file_path
+                ? "bg-emerald-500/10 text-emerald-700 ring-1 ring-emerald-200 dark:text-emerald-300 dark:ring-emerald-400/25"
+                : "bg-[#FFF8E1] text-[#0B2A6B] ring-1 ring-[#FFD120]/60 dark:bg-[#FFD120]/10 dark:text-[#FFD120] dark:ring-[#FFD120]/25"}`}>
+                {r.file_path ? "Uploaded" : "Missing"}
+              </span>
               {r.file_path && (
-                <button onClick={() => open(r)} className="pressable inline-flex items-center gap-1 rounded-full bg-slate-100 px-3 py-1.5 text-xs font-bold dark:bg-white/10">
+                <button onClick={() => open(r)} className="pressable btn btn-secondary btn-sm">
                   <ExternalLink size={13} /> View
                 </button>
               )}
               <button onClick={() => pick(r.key)} disabled={busyKey === r.key}
-                className="pressable inline-flex items-center gap-1 rounded-full bg-[#FFD120] px-3 py-1.5 text-xs font-bold text-[#0B2A6B] hover:bg-[#F0BB00] disabled:opacity-50">
-                <UploadCloud size={13} /> {busyKey === r.key ? "…" : r.file_path ? "Replace" : "Upload"}
+                className="pressable btn btn-accent btn-sm">
+                <UploadCloud size={13} /> {busyKey === r.key ? "Uploading…" : r.file_path ? "Replace" : "Upload"}
               </button>
             </div>
           </div>

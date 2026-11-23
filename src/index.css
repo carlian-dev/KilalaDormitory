@@ -21,49 +21,203 @@
   --color-dorm-900: #081f52;
 }
 
+/* ---------------------------------------------------------------------------
+   Design tokens
+   One quiet background, one surface, one hairline. Gold is the action colour;
+   navy carries structure. Keep shadows soft — depth should read, not shout.
+--------------------------------------------------------------------------- */
 :root {
   font: 100%/1.5 var(--font-sans);
+  --bg: #f5f7fb;
+  --surface: #ffffff;
+  --surface-2: #f8fafc;
+  --ink: #0b2a6b;
+  --ink-strong: #071f4f;
+  --muted: #64748b;
+  --muted-soft: #94a3b8;
+  --line: #e6eaf3;
+  --line-strong: #d8dfec;
+  --gold: #ffd120;
+  --gold-strong: #f0bb00;
+  --red: #e2402f;
+  --shadow-card: 0 1px 2px rgba(9, 25, 58, 0.04), 0 24px 48px -36px rgba(9, 25, 58, 0.4);
+  --shadow-float: 0 2px 6px rgba(9, 25, 58, 0.06), 0 24px 60px -24px rgba(9, 25, 58, 0.38);
+}
+
+.dark {
+  --bg: #051331;
+  --surface: #0a2148;
+  --surface-2: rgba(255, 255, 255, 0.04);
+  --ink: #f8fafc;
+  --ink-strong: #ffffff;
+  --muted: #94a3b8;
+  --muted-soft: #64748b;
+  --line: rgba(255, 255, 255, 0.1);
+  --line-strong: rgba(255, 255, 255, 0.16);
+  --shadow-card: 0 1px 2px rgba(0, 0, 0, 0.18), 0 24px 48px -32px rgba(0, 0, 0, 0.65);
+  --shadow-float: 0 2px 8px rgba(0, 0, 0, 0.24), 0 32px 64px -28px rgba(0, 0, 0, 0.7);
 }
 
 html {
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
+  scroll-behavior: smooth;
 }
 
 body {
   margin: 0;
-  background: #f7f8fc;
-  color: #0b2a6b;
+  background: var(--bg);
+  color: var(--ink);
 }
 
-.dark body {
-  background: #041743;
-  color: #f1f5f9;
+::selection {
+  background: rgba(255, 209, 32, 0.5);
+  color: #071f4f;
 }
 
 /* Apple-design typography: Nunito display (BukSU-friendly rounded), neutral body */
 .display {
   font-family: var(--font-display);
-  font-size: clamp(2.25rem, 5vw, 3.75rem);
-  line-height: 1.05;
-  letter-spacing: -0.02em;
+  font-size: clamp(2.35rem, 5vw, 4rem);
+  line-height: 1.02;
+  letter-spacing: -0.035em;
   font-weight: 800;
+  text-wrap: balance;
 }
 .h-section {
   font-family: var(--font-display);
   font-weight: 800;
-  letter-spacing: -0.015em;
-  line-height: 1.2;
+  letter-spacing: -0.02em;
+  line-height: 1.15;
+  text-wrap: balance;
 }
-.body-text { line-height: 1.6; letter-spacing: 0; }
+.body-text { line-height: 1.65; letter-spacing: 0; }
+
+@layer components {
+  .eyebrow {
+    font-size: 0.6875rem;
+    font-weight: 700;
+    letter-spacing: 0.17em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 1.5rem;
+    box-shadow: var(--shadow-card);
+  }
+
+  .card-quiet {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 1.5rem;
+  }
+
+  .field {
+    width: 100%;
+    border-radius: 0.875rem;
+    border: 1px solid var(--line-strong);
+    background: var(--surface);
+    padding: 0.7rem 0.9rem;
+    font-size: 0.875rem;
+    line-height: 1.4;
+    color: var(--ink);
+    outline: none;
+    transition: border-color 160ms ease, box-shadow 160ms ease;
+  }
+  .field::placeholder { color: var(--muted-soft); }
+  .dark .field { background: rgba(255, 255, 255, 0.05); }
+  .field:focus {
+    border-color: rgba(11, 42, 107, 0.5);
+    box-shadow: 0 0 0 4px rgba(255, 209, 32, 0.28);
+  }
+  .dark .field:focus {
+    border-color: rgba(255, 209, 32, 0.55);
+    box-shadow: 0 0 0 4px rgba(255, 209, 32, 0.16);
+  }
+  .field:disabled { opacity: 0.55; }
+
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    border-radius: 999px;
+    padding: 0.8rem 1.25rem;
+    font-size: 0.875rem;
+    font-weight: 700;
+    line-height: 1;
+    white-space: nowrap;
+    transition: transform 160ms ease-out, background-color 160ms ease-out,
+      border-color 160ms ease-out, box-shadow 160ms ease-out, color 160ms ease-out;
+  }
+  .btn:disabled { opacity: 0.45; pointer-events: none; }
+
+  .btn-primary {
+    background: #0b2a6b;
+    color: #ffffff;
+    box-shadow: 0 10px 24px -18px rgba(11, 42, 107, 0.9);
+  }
+  .btn-primary:hover { background: #0a255f; }
+  .dark .btn-primary { background: #ffd120; color: #0b2a6b; }
+  .dark .btn-primary:hover { background: #f0bb00; }
+
+  .btn-accent {
+    background: #ffd120;
+    color: #0b2a6b;
+    box-shadow: 0 10px 24px -18px rgba(240, 187, 0, 0.9);
+  }
+  .btn-accent:hover { background: #f0bb00; }
+
+  .btn-secondary {
+    background: var(--surface);
+    color: var(--ink);
+    border: 1px solid var(--line-strong);
+  }
+  .btn-secondary:hover { background: var(--surface-2); }
+
+  .btn-ghost { color: var(--muted); }
+  .btn-ghost:hover { background: rgba(11, 42, 107, 0.05); color: var(--ink); }
+  .dark .btn-ghost:hover { background: rgba(255, 255, 255, 0.06); color: #ffffff; }
+
+  .btn-sm { padding: 0.55rem 0.9rem; font-size: 0.75rem; }
+  .btn-lg { padding: 0.95rem 1.5rem; font-size: 0.9375rem; }
+
+  .icon-btn {
+    display: inline-grid;
+    place-items: center;
+    height: 2.5rem;
+    width: 2.5rem;
+    border-radius: 999px;
+    color: var(--muted);
+    transition: background-color 160ms ease, color 160ms ease, transform 100ms ease-out;
+  }
+  .icon-btn:hover { background: rgba(11, 42, 107, 0.06); color: var(--ink); }
+  .dark .icon-btn:hover { background: rgba(255, 255, 255, 0.08); color: #ffffff; }
+
+  .chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+    border-radius: 999px;
+    padding: 0.35rem 0.7rem;
+    font-size: 0.6875rem;
+    font-weight: 700;
+    line-height: 1.2;
+    white-space: nowrap;
+  }
+}
 
 /* Instant press feedback — respond on pointer-down */
 .pressable:active {
-  transform: scale(0.97);
+  transform: scale(0.975);
   transition: transform 100ms ease-out;
 }
 .pressable {
-  transition: transform 160ms ease-out, background-color 160ms ease-out, box-shadow 160ms ease-out;
+  transition: transform 160ms ease-out, background-color 160ms ease-out,
+    box-shadow 160ms ease-out, border-color 160ms ease-out, color 160ms ease-out;
   /* NOTE: no will-change here — it forced a GPU layer per button and, combined
      with backdrop blurs + a video-heavy tab, could crash flaky GPU drivers. */
 }
@@ -72,14 +226,14 @@ body {
    backdrop blurs repaint the GPU on every keystroke and have crashed
    Brave/Chrome when a video tab saturates the GPU next door. */
 .material-bar {
-  background: rgba(255, 255, 255, 0.82);
+  background: rgba(255, 255, 255, 0.88);
   backdrop-filter: blur(4px);
   -webkit-backdrop-filter: blur(4px);
-  border-bottom: 1px solid rgba(10, 31, 68, 0.08);
+  border-bottom: 1px solid var(--line);
 }
 .dark .material-bar {
-  background: rgba(4, 15, 36, 0.72);
-  border-bottom: 1px solid rgba(255, 209, 32, 0.15);
+  background: rgba(5, 19, 49, 0.86);
+  border-bottom: 1px solid var(--line);
 }
 .material-card {
   background: rgba(255, 255, 255, 0.9);
@@ -87,26 +241,33 @@ body {
   -webkit-backdrop-filter: blur(4px);
 }
 .dark .material-card {
-  background: rgba(11, 30, 58, 0.85);
+  background: rgba(11, 33, 72, 0.88);
 }
 
 /* Focus visibility for wayfinding */
 :focus-visible {
   outline: 2px solid #0b2a6b;
   outline-offset: 2px;
-  box-shadow: 0 0 0 4px rgba(255, 209, 32, 0.5);
+  box-shadow: 0 0 0 4px rgba(255, 209, 32, 0.45);
+}
+.dark :focus-visible {
+  outline-color: #ffd120;
+  box-shadow: 0 0 0 4px rgba(255, 209, 32, 0.2);
 }
 
 /* Reduced motion + transparency */
 @media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
   *, *::before, *::after {
     animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
   }
   .sheet-motion { transform: none !important; }
 }
 @media (prefers-reduced-transparency: reduce) {
   .material-bar, .material-card { background: white; backdrop-filter: none; -webkit-backdrop-filter: none; }
+  .dark .material-bar, .dark .material-card { background: #0a2148; }
 }
 
 /* File drop glow */
@@ -122,6 +283,7 @@ body {
 /* Thin scrollbars for admin tables */
 .nice-scroll::-webkit-scrollbar { height: 8px; width: 8px; }
 .nice-scroll::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 8px; }
+.dark .nice-scroll::-webkit-scrollbar-thumb { background: #334155; }
 
 /* Dormi mascot motion — CSS only, so she can move at any render size.
    Rotation carries most of the motion on purpose: it's size-independent,

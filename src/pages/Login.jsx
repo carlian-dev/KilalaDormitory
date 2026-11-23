@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
+import { ArrowLeft, Building2, ShieldCheck } from "lucide-react";
 import { PageFade } from "../components/ui";
 import { useAuth } from "../lib/auth";
 
@@ -37,12 +38,11 @@ export default function Login() {
   const [password, setPassword] = useState("");
   const [err, setErr] = useState(readOAuthError);
   const [busy, setBusy] = useState(false);
-  const cls = "w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2.5 text-sm text-[#0B2A6B] outline-none focus:border-[#0B2A6B] focus:ring-4 focus:ring-[#FFD120]/40 dark:border-white/15 dark:bg-white/5 dark:text-white dark:placeholder:text-slate-400";
 
   const rawNext = params.get("next");
   const next = rawNext && rawNext.startsWith("/") ? rawNext : "";
   const destFor = (role) => next || (role === "admin" ? "/admin" : "/dashboard");
-  const destination = next === "/apply" ? "start an application" : next === "/dashboard" ? "view your dashboard" : "continue";
+  const destination = next === "/apply" ? "start your application" : next === "/dashboard" ? "view your dashboard" : "continue";
 
   // Handles the return trip from Google: once the session + profile are
   // ready, honour ?next= or fall back to the role's home page.
@@ -86,62 +86,88 @@ export default function Login() {
 
   return (
     <PageFade>
-      <div className="mx-auto max-w-md px-4 py-12">
-        <div className="rounded-3xl bg-white p-6 shadow-sm ring-1 ring-slate-100 dark:bg-[#0A2456] dark:ring-white/10 dark:text-white">
-          <p className="text-xs font-semibold uppercase tracking-widest text-slate-400">Kilala Dormitory · student portal</p>
-          <h1 className="text-2xl font-bold tracking-tight">Sign in to {destination}</h1>
-          <p className="mt-2 text-sm text-slate-500 dark:text-slate-300">
-            {destination === "view your dashboard"
-              ? "Your dashboard is private and shows only your applications and status."
-              : "Use your BukSU account to securely continue."}
-          </p>
+      <div className="relative isolate overflow-hidden px-4 py-10 sm:flex sm:min-h-[calc(100vh-11rem)] sm:items-center sm:py-14">
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-0 -z-10 bg-[radial-gradient(55%_42%_at_50%_0%,rgba(255,209,32,0.15),transparent_70%)] dark:bg-[radial-gradient(55%_42%_at_50%_0%,rgba(255,209,32,0.08),transparent_70%)]"
+        />
 
-          {!configured && (
-            <p className="mt-3 rounded-2xl bg-rose-50 p-3 text-[13px] font-semibold text-rose-700 ring-1 ring-rose-200">
-              Supabase is not configured yet — add keys to .env.local (see .env.example).
+        <div className="mx-auto w-full max-w-md">
+          <div className="card p-6 sm:p-8">
+            <div className="flex items-center gap-2.5">
+              <span className="grid h-9 w-9 place-items-center rounded-xl bg-[#0B2A6B] text-[#FFD120] dark:bg-[#FFD120] dark:text-[#0B2A6B]">
+                <Building2 size={18} />
+              </span>
+              <div className="leading-tight">
+                <p className="font-display text-sm font-extrabold tracking-tight text-[var(--ink)]">Kilala Dormitory</p>
+                <p className="text-[10px] font-semibold uppercase tracking-[0.15em] text-[var(--muted-soft)]">Student portal</p>
+              </div>
+            </div>
+
+            <h1 className="h-section mt-6 text-2xl text-[var(--ink)]">Sign in to {destination}</h1>
+            <p className="mt-1.5 text-[13px] leading-relaxed text-[var(--muted)]">
+              {destination === "view your dashboard"
+                ? "Your dashboard is private and shows only your applications and status."
+                : "Use your BukSU account to continue securely."}
             </p>
-          )}
 
-          {err && (
-            <p role="alert" className="mt-3 rounded-2xl bg-rose-50 p-3 text-[13px] font-semibold text-rose-700 ring-1 ring-rose-200 dark:bg-rose-500/10 dark:text-rose-200 dark:ring-rose-500/30">
-              {err}
+            {!configured && (
+              <p className="mt-4 rounded-2xl bg-rose-50 p-3 text-[12px] font-semibold text-rose-700 ring-1 ring-rose-200 dark:bg-rose-500/10 dark:text-rose-200 dark:ring-rose-400/30">
+                Supabase is not configured yet — add keys to .env.local (see .env.example).
+              </p>
+            )}
+
+            {err && (
+              <p role="alert" className="mt-4 rounded-2xl bg-rose-50 p-3 text-[12px] font-semibold text-rose-700 ring-1 ring-rose-200 dark:bg-rose-500/10 dark:text-rose-200 dark:ring-rose-400/30">
+                {err}
+              </p>
+            )}
+
+            <button
+              type="button"
+              onClick={google}
+              disabled={busy || !configured}
+              className="pressable btn btn-secondary mt-5 w-full border-[var(--line-strong)] py-3"
+            >
+              <GoogleMark />
+              {busy ? "Opening Google…" : "Continue with Google"}
+            </button>
+            <p className="mt-2 flex items-center justify-center gap-1.5 text-center text-[11px] text-[var(--muted-soft)]">
+              <ShieldCheck size={12} /> Use your @student.buksu.edu.ph account
             </p>
-          )}
 
-          <button
-            type="button"
-            onClick={google}
-            disabled={busy || !configured}
-            className="pressable mt-5 flex w-full items-center justify-center gap-3 rounded-full border border-slate-200 bg-white py-3 text-sm font-bold text-[#0B2A6B] shadow-sm hover:bg-slate-50 disabled:opacity-40 dark:border-white/15 dark:bg-white/5 dark:text-white dark:hover:bg-white/10"
-          >
-            <GoogleMark />
-            {busy ? "Opening Google…" : "Continue with Google"}
-          </button>
-          <p className="mt-2 text-center text-[12px] text-slate-400 dark:text-slate-400">
-            Use your @student.buksu.edu.ph Google account.
-          </p>
+            <div className="my-6 flex items-center gap-3" aria-hidden="true">
+              <span className="h-px flex-1 bg-[var(--line)]" />
+              <span className="text-[10px] font-bold uppercase tracking-[0.15em] text-[var(--muted-soft)]">Housing office</span>
+              <span className="h-px flex-1 bg-[var(--line)]" />
+            </div>
 
-          <div className="my-5 flex items-center gap-3" aria-hidden="true">
-            <span className="h-px flex-1 bg-slate-200 dark:bg-white/10" />
-            <span className="text-[11px] font-semibold uppercase tracking-widest text-slate-400">or sign in with email</span>
-            <span className="h-px flex-1 bg-slate-200 dark:bg-white/10" />
+            <form onSubmit={go} className="grid gap-3.5">
+              <label className="grid gap-1.5 text-[12px] font-semibold text-[var(--ink)]">
+                Email
+                <input className="field" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="name@buksu.edu.ph" autoComplete="email" spellCheck={false} />
+              </label>
+              <label className="grid gap-1.5 text-[12px] font-semibold text-[var(--ink)]">
+                Password
+                <input className="field" type="password" value={password} onChange={(e) => setPassword(e.target.value)}
+                  placeholder="Your password" autoComplete="current-password" />
+              </label>
+              <button type="submit" disabled={busy || !configured} className="pressable btn btn-primary mt-1 w-full py-3">
+                {busy ? "Please wait…" : "Sign in"}
+              </button>
+            </form>
+
+            <p className="mt-5 text-center text-[11px] leading-relaxed text-[var(--muted-soft)]">
+              By continuing, you agree to the{" "}
+              <Link to="/terms" className="font-semibold text-[var(--muted)] underline underline-offset-2 hover:text-[var(--ink)]">Terms</Link>{" "}
+              and{" "}
+              <Link to="/privacy" className="font-semibold text-[var(--muted)] underline underline-offset-2 hover:text-[var(--ink)]">Privacy Policy</Link>.
+            </p>
           </div>
 
-          <form onSubmit={go} className="grid gap-3">
-            <label className="text-sm font-semibold">Email
-              <input className={cls} value={email} onChange={(e) => setEmail(e.target.value)} placeholder="name@buksu.edu.ph" autoComplete="email" spellCheck={false} />
-            </label>
-            <label className="text-sm font-semibold">Password
-              <input className={cls} type="password" value={password} onChange={(e) => setPassword(e.target.value)}
-                placeholder="Your password" autoComplete="current-password" />
-            </label>
-            <button
-              type="submit" disabled={busy || !configured}
-              className="pressable rounded-full bg-[#0B2A6B] py-3 text-sm font-bold text-white hover:bg-[#081f50] disabled:opacity-40 dark:bg-[#FFD120] dark:text-[#0B2A6B] dark:hover:bg-[#F0BB00]"
-            >{busy ? "Please wait…" : "Sign in"}</button>
-          </form>
-
-          <Link to="/" className="mt-3 block text-center text-[13px] font-semibold text-slate-400 hover:underline">Back home</Link>
+          <Link to="/" className="pressable mx-auto mt-5 flex w-fit items-center gap-1.5 rounded-full px-3 py-2 text-[12px] font-semibold text-[var(--muted)] hover:text-[var(--ink)]">
+            <ArrowLeft size={14} /> Back to home
+          </Link>
         </div>
       </div>
     </PageFade>

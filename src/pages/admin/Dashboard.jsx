@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { ArrowRight, Clock, CheckCircle2, AlertTriangle, FileSearch } from "lucide-react";
+import { ArrowRight, CheckCircle2, ChevronRight, Clock, FileSearch, Files, AlertTriangle } from "lucide-react";
 import { motion } from "motion/react";
-import { statusMeta } from "../../lib/mockData";
+import { StatusBadge } from "../../components/ui";
 import { fetchAllApplications } from "../../lib/applications";
 
 export default function Dashboard() {
@@ -19,51 +19,76 @@ export default function Dashboard() {
 
   const count = (s) => applications.filter((a) => a.status === s).length;
   const stats = [
-    { label: "Pending", v: count("pending"), icon: Clock, tone: "bg-[#F0BB00] text-[#0B2A6B]" },
+    { label: "Pending", v: count("pending"), icon: Clock, tone: "bg-[#FFF8E1] text-[#0B2A6B] ring-[#FFD120]/50 dark:bg-[#FFD120]/10 dark:text-[#FFD120] dark:ring-[#FFD120]/25" },
     { label: "Under review", v: count("under_review"), icon: FileSearch, tone: "bg-[#0B2A6B] text-[#FFD120] dark:bg-[#FFD120] dark:text-[#0B2A6B]" },
-    { label: "Approved", v: count("approved"), icon: CheckCircle2, tone: "bg-emerald-500 text-white" },
-    { label: "Needs resubmit", v: count("rejected"), icon: AlertTriangle, tone: "bg-rose-500 text-white" },
+    { label: "Approved", v: count("approved"), icon: CheckCircle2, tone: "bg-emerald-500/10 text-emerald-600 ring-emerald-200 dark:text-emerald-300 dark:ring-emerald-400/25" },
+    { label: "Needs resubmit", v: count("rejected"), icon: AlertTriangle, tone: "bg-rose-500/10 text-rose-600 ring-rose-200 dark:text-rose-300 dark:ring-rose-400/25" },
   ];
   const recent = applications.slice(0, 5);
 
   return (
     <div>
-      <p className="text-[11px] font-bold uppercase tracking-widest text-slate-400">Overview</p>
-      <h1 className="h-section text-2xl text-[#0B2A6B] sm:text-3xl dark:text-white">Kilala Housing Office</h1>
+      <div className="flex flex-wrap items-end justify-between gap-3">
+        <div>
+          <p className="eyebrow">Overview</p>
+          <h1 className="h-section mt-2 text-2xl text-[var(--ink)] sm:text-3xl">Housing office</h1>
+          <p className="mt-1.5 text-[12px] text-[var(--muted)]">Every application, in one queue.</p>
+        </div>
+        <Link to="/admin/apps" className="pressable btn btn-secondary btn-sm hidden sm:inline-flex">
+          <Files size={14} /> Open queue
+        </Link>
+      </div>
 
-      {fetchErr && <p className="mt-3 rounded-2xl bg-rose-50 p-3 text-[13px] font-semibold text-rose-700 ring-1 ring-rose-200 dark:bg-rose-500/10 dark:text-rose-300 dark:ring-rose-400/30">{fetchErr}</p>}
-      {loading && <p className="mt-6 text-sm text-slate-500 dark:text-slate-400">Loading…</p>}
+      {fetchErr && <p className="mt-4 rounded-2xl bg-rose-50 p-3 text-[12px] font-semibold text-rose-700 ring-1 ring-rose-200 dark:bg-rose-500/10 dark:text-rose-300 dark:ring-rose-400/30">{fetchErr}</p>}
+      {loading && <p className="mt-8 text-[13px] text-[var(--muted-soft)]">Loading…</p>}
 
       {!loading && (
         <>
-          <div className="mt-5 grid grid-cols-2 gap-2.5 lg:grid-cols-4">
+          <div className="mt-6 grid grid-cols-2 gap-3 lg:grid-cols-4">
             {stats.map((s, i) => (
-              <motion.div key={s.label} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.06, type: "spring", bounce: 0, duration: 0.4 }}
-                className="rounded-3xl bg-white p-4 text-slate-900 shadow dark:bg-[#0A2456] dark:text-white dark:ring-1 dark:ring-white/10">
-                <span className={`inline-grid h-8 w-8 place-items-center rounded-xl ${s.tone}`}><s.icon size={16} /></span>
-                <p className="mt-2 text-2xl font-bold">{s.v}</p>
-                <p className="text-xs font-semibold text-slate-500 dark:text-slate-300">{s.label}</p>
+              <motion.div
+                key={s.label}
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: i * 0.05, type: "spring", bounce: 0, duration: 0.4 }}
+                className="card p-4"
+              >
+                <div className="flex items-center justify-between gap-2">
+                  <span className={`grid h-9 w-9 place-items-center rounded-xl ring-1 ${s.tone}`}>
+                    <s.icon size={16} />
+                  </span>
+                  <span className="text-3xl font-extrabold tracking-tight text-[var(--ink)]">{s.v}</span>
+                </div>
+                <p className="mt-4 text-[11px] font-semibold text-[var(--muted)]">{s.label}</p>
               </motion.div>
             ))}
           </div>
 
-          <div className="mt-4 rounded-3xl bg-white p-4 sm:p-5 text-slate-900 shadow dark:bg-[#0A2456] dark:text-white dark:ring-1 dark:ring-white/10">
-            <div className="flex items-center justify-between">
-              <p className="font-bold">Latest submissions</p>
-              <Link to="/admin/apps" className="pressable inline-flex items-center gap-1 rounded-full bg-[#0B2A6B] px-4 py-2 text-xs font-bold text-[#FFD120] dark:bg-[#FFD120] dark:text-[#0B2A6B]">Review all <ArrowRight size={13} /></Link>
+          <div className="card mt-4 overflow-hidden">
+            <div className="flex items-center justify-between gap-3 border-b border-[var(--line)] px-5 py-4">
+              <p className="text-[13px] font-bold text-[var(--ink)]">Latest submissions</p>
+              <Link to="/admin/apps" className="pressable inline-flex items-center gap-1 rounded-full px-2.5 py-1.5 text-[11px] font-bold text-[var(--muted)] hover:bg-[var(--surface-2)] hover:text-[var(--ink)]">
+                View all <ArrowRight size={13} />
+              </Link>
             </div>
-            <div className="mt-3 divide-y divide-slate-100 dark:divide-white/10">
-              {recent.length === 0 && <p className="py-4 text-center text-sm text-slate-400">No applications yet.</p>}
-              {recent.map((a) => (
-                <Link key={a.id} to={`/admin/apps/${a.id}`} className="pressable flex items-center justify-between gap-3 py-2.5">
-                  <div className="min-w-0">
-                    <p className="truncate text-sm font-bold">{a.name}</p>
-                    <p className="text-xs text-slate-400">{a.course} · {new Date(a.submittedAt).toLocaleDateString()}</p>
-                  </div>
-                  <span className={`shrink-0 rounded-full px-2.5 py-1 text-[11px] font-bold ring-1 ${statusMeta[a.status].pill}`}>{statusMeta[a.status].label}</span>
-                </Link>
-              ))}
-            </div>
+
+            {recent.length === 0 && (
+              <p className="px-5 py-10 text-center text-[13px] text-[var(--muted-soft)]">No applications yet.</p>
+            )}
+
+            {recent.map((a) => (
+              <Link key={a.id} to={`/admin/apps/${a.id}`} className="pressable group flex items-center gap-3 border-b border-[var(--line)] px-5 py-3.5 last:border-0 hover:bg-[var(--surface-2)]">
+                <span className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-[#0B2A6B]/[0.06] text-[11px] font-bold text-[#0B2A6B] dark:bg-white/10 dark:text-[#FFD120]">
+                  {(a.name || "?").split(" ").map((w) => w[0]).slice(0, 2).join("")}
+                </span>
+                <div className="min-w-0 flex-1">
+                  <p className="truncate text-[13px] font-bold text-[var(--ink)]">{a.name}</p>
+                  <p className="mt-0.5 truncate text-[11px] text-[var(--muted-soft)]">{a.course} · {new Date(a.submittedAt).toLocaleDateString()}</p>
+                </div>
+                <StatusBadge status={a.status} />
+                <ChevronRight size={15} className="shrink-0 text-[var(--muted-soft)] transition-transform duration-200 group-hover:translate-x-0.5" />
+              </Link>
+            ))}
           </div>
         </>
       )}
