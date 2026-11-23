@@ -21,17 +21,23 @@ import Templates from "../pages/admin/Templates";
 function SiteShell() {
   const { user } = useAuth();
   return (
-    <div className="min-h-screen bg-[#F7F8FC] text-[#0B2A6B] dark:bg-[#041743] dark:text-slate-100">
+    <div className="flex min-h-screen flex-col bg-[var(--bg)] text-[var(--ink)]">
       <TopBar />
-      <Outlet />
-      <footer className="mx-auto max-w-6xl px-4 sm:px-6 pb-8 pt-4 text-[12px] text-slate-400 dark:text-slate-500">
-        <div className="border-t border-slate-200 pt-4 text-center dark:border-white/10">
-          <nav className="mb-2 flex flex-wrap justify-center gap-x-4 gap-y-1">
-            <Link to="/privacy" className="hover:underline">Privacy Policy</Link>
-            <Link to="/terms" className="hover:underline">Terms of Service</Link>
-            <Link to="/storage-policy" className="hover:underline">Cookie Policy</Link>
+      <main className="flex-1">
+        <Outlet />
+      </main>
+      <footer className="mt-6 border-t border-[var(--line)]">
+        <div className="mx-auto flex max-w-6xl flex-col gap-5 px-4 py-8 sm:flex-row sm:items-center sm:justify-between sm:px-6">
+          <div>
+            <p className="font-display text-sm font-extrabold tracking-tight text-[var(--ink)]">Kilala Dormitory</p>
+            <p className="mt-1 text-[11px] text-[var(--muted-soft)]">Bukidnon State University · Housing Office</p>
+          </div>
+          <nav className="flex flex-wrap gap-x-5 gap-y-2 text-[12px] font-medium text-[var(--muted)]">
+            <Link to="/privacy" className="transition-colors hover:text-[var(--ink)]">Privacy Policy</Link>
+            <Link to="/terms" className="transition-colors hover:text-[var(--ink)]">Terms of Service</Link>
+            <Link to="/storage-policy" className="transition-colors hover:text-[var(--ink)]">Cookie Policy</Link>
           </nav>
-          <span>© 2026 Kilala Dormitory · Bukidnon State University</span>
+          <p className="text-[11px] text-[var(--muted-soft)]">© 2026 Kilala Dormitory</p>
         </div>
       </footer>
       <ConsentBanner />

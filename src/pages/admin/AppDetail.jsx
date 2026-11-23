@@ -44,23 +44,23 @@ export default function AppDetail() {
       .finally(() => setLoading(false));
   }, [id]);
 
-  if (loading) return <p className="py-10 text-center text-sm text-slate-400">Loading…</p>;
+  if (loading) return <p className="py-10 text-center text-[13px] text-[var(--muted-soft)]">Loading…</p>;
 
   if (fetchErr) {
     return (
-      <div className="rounded-3xl bg-white p-8 text-center text-slate-900">
-        <p className="font-bold">Could not load application</p>
-        <p className="mt-1 text-sm text-slate-500">{fetchErr}</p>
-        <Link to="/admin/apps" className="mt-2 inline-block font-bold text-[#0B2A6B] underline decoration-[#FFD120] decoration-2 hover:underline">Back to queue</Link>
+      <div className="card p-8 text-center">
+        <p className="font-bold text-[var(--ink)]">Could not load application</p>
+        <p className="mt-1 text-[12px] text-[var(--muted)]">{fetchErr}</p>
+        <Link to="/admin/apps" className="mt-3 inline-block text-[12px] font-bold text-[var(--ink)] underline decoration-[#FFD120] decoration-2 hover:underline">Back to queue</Link>
       </div>
     );
   }
 
   if (!app) {
     return (
-      <div className="rounded-3xl bg-white p-8 text-center text-slate-900 dark:bg-[#0A2456] dark:text-white dark:ring-1 dark:ring-white/10">
-        <p className="font-bold">Application not found</p>
-        <Link to="/admin/apps" className="mt-2 inline-block font-bold text-[#0B2A6B] underline decoration-[#FFD120] decoration-2 hover:underline dark:text-[#FFD120]">Back to queue</Link>
+      <div className="card p-8 text-center">
+        <p className="font-bold text-[var(--ink)]">Application not found</p>
+        <Link to="/admin/apps" className="mt-3 inline-block text-[12px] font-bold text-[var(--ink)] underline decoration-[#FFD120] decoration-2 hover:underline">Back to queue</Link>
       </div>
     );
   }
@@ -157,71 +157,70 @@ export default function AppDetail() {
 
   return (
     <div>
-      <button onClick={() => nav("/admin/apps")} className="pressable inline-flex items-center gap-1.5 rounded-full bg-white px-4 py-2 text-[13px] font-bold text-[#0B2A6B] shadow-sm ring-1 ring-slate-200 dark:bg-white/10 dark:text-slate-200 dark:ring-0">
+      <button onClick={() => nav("/admin/apps")} className="pressable btn btn-secondary btn-sm">
         <ArrowLeft size={14} /> Queue
       </button>
 
       <div className="mt-3 grid gap-3 lg:grid-cols-[1.2fr_0.8fr]">
-        <div className="rounded-3xl bg-white p-5 sm:p-6 text-slate-900 shadow dark:bg-[#0A2456] dark:text-white dark:ring-1 dark:ring-white/10">
-          <div className="flex flex-wrap items-start justify-between gap-2">
+        <div className="card p-5 sm:p-6">
+          <div className="flex flex-wrap items-start justify-between gap-2.5">
             <div>
-              <h1 className="h-section text-2xl tracking-tight">{app.name}</h1>
-              <p className="text-[13px] text-slate-500 dark:text-slate-300">{app.studentId} · {app.course} · {app.year}</p>
-              <p className="text-xs text-slate-400">{app.term} · Submitted {new Date(app.submittedAt).toLocaleString()}</p>
+              <p className="eyebrow">Application</p>
+              <h1 className="h-section mt-1.5 text-2xl text-[var(--ink)]">{app.name}</h1>
+              <p className="mt-1 text-[12px] text-[var(--muted)]">{app.studentId} · {app.course} · {app.year}</p>
+              <p className="mt-0.5 text-[11px] text-[var(--muted-soft)]">{app.term} · Submitted {new Date(app.submittedAt).toLocaleString()}</p>
             </div>
             <StatusBadge status={app.status} />
           </div>
 
-          <dl className="mt-4 grid grid-cols-2 gap-2 text-[13px]">
+          <dl className="mt-5 grid grid-cols-2 gap-2.5 text-[12px]">
             {[["Phone", app.phone], ["Guardian", app.guardian], ["Address", app.address], ["Term", app.term], ["Submitted", new Date(app.submittedAt).toLocaleString()]].map(([k, v]) => (
-              <div key={k} className="rounded-2xl bg-slate-50 px-3 py-2 ring-1 ring-slate-100 dark:bg-white/5 dark:ring-white/10">
-                <dt className="text-[11px] font-bold uppercase tracking-wide text-slate-400">{k}</dt>
-                <dd className="font-semibold break-words">{v || "—"}</dd>
+              <div key={k} className="rounded-xl border border-[var(--line)] bg-[var(--surface-2)] px-3 py-2">
+                <dt className="text-[10px] font-bold uppercase tracking-[0.12em] text-[var(--muted-soft)]">{k}</dt>
+                <dd className="mt-0.5 break-words font-semibold text-[var(--ink)]">{v || "—"}</dd>
               </div>
             ))}
           </dl>
 
           {/* Billing card */}
-          <div className="mt-4 rounded-2xl bg-[#0B2A6B] p-4 text-white dark:bg-[#FFD120] dark:text-[#0B2A6B]">
-            <div className="flex justify-between items-center text-sm font-bold">
-              <span>Expected monthly total</span>
-              <span className="text-base sm:text-lg">{formatPeso(currentTotal)}/mo</span>
-            </div>
-            <div className="mt-2 text-xs space-y-1 opacity-90">
-              <div className="flex justify-between">
-                <span>Base rate:</span>
-                <span className="font-semibold">{formatPeso(BILLING.BASE_RATE)}</span>
-              </div>
-              <div className="flex justify-between">
-                <span>Paid appliances ({applianceCount}):</span>
-                <span className="font-semibold">+{formatPeso(applianceCount * BILLING.PER_APPLIANCE)}</span>
+          <div className="mt-4 rounded-2xl border border-[#FFD120]/60 bg-[#FFF8E1] p-4 dark:border-[#FFD120]/30 dark:bg-[#FFD120]/10">
+            <div className="flex items-end justify-between gap-3">
+              <div>
+                <p className="text-[10px] font-bold uppercase tracking-[0.15em] text-[#0B2A6B]/55 dark:text-[#FFD120]/70">Expected monthly total</p>
+                <p className="mt-1 text-[#0B2A6B] dark:text-white">
+                  <span className="text-2xl font-extrabold tracking-tight">{formatPeso(currentTotal)}</span>
+                  <span className="ml-1 text-[12px] font-semibold opacity-60">/mo</span>
+                </p>
               </div>
               {pendingCount > 0 && (
-                <div className="flex justify-between font-semibold text-amber-300 dark:text-amber-800">
-                  <span>Pending assessment:</span>
-                  <span>{pendingCount} other item{pendingCount > 1 ? "s" : ""}</span>
-                </div>
+                <span className="chip bg-amber-100 text-amber-800 ring-1 ring-amber-200 dark:bg-amber-400/15 dark:text-amber-200 dark:ring-amber-400/30">
+                  {pendingCount} for review
+                </span>
               )}
             </div>
-            <p className="mt-2 text-[11px] opacity-80 border-t border-white/20 dark:border-[#0B2A6B]/20 pt-2">
+            <div className="mt-3 space-y-1.5 border-t border-[#0B2A6B]/10 pt-3 text-[11px] text-[#0B2A6B]/75 dark:border-white/10 dark:text-slate-300">
+              <div className="flex justify-between"><span>Base rate</span><span className="font-semibold">{formatPeso(BILLING.BASE_RATE)}</span></div>
+              <div className="flex justify-between"><span>Paid appliances ({applianceCount})</span><span className="font-semibold">+{formatPeso(applianceCount * BILLING.PER_APPLIANCE)}</span></div>
+            </div>
+            <p className="mt-2 border-t border-[#0B2A6B]/10 pt-2 text-[10px] text-[#0B2A6B]/60 dark:border-white/10 dark:text-slate-400">
               Collected face-to-face at the Housing Office.
             </p>
           </div>
 
           {/* Declared appliances & devices */}
-          <div className="mt-4 rounded-2xl border border-slate-100 bg-slate-50/70 p-4 dark:border-white/10 dark:bg-white/5">
-            <div className="flex items-center justify-between">
-              <p className="flex items-center gap-1.5 text-sm font-bold text-slate-900 dark:text-white">
-                <PlugZap size={16} /> Declared appliances & gadgets
-                <span className="text-xs font-semibold text-slate-400">({devices.length})</span>
+          <div className="mt-4 rounded-2xl border border-[var(--line)] bg-[var(--surface-2)] p-4">
+            <div className="flex flex-wrap items-center justify-between gap-2">
+              <p className="flex items-center gap-1.5 text-[12px] font-bold text-[var(--ink)]">
+                <PlugZap size={15} /> Declared appliances & gadgets
+                <span className="text-[11px] font-semibold text-[var(--muted-soft)]">({devices.length})</span>
               </p>
               {customDevices.length > 0 && (
                 pendingCount > 0 ? (
-                  <span className="rounded-full bg-amber-100 px-2.5 py-0.5 text-[11px] font-bold text-amber-800 dark:bg-amber-400/20 dark:text-amber-200">
+                  <span className="chip bg-amber-100 text-amber-800 dark:bg-amber-400/15 dark:text-amber-200">
                     {pendingCount} for review
                   </span>
                 ) : (
-                  <span className="inline-flex items-center gap-1 rounded-full bg-emerald-100 px-2.5 py-0.5 text-[11px] font-bold text-emerald-800 dark:bg-emerald-500/20 dark:text-emerald-300">
+                  <span className="chip bg-emerald-500/10 text-emerald-700 dark:text-emerald-300">
                     <Check size={12} /> All assessed
                   </span>
                 )
@@ -229,28 +228,28 @@ export default function AppDetail() {
             </div>
 
             {devices.length === 0 ? (
-              <p className="mt-2 text-xs text-slate-500 dark:text-slate-400">
+              <p className="mt-2 text-[11px] text-[var(--muted-soft)]">
                 No appliances or gadgets declared by applicant.
               </p>
             ) : (
               <div className="mt-3 space-y-3">
                 {presetDevices.length > 0 && (
                   <div>
-                    <p className="text-[11px] font-bold uppercase tracking-wider text-slate-400">
+                    <p className="text-[10px] font-bold uppercase tracking-[0.14em] text-[var(--muted-soft)]">
                       Standard presets
                     </p>
-                    <div className="mt-1.5 flex flex-wrap gap-2">
+                    <div className="mt-2 flex flex-wrap gap-2">
                       {presetDevices.map((d, i) => (
                         <span
                           key={i}
-                          className="inline-flex items-center gap-1.5 rounded-xl border border-slate-200 bg-white px-2.5 py-1 text-xs font-semibold text-slate-800 shadow-xs dark:border-white/10 dark:bg-white/10 dark:text-white"
+                          className="inline-flex items-center gap-1.5 rounded-xl border border-[var(--line)] bg-[var(--surface)] px-2.5 py-1 text-[11px] font-semibold text-[var(--ink)]"
                         >
                           <span>{d.name}</span>
                           <span
                             className={`rounded-full px-2 py-0.5 text-[10px] font-bold ${
                               d.kind === "appliance"
                                 ? "bg-[#0B2A6B] text-[#FFD120] dark:bg-[#FFD120] dark:text-[#0B2A6B]"
-                                : "bg-emerald-100 text-emerald-800 dark:bg-emerald-500/20 dark:text-emerald-300"
+                                : "bg-emerald-500/10 text-emerald-700 dark:text-emerald-300"
                             }`}
                           >
                             {deviceKindLabel(d.kind)}
@@ -264,14 +263,14 @@ export default function AppDetail() {
                 {customDevices.length > 0 && (
                   <div className="rounded-xl border border-amber-200 bg-amber-50/70 p-3 dark:border-amber-400/30 dark:bg-amber-400/10">
                     <div className="flex flex-wrap items-center justify-between gap-1">
-                      <p className="text-[11px] font-bold uppercase tracking-wider text-amber-800 dark:text-amber-200">
-                        Custom declared items (Review & Classify)
+                      <p className="text-[10px] font-bold uppercase tracking-[0.14em] text-amber-800 dark:text-amber-200">
+                        Custom declared items
                       </p>
-                      <span className="text-[11px] text-amber-700/80 dark:text-amber-200/80">
+                      <span className="text-[10px] text-amber-700/80 dark:text-amber-200/80">
                         Face-to-face assessment
                       </span>
                     </div>
-                    <p className="mt-0.5 text-xs text-amber-800/80 dark:text-amber-200/80">
+                    <p className="mt-1 text-[11px] leading-relaxed text-amber-800/80 dark:text-amber-200/80">
                       Classify each as Free (gadget) or +₱150/mo (paid appliance). Changes update the expected monthly total.
                     </p>
 
@@ -279,25 +278,25 @@ export default function AppDetail() {
                       {customDevices.map((cd) => (
                         <div
                           key={cd.originalIndex}
-                          className="flex flex-col gap-2 rounded-xl border border-amber-200/60 bg-white p-2.5 sm:flex-row sm:items-center sm:justify-between dark:border-white/10 dark:bg-[#0A2456]"
+                          className="flex flex-col gap-2 rounded-xl border border-amber-200/60 bg-[var(--surface)] p-2.5 sm:flex-row sm:items-center sm:justify-between dark:border-white/10"
                         >
                           <div className="min-w-0">
-                            <span className="font-bold text-slate-900 dark:text-white text-[13px]">
+                            <span className="text-[12px] font-bold text-[var(--ink)]">
                               {cd.name}
                             </span>
-                            <span className="ml-2 inline-block text-[11px] font-semibold text-slate-500 dark:text-slate-400">
+                            <span className="ml-2 inline-block text-[10px] font-semibold text-[var(--muted)]">
                               Current: {deviceKindLabel(cd.kind)}
                             </span>
                           </div>
 
-                          <div className="inline-flex items-center gap-1 rounded-lg bg-slate-100 p-0.5 dark:bg-white/10 shrink-0">
+                          <div className="inline-flex shrink-0 items-center gap-0.5 rounded-lg bg-[var(--surface-2)] p-0.5">
                             <button
                               type="button"
                               onClick={() => classifyDevice(cd.originalIndex, "gadget")}
-                              className={`pressable rounded-md px-2.5 py-1 text-xs font-bold transition-colors ${
+                              className={`pressable rounded-md px-2.5 py-1 text-[11px] font-bold transition-colors ${
                                 cd.kind === "gadget"
-                                  ? "bg-emerald-600 text-white shadow-xs"
-                                  : "text-slate-600 hover:text-slate-900 dark:text-slate-300 dark:hover:text-white"
+                                  ? "bg-emerald-600 text-white"
+                                  : "text-[var(--muted)] hover:text-[var(--ink)]"
                               }`}
                             >
                               Free
@@ -305,10 +304,10 @@ export default function AppDetail() {
                             <button
                               type="button"
                               onClick={() => classifyDevice(cd.originalIndex, "appliance")}
-                              className={`pressable rounded-md px-2.5 py-1 text-xs font-bold transition-colors ${
+                              className={`pressable rounded-md px-2.5 py-1 text-[11px] font-bold transition-colors ${
                                 cd.kind === "appliance"
-                                  ? "bg-[#0B2A6B] text-[#FFD120] shadow-xs dark:bg-[#FFD120] dark:text-[#0B2A6B]"
-                                  : "text-slate-600 hover:text-slate-900 dark:text-slate-300 dark:hover:text-white"
+                                  ? "bg-[#0B2A6B] text-[#FFD120] dark:bg-[#FFD120] dark:text-[#0B2A6B]"
+                                  : "text-[var(--muted)] hover:text-[var(--ink)]"
                               }`}
                             >
                               +₱150 Paid
@@ -316,10 +315,10 @@ export default function AppDetail() {
                             <button
                               type="button"
                               onClick={() => classifyDevice(cd.originalIndex, "other")}
-                              className={`pressable rounded-md px-2.5 py-1 text-xs font-bold transition-colors ${
+                              className={`pressable rounded-md px-2.5 py-1 text-[11px] font-bold transition-colors ${
                                 cd.kind === "other"
-                                  ? "bg-amber-500 text-white shadow-xs"
-                                  : "text-slate-600 hover:text-slate-900 dark:text-slate-300 dark:hover:text-white"
+                                  ? "bg-amber-500 text-white"
+                                  : "text-[var(--muted)] hover:text-[var(--ink)]"
                               }`}
                             >
                               For review
@@ -329,8 +328,8 @@ export default function AppDetail() {
                       ))}
                     </div>
 
-                    <div className="mt-3 flex items-center justify-between border-t border-amber-200/60 pt-2 dark:border-amber-400/20">
-                      <div className="text-xs">
+                    <div className="mt-3 flex flex-wrap items-center justify-between gap-2 border-t border-amber-200/60 pt-2.5 dark:border-amber-400/20">
+                      <div className="text-[11px]">
                         {deviceSaveMsg ? (
                           <span className="font-bold text-emerald-600 dark:text-emerald-400">
                             ✓ {deviceSaveMsg}
@@ -344,7 +343,7 @@ export default function AppDetail() {
                             Unsaved device changes
                           </span>
                         ) : (
-                          <span className="text-slate-500 dark:text-slate-400">
+                          <span className="text-[var(--muted)]">
                             All classifications saved
                           </span>
                         )}
@@ -354,7 +353,7 @@ export default function AppDetail() {
                         type="button"
                         onClick={saveDeviceAssessment}
                         disabled={savingDevices || !hasDeviceChanges}
-                        className="pressable rounded-full bg-[#0B2A6B] px-3.5 py-1.5 text-xs font-bold text-[#FFD120] hover:bg-[#0B2A6B]/90 disabled:opacity-50 dark:bg-[#FFD120] dark:text-[#0B2A6B] dark:hover:bg-[#FFD120]/90"
+                        className="pressable btn btn-primary btn-sm"
                       >
                         {savingDevices ? "Saving…" : "Save classification"}
                       </button>
@@ -365,55 +364,78 @@ export default function AppDetail() {
             )}
           </div>
 
-          <p className="h-section mt-5 text-sm">Signed forms ({app.docs.filter((d) => TEMPLATE_DOCS.some((t) => t.key === d.type)).length}/{TEMPLATE_DOCS.length})</p>
-          <div className="mt-2 grid gap-2">
-            {app.docs.filter((d) => TEMPLATE_DOCS.some((t) => t.key === d.type)).map((d) => (
-              <div key={d.type} className="flex items-center gap-3 rounded-2xl border border-slate-100 bg-white px-3 py-2.5 shadow-sm dark:border-white/10 dark:bg-white/5">
-                <span className="grid h-10 w-10 place-items-center rounded-xl bg-[#0B2A6B] text-[#FFD120] dark:bg-[#FFD120] dark:text-[#0B2A6B]"><FileText size={16} /></span>
-                <div className="min-w-0 flex-1">
-                  <p className="text-[13px] font-bold">{label(d.type)}</p>
-                  <p className="truncate font-mono text-xs text-slate-400">{d.fileName}</p>
-                </div>
-                <button onClick={() => openDoc(d)} className="pressable inline-flex items-center gap-1 rounded-full bg-slate-100 px-3 py-1.5 text-xs font-bold dark:bg-white/10">
-                  <ExternalLink size={13} /> Open
-                </button>
-              </div>
-            ))}
+          <div className="mt-5 flex items-center justify-between gap-2">
+            <p className="text-[12px] font-bold text-[var(--ink)]">Signed forms</p>
+            <span className="text-[11px] font-semibold text-[var(--muted-soft)]">
+              {app.docs.filter((d) => TEMPLATE_DOCS.some((t) => t.key === d.type)).length}/{TEMPLATE_DOCS.length}
+            </span>
           </div>
+          {app.docs.filter((d) => TEMPLATE_DOCS.some((t) => t.key === d.type)).length === 0 ? (
+            <p className="mt-2 rounded-xl bg-[var(--surface-2)] px-3 py-3 text-[11px] text-[var(--muted-soft)]">No signed forms attached.</p>
+          ) : (
+            <div className="mt-2 divide-y divide-[var(--line)] rounded-2xl border border-[var(--line)]">
+              {app.docs.filter((d) => TEMPLATE_DOCS.some((t) => t.key === d.type)).map((d) => (
+                <div key={d.type} className="flex items-center gap-3 px-3 py-2.5">
+                  <span className="grid h-8 w-8 shrink-0 place-items-center rounded-lg bg-[#0B2A6B]/[0.06] text-[#0B2A6B] dark:bg-white/10 dark:text-[#FFD120]"><FileText size={14} /></span>
+                  <div className="min-w-0 flex-1">
+                    <p className="truncate text-[12px] font-semibold text-[var(--ink)]">{label(d.type)}</p>
+                    <p className="truncate font-mono text-[10px] text-[var(--muted-soft)]">{d.fileName}</p>
+                  </div>
+                  <button onClick={() => openDoc(d)} className="pressable btn btn-secondary btn-sm shrink-0">
+                    <ExternalLink size={12} /> Open
+                  </button>
+                </div>
+              ))}
+            </div>
+          )}
 
-          <p className="h-section mt-5 text-sm">Student documents ({app.docs.filter((d) => UPLOAD_DOCS.some((t) => t.key === d.type)).length}/{UPLOAD_DOCS.length})</p>
-          <div className="mt-2 grid gap-2">
-            {app.docs.filter((d) => UPLOAD_DOCS.some((t) => t.key === d.type)).map((d) => (
-              <div key={d.type} className="flex items-center gap-3 rounded-2xl border border-slate-100 bg-white px-3 py-2.5 shadow-sm dark:border-white/10 dark:bg-white/5">
-                <span className="grid h-10 w-10 place-items-center rounded-xl bg-[#0B2A6B] text-[#FFD120] dark:bg-[#FFD120] dark:text-[#0B2A6B]"><FileText size={16} /></span>
-                <div className="min-w-0 flex-1">
-                  <p className="text-[13px] font-bold">{label(d.type)}</p>
-                  <p className="truncate font-mono text-xs text-slate-400">{d.fileName}</p>
-                </div>
-                <button onClick={() => openDoc(d)} className="pressable inline-flex items-center gap-1 rounded-full bg-slate-100 px-3 py-1.5 text-xs font-bold dark:bg-white/10">
-                  <ExternalLink size={13} /> Open
-                </button>
-              </div>
-            ))}
+          <div className="mt-5 flex items-center justify-between gap-2">
+            <p className="text-[12px] font-bold text-[var(--ink)]">Student documents</p>
+            <span className="text-[11px] font-semibold text-[var(--muted-soft)]">
+              {app.docs.filter((d) => UPLOAD_DOCS.some((t) => t.key === d.type)).length}/{UPLOAD_DOCS.length}
+            </span>
           </div>
+          {app.docs.filter((d) => UPLOAD_DOCS.some((t) => t.key === d.type)).length === 0 ? (
+            <p className="mt-2 rounded-xl bg-[var(--surface-2)] px-3 py-3 text-[11px] text-[var(--muted-soft)]">No student documents attached.</p>
+          ) : (
+            <div className="mt-2 divide-y divide-[var(--line)] rounded-2xl border border-[var(--line)]">
+              {app.docs.filter((d) => UPLOAD_DOCS.some((t) => t.key === d.type)).map((d) => (
+                <div key={d.type} className="flex items-center gap-3 px-3 py-2.5">
+                  <span className="grid h-8 w-8 shrink-0 place-items-center rounded-lg bg-[#0B2A6B]/[0.06] text-[#0B2A6B] dark:bg-white/10 dark:text-[#FFD120]"><FileText size={14} /></span>
+                  <div className="min-w-0 flex-1">
+                    <p className="truncate text-[12px] font-semibold text-[var(--ink)]">{label(d.type)}</p>
+                    <p className="truncate font-mono text-[10px] text-[var(--muted-soft)]">{d.fileName}</p>
+                  </div>
+                  <button onClick={() => openDoc(d)} className="pressable btn btn-secondary btn-sm shrink-0">
+                    <ExternalLink size={12} /> Open
+                  </button>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
 
-        <div className="h-fit rounded-3xl bg-white p-5 sm:p-6 text-slate-900 shadow dark:bg-[#0A2456] dark:text-white dark:ring-1 dark:ring-white/10">
-          <p className="h-section text-sm">Decision</p>
-          <label className="mt-3 block text-[13px] font-bold">Admin remarks <span className="font-medium text-slate-400">(shown to student)</span>
-            <textarea value={remarks} onChange={(e) => setRemarks(e.target.value)} rows={3} placeholder="e.g. Requirements complete and verified."
-              className="mt-1 w-full rounded-xl border border-slate-200 px-3 py-2.5 text-sm text-slate-900 outline-none focus:border-[#0B2A6B] focus:ring-4 focus:ring-[#FFD120]/40 dark:border-white/15 dark:bg-white/5 dark:text-white" />
+        <div className="card h-fit p-5 sm:p-6 lg:sticky lg:top-24">
+          <div className="flex items-center justify-between gap-2">
+            <p className="text-[12px] font-bold text-[var(--ink)]">Decision</p>
+            <StatusBadge status={app.status} />
+          </div>
+          <p className="mt-1 text-[11px] text-[var(--muted-soft)]">Remarks are shown to the student.</p>
+          <label className="mt-3 block text-[11px] font-bold text-[var(--ink)]">
+            Admin remarks
+            <textarea value={remarks} onChange={(e) => setRemarks(e.target.value)} rows={4} placeholder="e.g. Requirements complete and verified."
+              className="field mt-1.5 resize-y" />
           </label>
-          {saveErr && <p className="mt-2 text-[13px] font-semibold text-rose-500">{saveErr}</p>}
-          <div className="mt-3 grid gap-2">
-            <button onClick={markReview} disabled={saving} className="pressable rounded-full bg-[#DCE6FA] py-2.5 text-sm font-bold text-[#0B2A6B] ring-1 ring-[#0B2A6B]/20 disabled:opacity-50">
+          {saveErr && <p className="mt-2 text-[12px] font-semibold text-rose-500">{saveErr}</p>}
+          <div className="mt-4 grid gap-2">
+            <button onClick={markReview} disabled={saving} className="pressable btn btn-secondary w-full">
               Mark under review
             </button>
             <div className="grid grid-cols-2 gap-2">
-              <button onClick={() => decide("approved")} disabled={saving} className="pressable inline-flex items-center justify-center gap-1 rounded-full bg-emerald-500 py-2.5 text-sm font-bold text-white disabled:opacity-50">
+              <button onClick={() => decide("approved")} disabled={saving} className="pressable btn bg-emerald-600 text-white hover:bg-emerald-700">
                 <Check size={15} /> Approve
               </button>
-              <button onClick={() => decide("rejected")} disabled={saving} className="pressable inline-flex items-center justify-center gap-1 rounded-full bg-rose-500 py-2.5 text-sm font-bold text-white disabled:opacity-50">
+              <button onClick={() => decide("rejected")} disabled={saving} className="pressable btn bg-rose-600 text-white hover:bg-rose-700">
                 <X size={15} /> Reject
               </button>
             </div>

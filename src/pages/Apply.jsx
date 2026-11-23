@@ -9,7 +9,9 @@ import { useAuth } from "../lib/auth";
 import { createApplication, fetchMyApplications, listTemplates, downloadTemplate } from "../lib/applications";
 import { saveDraftFile, loadDraftFiles, removeDraftFile, clearDraftFiles } from "../lib/draftFiles";
 
-const inputCls = "w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2.5 text-sm text-[#0B2A6B] outline-none focus:border-[#0B2A6B] focus:ring-4 focus:ring-[#FFD120]/40 dark:border-white/15 dark:bg-white/5 dark:text-white dark:placeholder:text-slate-400";
+const inputCls = "field";
+
+const STEP_LABELS = ["Personal", "Downloads", "Upload", "Review", "Summary"];
 
 const emptyFiles = () => Object.fromEntries(DOC_TYPES.map((d) => [d.key, null]));
 
@@ -225,7 +227,7 @@ export default function Apply() {
   if (checkingExisting) {
     return (
       <PageFade>
-        <p className="mx-auto max-w-3xl px-4 py-16 text-center text-sm text-slate-400">Loading…</p>
+        <p className="mx-auto max-w-3xl px-4 py-16 text-center text-[13px] text-[var(--muted-soft)]">Loading…</p>
       </PageFade>
     );
   }
@@ -233,17 +235,20 @@ export default function Apply() {
   if (existingApp && !done) {
     return (
       <PageFade>
-        <div className="mx-auto max-w-xl px-4 py-14 text-center">
-          <h1 className="display !text-4xl text-[#0B2A6B] dark:text-white">You already applied</h1>
-          <p className="mt-2 text-sm text-slate-500 dark:text-slate-300">
+        <div className="mx-auto max-w-md px-4 py-16 text-center">
+          <span className="mx-auto grid h-14 w-14 place-items-center rounded-full bg-[#FFF8E1] text-[#0B2A6B] ring-1 ring-[#FFD120]/60 dark:bg-[#FFD120]/10 dark:text-[#FFD120]">
+            <ClipboardCheck size={24} />
+          </span>
+          <h1 className="h-section mt-5 text-2xl text-[var(--ink)]">You already applied</h1>
+          <p className="mt-2 text-[13px] leading-relaxed text-[var(--muted)]">
             One student, one application. Track your status in My dashboard
             {existingApp.status === "rejected"
               ? " — the housing office asked for corrections, so open your application there and resubmit the same one."
               : " — if corrections are needed, the housing office will mark it Needs resubmit and you'll revise the same application."}
           </p>
-          <div className="mt-6 flex justify-center gap-2">
-            <button onClick={() => nav("/dashboard")} className="pressable rounded-full bg-[#FFD120] px-6 py-3 text-sm font-bold text-[#0B2A6B] hover:bg-[#F0BB00]">View my application</button>
-          </div>
+          <button onClick={() => nav("/dashboard")} className="pressable btn btn-accent mt-6">
+            View my application
+          </button>
         </div>
       </PageFade>
     );
@@ -252,17 +257,26 @@ export default function Apply() {
   if (done) {
     return (
       <PageFade>
-        <div className="mx-auto max-w-xl px-4 py-14 text-center">
+        <div className="mx-auto max-w-md px-4 py-14 text-center">
           <motion.div initial={{ scale: 0.8, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} transition={{ type: "spring", bounce: 0.2, duration: 0.5 }} className="mx-auto grid h-16 w-16 place-items-center rounded-full bg-emerald-500 text-white shadow-lg">
             <CheckCircle2 size={30} />
           </motion.div>
-          <h1 className="display mt-4 !text-4xl text-[#0B2A6B] dark:text-white">Application sent!</h1>
-          <p className="mt-2 text-sm text-slate-500 dark:text-slate-300">Paperless received — track your status in My dashboard.</p>
-          <p className="mt-3 text-sm font-bold text-[#0B2A6B] dark:text-white">Expected monthly total: {formatPeso(done.total)}/mo</p>
-          <p className="mt-1 text-xs text-slate-500 dark:text-slate-300">Payment is made face-to-face at the Housing Office — no online payment is collected.</p>
-          <div className="mt-6 flex justify-center gap-2">
-            <button onClick={() => nav("/dashboard")} className="pressable rounded-full bg-[#FFD120] px-6 py-3 text-sm font-bold text-[#0B2A6B] hover:bg-[#F0BB00]">View my application</button>
+          <h1 className="h-section mt-5 text-3xl text-[var(--ink)]">Application sent.</h1>
+          <p className="mt-2 text-[13px] leading-relaxed text-[var(--muted)]">
+            We've received your application securely. You can follow every update from your dashboard.
+          </p>
+          <div className="card mt-6 p-5 text-left">
+            <div className="flex items-baseline justify-between gap-3">
+              <p className="text-[12px] font-semibold text-[var(--muted)]">Expected monthly total</p>
+              <p className="text-lg font-extrabold text-[var(--ink)]">{formatPeso(done.total)}<span className="text-[12px] font-semibold text-[var(--muted)]">/mo</span></p>
+            </div>
+            <p className="mt-2 border-t border-[var(--line)] pt-2 text-[11px] leading-relaxed text-[var(--muted-soft)]">
+              Payment is made face-to-face at the Housing Office — no online payment is collected.
+            </p>
           </div>
+          <button onClick={() => nav("/dashboard")} className="pressable btn btn-accent mt-5 w-full">
+            Go to my dashboard
+          </button>
         </div>
       </PageFade>
     );
@@ -270,21 +284,24 @@ export default function Apply() {
 
   return (
     <PageFade>
-      <div className="mx-auto max-w-3xl px-4 sm:px-6 py-8">
-        <p className="text-xs font-semibold uppercase tracking-widest text-slate-400">Online admission</p>
-        <h1 className="h-section text-3xl font-bold text-[#0B2A6B] dark:text-white">Kilala Dormitory application</h1>
-        <p className="mt-1 text-sm text-slate-500 dark:text-slate-300">5 steps · validated in-browser · stored securely</p>
+      <div className="mx-auto max-w-3xl px-4 py-9 sm:px-6 sm:py-11">
+        <p className="eyebrow">Online admission</p>
+        <h1 className="h-section mt-2 text-3xl text-[var(--ink)]">Kilala Dormitory application</h1>
+        <p className="mt-1.5 text-[13px] text-[var(--muted)]">Five steps, saved as you go — come back anytime.</p>
 
-        <div className="mt-5 rounded-3xl bg-white p-4 shadow-sm ring-1 ring-slate-100 dark:bg-[#0A2456] dark:ring-white/10">
-          <Stepper steps={["Personal", "Downloads", "Upload", "Review", "Summary"]} current={step} />
+        <div className="card mt-6 px-4 py-4">
+          <p className="mb-2 text-[11px] font-semibold text-[var(--muted-soft)] sm:hidden">
+            Step {step + 1} of {STEP_LABELS.length} · {STEP_LABELS[step]}
+          </p>
+          <Stepper steps={STEP_LABELS} current={step} />
         </div>
 
         {(restored || filesRestored) && !done && (
-          <div className="mt-4 flex flex-wrap items-center justify-between gap-2 rounded-2xl bg-[#FFF8E1] px-4 py-2.5 text-[13px] font-semibold text-[#0B2A6B] ring-1 ring-[#FFD120] dark:bg-[#FFD120]/10 dark:text-[#FFE9A8] dark:ring-[#FFD120]/40">
+          <div className="mt-4 flex flex-wrap items-center justify-between gap-2 rounded-2xl border border-[#FFD120]/60 bg-[#FFF8E1] px-4 py-2.5 text-[12px] font-semibold text-[#0B2A6B] dark:bg-[#FFD120]/10 dark:text-[#FFE9A8] dark:border-[#FFD120]/30">
             <span>{filesRestored
               ? "Draft restored — your info and uploads are back. Use Verify under each file to check it."
               : "Draft restored — your typed info is back. Your uploads are saved on this device as you attach them."}</span>
-            <button onClick={startOver} className="pressable rounded-full bg-white px-3 py-1 text-xs font-bold shadow-sm dark:bg-white/10 dark:text-white">Start over</button>
+            <button onClick={startOver} className="pressable btn btn-sm border border-[var(--line)] bg-[var(--surface)] text-[var(--ink)]">Start over</button>
           </div>
         )}
 
@@ -295,46 +312,46 @@ export default function Apply() {
             animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0, x: -24 }}
             transition={{ type: "spring", bounce: 0, duration: 0.35 }}
-            className="mt-4 rounded-3xl bg-white p-5 sm:p-7 shadow-sm ring-1 ring-slate-100 dark:bg-[#0A2456] dark:ring-white/10 dark:text-white"
+            className="card mt-4 p-5 sm:p-7"
           >
             {step === 0 && (
               <div className="grid gap-3 sm:grid-cols-2">
-                <div className="rounded-2xl bg-[#FFF8E1] px-3.5 py-2.5 ring-1 ring-[#FFD120] dark:bg-[#FFD120]/10 dark:ring-[#FFD120]/40 sm:col-span-2">
-                  <p className="text-[11px] font-bold uppercase tracking-wide text-slate-500 dark:text-slate-300">Applying as (your account)</p>
-                  <p className="text-sm font-bold">{identityName} · {identityEmail}</p>
+                <div className="rounded-2xl border border-[#FFD120]/60 bg-[#FFF8E1] px-4 py-3 dark:border-[#FFD120]/30 dark:bg-[#FFD120]/10 sm:col-span-2">
+                  <p className="text-[10px] font-bold uppercase tracking-[0.14em] text-[#0B2A6B]/55 dark:text-[#FFD120]/70">Applying as</p>
+                  <p className="mt-0.5 text-sm font-bold text-[#0B2A6B] dark:text-white">{identityName} · {identityEmail}</p>
                 </div>
-                <label className="text-sm font-semibold">Student ID<input className={inputCls} value={form.studentId} onChange={set("studentId")} placeholder="2024-01209" /></label>
-                <label className="text-sm font-semibold">Contact number<input className={inputCls} value={form.phone} onChange={set("phone")} placeholder="09xx-xxx-xxxx" inputMode="tel" /></label>
-                <label className="text-sm font-semibold sm:col-span-2">College
+                <label className="grid gap-1.5 text-[12px] font-semibold text-[var(--ink)]">Student ID<input className={inputCls} value={form.studentId} onChange={set("studentId")} placeholder="2024-01209" /></label>
+                <label className="grid gap-1.5 text-[12px] font-semibold text-[var(--ink)]">Contact number<input className={inputCls} value={form.phone} onChange={set("phone")} placeholder="09xx-xxx-xxxx" inputMode="tel" /></label>
+                <label className="grid gap-1.5 text-[12px] font-semibold text-[var(--ink)] sm:col-span-2">College
                   <select className={inputCls} value={form.college} onChange={setCollege}>
                     <option value="" disabled className="text-slate-900">Select your college</option>
                     {COLLEGES.map((c) => <option key={c.name} value={c.name} className="text-slate-900">{c.name}</option>)}
                   </select>
                 </label>
-                <label className="text-sm font-semibold">Course
+                <label className="grid gap-1.5 text-[12px] font-semibold text-[var(--ink)]">Course
                   <select className={`${inputCls} disabled:opacity-50`} value={form.course} onChange={set("course")} disabled={!form.college}>
                     <option value="" disabled className="text-slate-900">{form.college ? "Select your course" : "Choose a college first"}</option>
                     {collegeCourses.map((c) => <option key={c} value={c} className="text-slate-900">{c}</option>)}
                   </select>
                 </label>
-                <label className="text-sm font-semibold">Year level
+                <label className="grid gap-1.5 text-[12px] font-semibold text-[var(--ink)]">Year level
                   <select className={inputCls} value={form.year} onChange={set("year")}>
                     {["1st Year","2nd Year","3rd Year","4th Year","5th Year"].map((y) => <option key={y} className="text-slate-900">{y}</option>)}
                   </select>
                 </label>
-                <label className="text-sm font-semibold">Parent / Guardian name<input className={inputCls} value={form.guardian} onChange={set("guardian")} placeholder="Full name" /></label>
-                <label className="text-sm font-semibold">Parent / Guardian contact number<input className={inputCls} value={form.guardianContact} onChange={set("guardianContact")} placeholder="09xx-xxx-xxxx" inputMode="tel" /></label>
-                <label className="text-sm font-semibold sm:col-span-2">Home address<input className={inputCls} value={form.address} onChange={set("address")} placeholder="Street, City" /></label>
+                <label className="grid gap-1.5 text-[12px] font-semibold text-[var(--ink)]">Parent / Guardian name<input className={inputCls} value={form.guardian} onChange={set("guardian")} placeholder="Full name" /></label>
+                <label className="grid gap-1.5 text-[12px] font-semibold text-[var(--ink)]">Parent / Guardian contact number<input className={inputCls} value={form.guardianContact} onChange={set("guardianContact")} placeholder="09xx-xxx-xxxx" inputMode="tel" /></label>
+                <label className="grid gap-1.5 text-[12px] font-semibold text-[var(--ink)] sm:col-span-2">Home address<input className={inputCls} value={form.address} onChange={set("address")} placeholder="Street, City" /></label>
               </div>
             )}
 
             {step === 4 && (
               <div className="grid gap-4">
-                <div className="rounded-2xl bg-[#FFF8E1] px-4 py-3 text-[13px] ring-1 ring-[#FFD120] dark:bg-[#FFD120]/10 dark:ring-[#FFD120]/40">
-                  <p className="font-bold">Payment is face-to-face</p>
-                  <p className="mt-0.5 text-xs text-slate-600 dark:text-slate-300">No payment is collected online. Your expected monthly total is shown below — please settle it in person at the Housing Office.</p>
+                <div className="rounded-2xl border border-[#FFD120]/60 bg-[#FFF8E1] px-4 py-3 dark:border-[#FFD120]/30 dark:bg-[#FFD120]/10">
+                  <p className="text-[12px] font-bold text-[#0B2A6B] dark:text-[#FFE9A8]">Payment is face-to-face</p>
+                  <p className="mt-0.5 text-[11px] leading-relaxed text-[#0B2A6B]/70 dark:text-[#FFE9A8]/70">No payment is collected online. Your expected monthly total is shown below — please settle it in person at the Housing Office.</p>
                 </div>
-                <label className="text-sm font-semibold">Term covered
+                <label className="grid gap-1.5 text-[12px] font-semibold text-[var(--ink)]">Term covered
                   <select className={inputCls} value={form.term} onChange={set("term")}>
                     <option className="text-slate-900">1st Sem AY 2026–27</option>
                     <option className="text-slate-900">2nd Sem AY 2026–27</option>
@@ -342,52 +359,52 @@ export default function Apply() {
                   </select>
                 </label>
 
-                <div className="flex items-center justify-between rounded-2xl bg-slate-50 px-3.5 py-3 ring-1 ring-slate-100 dark:bg-white/5 dark:ring-white/10">
-                  <span className="text-sm font-semibold">Dorm rate (every room)</span>
-                  <span className="text-sm font-bold">{formatPeso(BILLING.BASE_RATE)}/mo</span>
+                <div className="flex items-center justify-between rounded-2xl border border-[var(--line)] bg-[var(--surface-2)] px-3.5 py-3">
+                  <span className="text-[12px] font-semibold text-[var(--ink)]">Dorm rate (every room)</span>
+                  <span className="text-sm font-bold text-[var(--ink)]">{formatPeso(BILLING.BASE_RATE)}/mo</span>
                 </div>
 
                 <div>
-                  <p className="flex items-center gap-1.5 text-sm font-semibold"><PlugZap size={15} /> Appliances & gadgets</p>
-                  <p className="mt-0.5 text-xs text-slate-500 dark:text-slate-400">
+                  <p className="flex items-center gap-1.5 text-[12px] font-semibold text-[var(--ink)]"><PlugZap size={15} /> Appliances & gadgets</p>
+                  <p className="mt-1 text-[11px] leading-relaxed text-[var(--muted)]">
                     Laptops, cellphones, and tablets are free but must still be registered. Iron and rice cooker add {formatPeso(BILLING.PER_APPLIANCE)}/mo each.
                   </p>
 
                   <div className="mt-3 grid gap-2 sm:grid-cols-2">
-                    <div className="rounded-2xl bg-slate-50 p-3 ring-1 ring-slate-100 dark:bg-white/5 dark:ring-white/10">
-                      <p className="text-[11px] font-bold uppercase tracking-wide text-slate-500 dark:text-slate-300">Free gadgets</p>
-                      <div className="mt-2 grid gap-2">
+                    <div className="rounded-2xl border border-[var(--line)] bg-[var(--surface-2)] p-3.5">
+                      <p className="text-[10px] font-bold uppercase tracking-[0.14em] text-[var(--muted-soft)]">Free gadgets</p>
+                      <div className="mt-2.5 grid gap-2.5">
                         {FREE_PRESETS.map((p) => (
-                          <label key={p.key} className="flex cursor-pointer items-center justify-between gap-2 text-[13px] font-semibold">
+                          <label key={p.key} className="flex cursor-pointer items-center justify-between gap-2 text-[12px] font-semibold text-[var(--ink)]">
                             <span className="flex items-center gap-2">
                               <input type="checkbox" checked={isPresetChecked(p.key)} onChange={() => togglePreset(p)} className="accent-[#F0BB00]" />
                               {p.label}
                             </span>
-                            <span className="text-xs font-bold text-emerald-600 dark:text-emerald-300">Free</span>
+                            <span className="text-[11px] font-bold text-emerald-600 dark:text-emerald-300">Free</span>
                           </label>
                         ))}
                       </div>
                     </div>
 
-                    <div className="rounded-2xl bg-slate-50 p-3 ring-1 ring-slate-100 dark:bg-white/5 dark:ring-white/10">
-                      <p className="text-[11px] font-bold uppercase tracking-wide text-slate-500 dark:text-slate-300">Paid appliances</p>
-                      <div className="mt-2 grid gap-2">
+                    <div className="rounded-2xl border border-[var(--line)] bg-[var(--surface-2)] p-3.5">
+                      <p className="text-[10px] font-bold uppercase tracking-[0.14em] text-[var(--muted-soft)]">Paid appliances</p>
+                      <div className="mt-2.5 grid gap-2.5">
                         {PAID_PRESETS.map((p) => (
-                          <label key={p.key} className="flex cursor-pointer items-center justify-between gap-2 text-[13px] font-semibold">
+                          <label key={p.key} className="flex cursor-pointer items-center justify-between gap-2 text-[12px] font-semibold text-[var(--ink)]">
                             <span className="flex items-center gap-2">
                               <input type="checkbox" checked={isPresetChecked(p.key)} onChange={() => togglePreset(p)} className="accent-[#F0BB00]" />
                               {p.label}
                             </span>
-                            <span className="text-xs font-bold text-[#0B2A6B] dark:text-[#FFD120]">+{formatPeso(BILLING.PER_APPLIANCE)}/mo</span>
+                            <span className="text-[11px] font-bold text-[var(--ink)] dark:text-[#FFD120]">+{formatPeso(BILLING.PER_APPLIANCE)}/mo</span>
                           </label>
                         ))}
                       </div>
                     </div>
                   </div>
 
-                  <div className="mt-3">
-                    <p className="text-[13px] font-semibold">Other appliance or device</p>
-                    <p className="mt-0.5 text-xs text-slate-500 dark:text-slate-400">
+                  <div className="mt-4">
+                    <p className="text-[12px] font-semibold text-[var(--ink)]">Other appliance or device</p>
+                    <p className="mt-1 text-[11px] leading-relaxed text-[var(--muted)]">
                       Add anything not listed above. The Housing Office will review it and confirm whether it is free or charged.
                     </p>
                     <div className="mt-2 grid gap-2">
@@ -401,69 +418,72 @@ export default function Apply() {
                             {deviceKindLabel(d.kind)}
                           </span>
                           <button type="button" onClick={() => removeDevice(i)} onMouseDown={(e) => e.preventDefault()} aria-label="Remove device"
-                            className="pressable grid h-9 w-9 shrink-0 place-items-center rounded-full bg-slate-100 dark:bg-white/10">
+                            className="pressable grid h-9 w-9 shrink-0 place-items-center rounded-full border border-[var(--line)] bg-[var(--surface)] text-[var(--muted)] hover:text-[var(--ink)]">
                             <X size={15} />
                           </button>
                         </div>
                       ))}
                     </div>
                     <button type="button" onClick={addDevice}
-                      className="pressable mt-2 inline-flex items-center gap-1.5 rounded-full bg-[#0B2A6B]/5 px-4 py-2 text-[13px] font-bold text-[#0B2A6B] dark:bg-white/10 dark:text-white">
+                      className="pressable btn btn-secondary btn-sm mt-2.5">
                       <Plus size={14} /> Add other device
                     </button>
                   </div>
                 </div>
 
-                <div className="rounded-2xl bg-[#0B2A6B] p-4 text-white dark:bg-[#FFD120] dark:text-[#0B2A6B]">
-                  <div className="flex justify-between text-[13px]"><span>Base rate</span><span className="font-bold">{formatPeso(BILLING.BASE_RATE)}</span></div>
-                  <div className="mt-1 flex justify-between text-[13px]"><span>Paid appliances × {applianceCount}</span><span className="font-bold">{formatPeso(applianceCount * BILLING.PER_APPLIANCE)}</span></div>
-                  {pendingCount > 0 && (
-                    <div className="mt-1 flex justify-between text-[13px]"><span>Other items × {pendingCount}</span><span className="font-bold">For review</span></div>
-                  )}
-                  <div className="mt-2 flex justify-between border-t border-white/20 pt-2 text-base font-bold dark:border-[#0B2A6B]/20">
-                    <span>Expected monthly total</span><span>{formatPeso(total)}/mo</span>
+                <div className="rounded-2xl bg-[#0B2A6B] p-5 text-white dark:bg-[#FFD120] dark:text-[#0B2A6B]">
+                  <p className="text-[10px] font-bold uppercase tracking-[0.15em] opacity-65">Expected monthly total</p>
+                  <p className="mt-1 text-3xl font-extrabold tracking-tight">
+                    {formatPeso(total)}<span className="ml-1 text-sm font-semibold opacity-65">/mo</span>
+                  </p>
+                  <div className="mt-3 space-y-1.5 border-t border-white/20 pt-3 text-[12px] opacity-90 dark:border-[#0B2A6B]/20">
+                    <div className="flex justify-between"><span>Base rate</span><span className="font-semibold">{formatPeso(BILLING.BASE_RATE)}</span></div>
+                    <div className="flex justify-between"><span>Paid appliances × {applianceCount}</span><span className="font-semibold">{formatPeso(applianceCount * BILLING.PER_APPLIANCE)}</span></div>
+                    {pendingCount > 0 && (
+                      <div className="flex justify-between"><span>Other items × {pendingCount}</span><span className="font-semibold">For review</span></div>
+                    )}
                   </div>
                 </div>
                 {pendingCount > 0 && (
-                  <p className="text-xs text-slate-500 dark:text-slate-400">Other items are assessed by the Housing Office and are not included in the expected total yet.</p>
+                  <p className="text-[11px] leading-relaxed text-[var(--muted)]">Other items are assessed by the Housing Office and are not included in the expected total yet.</p>
                 )}
-                <label className="flex cursor-pointer items-start gap-2 rounded-2xl bg-slate-50 p-3 text-[13px] ring-1 ring-slate-200 dark:bg-white/5 dark:ring-white/15">
-                  <input type="checkbox" checked={agree} onChange={(e) => setAgree(e.target.checked)} className="mt-1 accent-[#F0BB00]" />
+                <label className="flex cursor-pointer items-start gap-2.5 rounded-2xl border border-[var(--line)] bg-[var(--surface-2)] p-3.5 text-[12px] leading-relaxed text-[var(--ink)]">
+                  <input type="checkbox" checked={agree} onChange={(e) => setAgree(e.target.checked)} className="mt-0.5 accent-[#F0BB00]" />
                   I certify these uploads are true copies. I agree to paperless processing and to the expected monthly total above, and to the Terms of Service and Privacy Policy. I understand payment is made face-to-face at the Housing Office.
                 </label>
-                {err && <p className="text-[13px] font-semibold text-rose-500">{err}</p>}
+                {err && <p className="text-[12px] font-semibold text-rose-500">{err}</p>}
               </div>
             )}
 
             {step === 1 && (
               <div className="grid gap-2">
-                <p className="text-sm font-semibold">Download each form, print it, and sign it. You will upload the signed copies next.</p>
+                <p className="text-[12px] font-semibold text-[var(--ink)]">Download each form, print it, and sign it. You will upload the signed copies next.</p>
                 {TEMPLATE_DOCS.map((d) => {
                   const t = templates.find((r) => r.key === d.key);
                   const ready = !!t?.file_path;
                   return (
-                    <div key={d.key} className="flex items-center gap-3 rounded-2xl bg-slate-50 px-3 py-2.5 ring-1 ring-slate-100 dark:bg-white/5 dark:ring-white/10">
+                    <div key={d.key} className="flex items-center gap-3 rounded-2xl border border-[var(--line)] bg-[var(--surface-2)] px-3.5 py-3">
                       <div className="min-w-0 flex-1">
-                        <p className="text-[13px] font-bold">{d.label}</p>
-                        <p className="text-xs text-slate-400">{ready ? (t.file_name || "Softcopy available") : "Not available yet — check back soon"}</p>
+                        <p className="text-[12px] font-semibold text-[var(--ink)]">{d.label}</p>
+                        <p className="mt-0.5 truncate text-[11px] text-[var(--muted-soft)]">{ready ? (t.file_name || "Softcopy available") : "Not available yet — check back soon"}</p>
                       </div>
                       <button type="button" onClick={() => openTemplate(t || {})} disabled={!ready}
-                        className="pressable inline-flex shrink-0 items-center gap-1 rounded-full bg-[#0B2A6B] px-4 py-2 text-xs font-bold text-[#FFD120] disabled:opacity-30 dark:bg-[#FFD120] dark:text-[#0B2A6B]">
+                        className="pressable btn btn-primary btn-sm shrink-0">
                         <Download size={13} /> Download
                       </button>
                     </div>
                   );
                 })}
-                {err && <p className="text-[13px] font-semibold text-rose-500">{err}</p>}
+                {err && <p className="text-[12px] font-semibold text-rose-500">{err}</p>}
               </div>
             )}
 
             {step === 2 && (
-              <div className="grid gap-4">
-                <p className="-mb-1 text-xs text-slate-500 dark:text-slate-400">Uploads auto-save on this device — you can reload and continue. Use Verify under each file to check you attached the right one.</p>
+              <div className="grid gap-5">
+                <p className="text-[11px] leading-relaxed text-[var(--muted)]">Uploads auto-save on this device — you can reload and continue. Use Verify under each file to check you attached the right one.</p>
                 <div>
-                  <p className="text-sm font-bold">Signed forms ({TEMPLATE_DOCS.filter((d) => files[d.key]).length}/{TEMPLATE_DOCS.length})</p>
-                  <div className="mt-2 grid gap-3">
+                  <p className="text-[12px] font-bold text-[var(--ink)]">Signed forms ({TEMPLATE_DOCS.filter((d) => files[d.key]).length}/{TEMPLATE_DOCS.length})</p>
+                  <div className="mt-2.5 grid gap-3">
                     {TEMPLATE_DOCS.map((d) => (
                       <FileUploader key={d.key} label={d.label} hint="Signed copy — PDF / JPG / PNG, max 5MB"
                         value={files[d.key]} onChange={(v) => handleFileChange(d.key, v)} />
@@ -471,8 +491,8 @@ export default function Apply() {
                   </div>
                 </div>
                 <div>
-                  <p className="text-sm font-bold">Your documents ({UPLOAD_DOCS.filter((d) => files[d.key]).length}/{UPLOAD_DOCS.length})</p>
-                  <div className="mt-2 grid gap-3">
+                  <p className="text-[12px] font-bold text-[var(--ink)]">Your documents ({UPLOAD_DOCS.filter((d) => files[d.key]).length}/{UPLOAD_DOCS.length})</p>
+                  <div className="mt-2.5 grid gap-3">
                     {UPLOAD_DOCS.map((d) => (
                       <FileUploader key={d.key} label={d.label} hint={d.hint}
                         value={files[d.key]} onChange={(v) => handleFileChange(d.key, v)} />
@@ -489,50 +509,50 @@ export default function Apply() {
                     <ClipboardCheck size={18} />
                   </div>
                   <div>
-                    <p className="text-sm font-bold">Review your details</p>
-                    <p className="mt-0.5 text-xs text-slate-500 dark:text-slate-400">Confirm everything below is correct before the final step. Use Edit to fix anything.</p>
+                    <p className="text-[13px] font-bold text-[var(--ink)]">Review your details</p>
+                    <p className="mt-0.5 text-[11px] leading-relaxed text-[var(--muted)]">Confirm everything below is correct before the final step. Use Edit to fix anything.</p>
                   </div>
                 </div>
 
-                <div className="rounded-2xl bg-slate-50 ring-1 ring-slate-100 dark:bg-white/5 dark:ring-white/10">
+                <div className="rounded-2xl border border-[var(--line)] bg-[var(--surface-2)]">
                   <div className="flex items-center justify-between px-4 pt-3">
-                    <p className="text-[11px] font-bold uppercase tracking-wide text-slate-500 dark:text-slate-300">Personal</p>
+                    <p className="text-[10px] font-bold uppercase tracking-[0.14em] text-[var(--muted-soft)]">Personal</p>
                     <button type="button" onClick={() => { setConfirmCorrect(false); setErr(""); setStep(0); }}
-                      className="pressable inline-flex items-center gap-1 rounded-full bg-white px-3 py-1 text-xs font-bold text-[#0B2A6B] shadow-sm ring-1 ring-slate-200 dark:bg-white/10 dark:text-white dark:ring-white/15">
+                      className="pressable btn btn-secondary btn-sm">
                       <Pencil size={12} /> Edit
                     </button>
                   </div>
-                  <dl className="grid gap-x-4 gap-y-2 px-4 py-3 text-[13px] sm:grid-cols-2">
-                    <div><dt className="text-xs text-slate-500 dark:text-slate-400">Full name</dt><dd className="font-semibold">{identityName || "—"}</dd></div>
-                    <div><dt className="text-xs text-slate-500 dark:text-slate-400">Email</dt><dd className="font-semibold break-all">{identityEmail || "—"}</dd></div>
-                    <div><dt className="text-xs text-slate-500 dark:text-slate-400">Student ID</dt><dd className="font-semibold">{form.studentId || "—"}</dd></div>
-                    <div><dt className="text-xs text-slate-500 dark:text-slate-400">Contact number</dt><dd className="font-semibold">{form.phone || "—"}</dd></div>
-                    <div><dt className="text-xs text-slate-500 dark:text-slate-400">College</dt><dd className="font-semibold">{form.college || "—"}</dd></div>
-                    <div><dt className="text-xs text-slate-500 dark:text-slate-400">Course</dt><dd className="font-semibold">{form.course || "—"}</dd></div>
-                    <div><dt className="text-xs text-slate-500 dark:text-slate-400">Year level</dt><dd className="font-semibold">{form.year}</dd></div>
-                    <div><dt className="text-xs text-slate-500 dark:text-slate-400">Parent / Guardian</dt><dd className="font-semibold">{form.guardian || "—"}</dd></div>
-                    <div><dt className="text-xs text-slate-500 dark:text-slate-400">Guardian contact</dt><dd className="font-semibold">{form.guardianContact || "—"}</dd></div>
-                    <div className="sm:col-span-2"><dt className="text-xs text-slate-500 dark:text-slate-400">Home address</dt><dd className="font-semibold">{form.address || "—"}</dd></div>
+                  <dl className="grid gap-x-4 gap-y-2.5 px-4 py-3 text-[12px] sm:grid-cols-2">
+                    <div><dt className="text-[11px] text-[var(--muted-soft)]">Full name</dt><dd className="mt-0.5 font-semibold text-[var(--ink)]">{identityName || "—"}</dd></div>
+                    <div><dt className="text-[11px] text-[var(--muted-soft)]">Email</dt><dd className="mt-0.5 break-all font-semibold text-[var(--ink)]">{identityEmail || "—"}</dd></div>
+                    <div><dt className="text-[11px] text-[var(--muted-soft)]">Student ID</dt><dd className="mt-0.5 font-semibold text-[var(--ink)]">{form.studentId || "—"}</dd></div>
+                    <div><dt className="text-[11px] text-[var(--muted-soft)]">Contact number</dt><dd className="mt-0.5 font-semibold text-[var(--ink)]">{form.phone || "—"}</dd></div>
+                    <div><dt className="text-[11px] text-[var(--muted-soft)]">College</dt><dd className="mt-0.5 font-semibold text-[var(--ink)]">{form.college || "—"}</dd></div>
+                    <div><dt className="text-[11px] text-[var(--muted-soft)]">Course</dt><dd className="mt-0.5 font-semibold text-[var(--ink)]">{form.course || "—"}</dd></div>
+                    <div><dt className="text-[11px] text-[var(--muted-soft)]">Year level</dt><dd className="mt-0.5 font-semibold text-[var(--ink)]">{form.year}</dd></div>
+                    <div><dt className="text-[11px] text-[var(--muted-soft)]">Parent / Guardian</dt><dd className="mt-0.5 font-semibold text-[var(--ink)]">{form.guardian || "—"}</dd></div>
+                    <div><dt className="text-[11px] text-[var(--muted-soft)]">Guardian contact</dt><dd className="mt-0.5 font-semibold text-[var(--ink)]">{form.guardianContact || "—"}</dd></div>
+                    <div className="sm:col-span-2"><dt className="text-[11px] text-[var(--muted-soft)]">Home address</dt><dd className="mt-0.5 font-semibold text-[var(--ink)]">{form.address || "—"}</dd></div>
                   </dl>
                 </div>
 
-                <div className="rounded-2xl bg-slate-50 ring-1 ring-slate-100 dark:bg-white/5 dark:ring-white/10">
+                <div className="rounded-2xl border border-[var(--line)] bg-[var(--surface-2)]">
                   <div className="flex items-center justify-between px-4 pt-3">
-                    <p className="text-[11px] font-bold uppercase tracking-wide text-slate-500 dark:text-slate-300">
+                    <p className="text-[10px] font-bold uppercase tracking-[0.14em] text-[var(--muted-soft)]">
                       Documents · {DOC_TYPES.filter((d) => files[d.key]).length}/{DOC_TYPES.length}
                     </p>
                     <button type="button" onClick={() => { setConfirmCorrect(false); setErr(""); setStep(2); }}
-                      className="pressable inline-flex items-center gap-1 rounded-full bg-white px-3 py-1 text-xs font-bold text-[#0B2A6B] shadow-sm ring-1 ring-slate-200 dark:bg-white/10 dark:text-white dark:ring-white/15">
+                      className="pressable btn btn-secondary btn-sm">
                       <Pencil size={12} /> Edit
                     </button>
                   </div>
-                  <ul className="grid gap-1 px-4 py-3 text-[13px]">
+                  <ul className="grid gap-1.5 px-4 py-3 text-[12px]">
                     {DOC_TYPES.map((d) => {
                       const f = files[d.key];
                       return (
                         <li key={d.key} className="flex items-center justify-between gap-2">
-                          <span className="font-semibold">{d.label}</span>
-                          <span className={`shrink-0 text-xs font-bold ${f ? "text-emerald-600 dark:text-emerald-300" : "text-rose-500"}`}>
+                          <span className="font-semibold text-[var(--ink)]">{d.label}</span>
+                          <span className={`shrink-0 text-[11px] font-bold ${f ? "text-emerald-600 dark:text-emerald-300" : "text-rose-500"}`}>
                             {f ? (f.fileName || f.name || "Attached") : "Missing"}
                           </span>
                         </li>
@@ -541,35 +561,35 @@ export default function Apply() {
                   </ul>
                 </div>
 
-                <div className="rounded-2xl bg-[#FFF8E1] px-4 py-3 text-[13px] ring-1 ring-[#FFD120] dark:bg-[#FFD120]/10 dark:ring-[#FFD120]/40">
-                  <p className="font-bold">What happens next</p>
-                  <p className="mt-0.5 text-xs text-slate-600 dark:text-slate-300">
+                <div className="rounded-2xl border border-[#FFD120]/60 bg-[#FFF8E1] px-4 py-3 dark:border-[#FFD120]/30 dark:bg-[#FFD120]/10">
+                  <p className="text-[12px] font-bold text-[#0B2A6B] dark:text-[#FFE9A8]">What happens next</p>
+                  <p className="mt-1 text-[11px] leading-relaxed text-[#0B2A6B]/70 dark:text-[#FFE9A8]/70">
                     Term ({form.term}) and appliance declaration happen on the final step. Base rate is {formatPeso(BILLING.BASE_RATE)}/mo plus {formatPeso(BILLING.PER_APPLIANCE)}/mo per paid appliance; your expected monthly total is shown there. Laptops, cellphones, and tablets are free; other items are reviewed by the Housing Office. Payment is made face-to-face at the Housing Office.
                     {namedDevices.length > 0 ? ` Currently listed: ${namedDevices.map((d) => `${d.name.trim()} (${deviceKindLabel(d.kind)})`).join(", ")}.` : " No devices listed yet — you can add them next."}
                   </p>
                 </div>
 
-                <label className="flex cursor-pointer items-start gap-2 rounded-2xl bg-slate-50 p-3 text-[13px] ring-1 ring-slate-200 dark:bg-white/5 dark:ring-white/15">
-                  <input type="checkbox" checked={confirmCorrect} onChange={(e) => setConfirmCorrect(e.target.checked)} className="mt-1 accent-[#F0BB00]" />
+                <label className="flex cursor-pointer items-start gap-2.5 rounded-2xl border border-[var(--line)] bg-[var(--surface-2)] p-3.5 text-[12px] leading-relaxed text-[var(--ink)]">
+                  <input type="checkbox" checked={confirmCorrect} onChange={(e) => setConfirmCorrect(e.target.checked)} className="mt-0.5 accent-[#F0BB00]" />
                   I confirm all the details above are correct and I'm ready to submit my application.
                 </label>
-                {err && <p className="text-[13px] font-semibold text-rose-500">{err}</p>}
+                {err && <p className="text-[12px] font-semibold text-rose-500">{err}</p>}
               </div>
             )}
 
-            <div className="mt-6 flex items-center justify-between">
+            <div className="mt-7 flex items-center justify-between gap-3 border-t border-[var(--line)] pt-5">
               <button
                 onClick={() => { setErr(""); setStep((s) => Math.max(0, s - 1)); }} disabled={step === 0}
-                className="pressable inline-flex items-center gap-1.5 rounded-full px-4 py-2.5 text-sm font-semibold text-slate-500 disabled:opacity-30 dark:text-slate-300"
+                className="pressable btn btn-ghost"
               ><ArrowLeft size={15} /> Back</button>
               {step < 4 ? (
                 <button
                   onClick={() => { setErr(""); setStep((s) => s + 1); }}
                   disabled={(step === 0 && !validStep0) || (step === 2 && !validUpload) || (step === 3 && !validReview)}
-                  className="pressable inline-flex items-center gap-1.5 rounded-full bg-[#0B2A6B] px-6 py-2.5 text-sm font-semibold text-white disabled:opacity-40 dark:bg-[#FFD120] dark:text-[#0B2A6B]"
+                  className="pressable btn btn-primary"
                 >Continue <ArrowRight size={15} /></button>
               ) : (
-                <button onClick={submit} disabled={busy} className="pressable rounded-full bg-[#FFD120] px-6 py-2.5 text-sm font-bold text-[#0B2A6B] shadow hover:bg-[#F0BB00] disabled:opacity-50">
+                <button onClick={submit} disabled={busy} className="pressable btn btn-accent">
                   {busy ? "Uploading…" : "Submit application"}
                 </button>
               )}
